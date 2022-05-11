@@ -64,6 +64,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 'Present'::text AS tuorres,
@@ -101,6 +102,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLBSITE",'') is not null then concat("RecordPosition",'-',"NTLBSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 "NTLBYN"::text AS tuorres,
@@ -138,6 +140,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 "NTLBSTAT"::text AS tuorres,
@@ -175,6 +178,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLBSITE",'') is not null then concat("RecordPosition",'-',"TLBSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 "TLBDIM"::text AS tuorres,
@@ -212,6 +216,7 @@ select   distinct		null::text AS comprehendid,
                 "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLSITE",'') is not null then concat("RecordPosition",'-',"TLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 "TLDIM"::text AS tuorres,

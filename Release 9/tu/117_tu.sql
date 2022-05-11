@@ -64,6 +64,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 "TUNUM2"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NLSITE",'') is not null then concat("TUNUM2",'-',"NLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 case when "NLNO"=0 then 'Present'
@@ -103,6 +104,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "TUNUM1"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLSITE",'') is not null then concat("TUNUM1",'-',"NTLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 'Present'::text AS tuorres,
@@ -140,6 +142,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "TUNUM1"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLSITE",'') is not null then concat("TUNUM1",'-',"NTLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 case when "NA"=1 then 'Not Assessed'
@@ -179,6 +182,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "TUNUM"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLSITE",'') is not null then concat("TUNUM",'-',"TLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 "MEASURMT"::text AS tuorres,
@@ -216,6 +220,7 @@ select   distinct		null::text AS comprehendid,
                 "TUNUM"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLSITE",'') is not null then concat("TUNUM",'-',"TLSITE")
+				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 "MEASURMT"::text AS tuorres,

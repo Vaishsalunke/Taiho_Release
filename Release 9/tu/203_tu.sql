@@ -57,7 +57,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								"RecordPosition":: text as tulnkid,
-								concat("RecordPosition",'-',"NLSITE"):: text as tutestcd,
+								case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'Present':: text as tuorres,
 								case when "NLSITE" = 'Other' then "NLSITEOT" else "NLSITE" end:: text as tuloc,
@@ -83,7 +84,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
                                  null::numeric as tuseq,								
                                  "RecordPosition":: text as tulnkid,
-								concat("RecordPosition",'-',"NTLBSITE"):: text as tutestcd,
+								 case when nullif("NTLBSITE",'') is not null then concat("RecordPosition",'-',"NTLBSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								case when "NTLBYN" = 'Yes' then 'Present'
 								     when "NTLBYN" = 'No' then 'Absent' end:: text as tuorres,
@@ -110,7 +112,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								"RecordPosition":: text as tulnkid,
-								concat("RecordPosition",'-',"NTLSITE"):: text as tutestcd,
+								case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"NTLBSTAT":: text as tuorres,
 								case when "NTLSITE" = 'Other' then "NTLSTOT" else "NTLSITE" end:: text as tuloc,
@@ -136,7 +139,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								"RecordPosition":: text as tulnkid,
-								concat("RecordPosition",'-',"TLBSITE"):: text as tutestcd,
+								case when nullif("TLBSITE",'') is not null then concat("RecordPosition",'-',"TLBSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLBDIM":: text as tuorres,
 								case when "TLBSITE" = 'Other' then "TLBSTOT" else "TLBSITE" end:: text as tuloc,
@@ -162,7 +166,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								"RecordPosition":: text as tulnkid,
-								concat("RecordPosition",'-',"TLSITE"):: text as tutestcd,
+								case when nullif("TLSITE",'') is not null then concat("RecordPosition",'-',"TLSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLDIM":: text as tuorres,
 								case when "TLSITE" = 'Other' then "TLSITEOT" else "TLSITE" end:: text as tuloc,

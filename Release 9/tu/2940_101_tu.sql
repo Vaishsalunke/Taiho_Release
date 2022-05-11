@@ -56,7 +56,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								"NLNUM":: text as tulnkid,
-								concat("NLNUM",'-',"NLSITE"):: text as tutestcd,
+								case when nullif("NLSITE",'') is not null then concat("NLNUM",'-',"NLSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'Present':: text as tuorres,
 								"NLSITE":: text as tuloc,
@@ -80,7 +81,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"NTLNUM":: text as tulnkid,
-								concat("NTLNUM",'-',"NTLBSITE"):: text as tutestcd,
+								case when nullif("NTLBSITE",'') is not null then concat("NTLNUM",'-',"NTLBSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'Present':: text as tuorres,
 								"NTLBSITE":: text as tuloc,
@@ -104,7 +106,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"NTLNUM":: text as tulnkid,
-								concat("NTLNUM",'-',"NTLSITE"):: text as tutestcd,
+								case when nullif("NTLSITE",'') is not null then concat("NTLNUM",'-',"NTLSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"NTLBSTAT":: text as tuorres,
 								"NTLSITE":: text as tuloc,
@@ -128,7 +131,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"TLNUM":: text as tulnkid,
-								concat("TLNUM",'-',"TLBSITE"):: text as tutestcd,
+								case when nullif("TLBSITE",'') is not null then concat("TLNUM",'-',"TLBSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLBDIM":: text as tuorres,
 								"TLBSITE":: text as tuloc,
@@ -152,7 +156,8 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"TLNUM":: text as tulnkid,
-								concat("TLNUM",'-',"TLSITE"):: text as tutestcd,
+								case when nullif("TLSITE",'') is not null then concat("TLNUM",'-',"TLSITE")
+				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLDIM":: text as tuorres,
 								"TLSITE":: text as tuloc,
