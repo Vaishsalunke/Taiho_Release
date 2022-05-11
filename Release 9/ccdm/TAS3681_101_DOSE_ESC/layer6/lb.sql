@@ -208,20 +208,20 @@ from(select distinct
                     NULL::text                            AS lbclsig
                 FROM tas3681_101."URIN"
                 CROSS JOIN LATERAL(VALUES
-(nullif("PROT",'')::text,'Urinary Protein',case when UPPER("PROT") = 'OTHER' then "PROTSP"
+('PROT','Urinary Protein',case when UPPER("PROT") = 'OTHER' then "PROTSP"
 end::text,concat("instanceId",14),null),
-(nullif("PROTSP",'')::text,null,"PROTSP"::text,concat("instanceId",26),null),
-(nullif("GLUC",'')::text,'Glucose (Sugar)',case when UPPER("GLUC") = 'OTHER' then "GLUCSP" END::text,concat("instanceId",38),null),
-(nullif("GLUCSP",'')::text,null,"GLUCSP"::text,concat("instanceId",47),null),
-(nullif("UBILI",'')::text,'Urinary Bilirubin',"UBILI"::text,concat("instanceId",54),null),
-(nullif("UKET",'')::text,'Urinary Ketones',"UKET"::text,concat("instanceId",68),null),
-(nullif("ULEK",'')::text,'Urinary Leukocytes',"ULEK"::text,concat("instanceId",79),null),
-(nullif("UNITR",'')::text,'Urinary Nitrite',"UNITR"::text,concat("instanceId",81),null),
-(nullif("UOCCB",'')::text,'Urinary Occult Blood',"UOCCB"::text,concat("instanceId",17),null),
-(nullif("RBC",'')::text,'RBCs (Microscopic)',"RBC"::text,concat("instanceId",25),null),
-(nullif("WBC",'')::text,'WBCs (Microscopic)',"WBC"::text,concat("instanceId",39),null),
-(nullif("USPGRAV"::text,'')::text,'Urine Specific Gravity Density',"USPGRAV"::text,concat("instanceId",41),"USPGRAV"),
-(nullif("PH"::text,'')::text,'PH',"PH"::text,concat("instanceId",59),"PH")
+('PROTSP',null,"PROTSP"::text,concat("instanceId",26),null),
+('GLUC','Glucose (Sugar)',case when UPPER("GLUC") = 'OTHER' then "GLUCSP" END::text,concat("instanceId",38),null),
+('GLUCSP',null,"GLUCSP"::text,concat("instanceId",47),null),
+('UBILI','Urinary Bilirubin',"UBILI"::text,concat("instanceId",54),null),
+('UKET','Urinary Ketones',"UKET"::text,concat("instanceId",68),null),
+('ULEK','Urinary Leukocytes',"ULEK"::text,concat("instanceId",79),null),
+('UNITR','Urinary Nitrite',"UNITR"::text,concat("instanceId",81),null),
+('UOCCB','Urinary Occult Blood',"UOCCB"::text,concat("instanceId",17),null),
+('RBC','RBCs (Microscopic)',"RBC"::text,concat("instanceId",25),null),
+('WBC','WBCs (Microscopic)',"WBC"::text,concat("instanceId",39),null),
+('USPGRAV','Urine Specific Gravity Density',"USPGRAV"::text,concat("instanceId",41),"USPGRAV"),
+('PH','PH',"PH"::text,concat("instanceId",59),"PH")
 
 ) t (lbtestcd,lbtest,lborres,lbseq,lbstresn)
 where lbtestcd is not null and lbtest is not null
