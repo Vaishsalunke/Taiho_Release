@@ -239,12 +239,12 @@ null:: text as epoch,
 null::text as  tudy
 From tas120_204."TL" tl
 )tu
-left join ex_data ex1
-on tu.usubjid= ex1."usubjid"
-left join ex_visit ex2
-on tu.usubjid= ex2."usubjid"
-left join cqs.dm
-on tu.usubjid=dm."usubjid"
+					left join 	ex_data ex1
+					on			tu."study" = ex1."studyid" and tu.siteid=ex1.siteid and tu.usubjid= ex1."usubjid"
+					left join	ex_visit ex2
+					on			tu."study"=ex2."studyid" and tu.siteid = ex2.siteid and tu.usubjid= ex2."usubjid" 
+					left join 	cqs.dm
+					on 		tu."study" = dm."studyid" and tu.siteid = dm.siteid and tu.usubjid=dm."usubjid"
 )
 
 
@@ -286,6 +286,5 @@ SELECT
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;
-
 
 
