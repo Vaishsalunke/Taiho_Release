@@ -36,13 +36,13 @@ WITH included_subjects AS (
 						trstat,
 						trreasnd,
 						trnam,
-						tumethod::text as trmethod,
+						trmethod::text as trmethod,
 						trlobxfl,
 						trblfl,
 						treval,
 						trevalid,
 						tracptfl,
-						tu.visitnum::numeric as visitnum,
+						u.visitnum,
 						u.visit,
 						u.visitdy,
 						u.taetord,
@@ -79,7 +79,7 @@ WITH included_subjects AS (
 									null::text AS treval,
 									'Radiologist'::text AS trevalid,
 									null::text AS tracptfl,
-									null::numeric AS visitnum,-----------------------to be mapped in outer query
+									"RecordPosition"::numeric AS visitnum,-----------------------to be mapped in outer query
 									"FolderName"::text AS visit,
 									null::numeric AS visitdy,
 									null::numeric AS taetord,
@@ -102,8 +102,7 @@ WITH included_subjects AS (
 					
 					) t (trtestcd_1,trtestcd,trstresc,trorres,trstat)
 					) u 
-		left join cqs.tu
-		on u.siteid=tu.siteid and u.usubjid=tu.usubjid and u.trdtc::date=tu.tudtc::date
+		
 		left join cqs.dm 
 		on u.studyid=dm.studyid and u.siteid=dm.siteid and u.usubjid=dm.usubjid
 		left join ex_data ex 
