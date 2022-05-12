@@ -26,27 +26,36 @@ WITH included_subjects AS (
 										,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 										,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 							) ::text AS visit,
-                        'TAS2940'::text AS extrt,
+                        case when lower("EXOADJYN")='yes' then (case when nullif("EXOADJDS",'') is not null then concat("EXOPFREQ",' -TAS2940- ',"EXOADJDS")
+                        else concat("EXOPFREQ",'-TAS2940-','NA') 
+                        
+                        end) when lower("EXOADJYN")='no' then concat("EXOPFREQ",'-TAS2940') end::text AS extrt,
                         'Locally Advanced or Metastatic Solid Tumor Cancer'::text AS excat,
                         null::text AS exscat,
-                        "EXOSDOSE" ::numeric AS exdose,
+                        case when lower("EXOADJYN")='yes' then "EXOSDOSE" 
+                        	 when lower("EXOADJYN")='no'  then "EXOPDOSE"
+                        end ::numeric AS exdose,
                         null::text AS exdostxt,
-                        "EXOSDOSE_Units" ::text AS exdosu,
+                        case when lower("EXOADJYN")='yes' then "EXOSDOSE_Units" 
+                        	 when lower("EXOADJYN")='no'  then "EXOPDOSE_Units"
+                        end ::text AS exdosu,
                         null::text AS exdosfrm,
                         null::text AS exdosfrq,
                         null::numeric AS exdostot,
                         --coalesce("EXOCYCSDT","EXOSTDAT") ::date AS exstdtc,
-						case when "EXOADJYN" = 'Yes' then "EXOSTDAT" else "EXOCYCSDT" end ::date AS exstdtc,
+						case when lower("EXOADJYN") = 'yes' then "EXOSTDAT" else "EXOCYCSDT" end::date AS exstdtc,
                         null::time AS exsttm,
                         null::int AS exstdy,
                         --coalesce("EXOCYCEDT","EXOENDAT") ::date AS exendtc,
-						case when "EXOADJYN" = 'Yes' then "EXOENDAT" else "EXOCYCEDT" end ::date AS exendtc,
+						case when lower("EXOADJYN") = 'yes' then "EXOENDAT" else "EXOCYCEDT" end::date AS exendtc,
                         null::time AS exendtm,
                         null::int AS exendy,
                         null::text AS exdur,
                         null::text AS drugrsp,
                         null::text AS drugrspcd
-                        from TAS2940_101."EXO" exo ),
+                from TAS2940_101."EXO" exo
+                where nullif("EXOADJYN",'') is not null 
+				),
 						
 		site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 
