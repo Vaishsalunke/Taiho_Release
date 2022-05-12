@@ -97,7 +97,7 @@ WITH included_subjects AS (
 					case when lower("ORTLRES")='yes' then 'Completed' else 'Not Completed' end),
 					("ORNTLRES",'Non-Target Lesion Response',"ORNTLRES_STD","ORNTLRES",
 					case when lower("ORNTLYN")='yes' then 'Completed' else 'Not Completed' end),
-					("ORRES",'Overall RECIST Response',"ORRES_STD","ORRES",
+					("ORRES",'Overall RECIST Response',"ORRES_STD",case when "ORRES"='Progressive Disease' then "ORPD" else "ORRES" end,
 					case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end)
 					
 					) t (trtestcd_1,trtestcd,trstresc,trorres,trstat)
@@ -146,6 +146,8 @@ SELECT
     /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum || '~' || tr.trseq)::text  AS objectuniquekey KEY*/ 
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid);
+
+
 
 
 
