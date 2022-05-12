@@ -2,7 +2,6 @@
 CCDM EX mapping
 Notes: Standard mapping to CCDM EX table
 */
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
@@ -27,9 +26,9 @@ WITH included_subjects AS (
                         'Futibatinib'::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
-                        "EXOSDOSE" ::numeric AS exdose,
+                        case when "EXOADJYN" = 'No' then "EXOPDOSE" else "EXOSDOSE" end ::numeric AS exdose,
                         null::text AS exdostxt,
-                        "EXOSDOSE_Units" ::text AS exdosu,
+                       (case when "EXOADJYN" = 'No' then "EXOPDOSE"::text else "EXOPDOSE_Units" ::text end)::text AS exdosu,
                         null::text AS exdosfrm,
                         null::text AS exdosfrq,
                         null::numeric AS exdostot,
@@ -45,6 +44,7 @@ WITH included_subjects AS (
                         null::text AS drugrsp,
                         null::text AS drugrspcd
                         from tas120_204."EXO" exo 
+                         where "EXOADJYN"!= '' 
  union all
  SELECT  distinct project ::text AS studyid,
                         'TAS120_204'::text AS studyname,
@@ -62,27 +62,28 @@ WITH included_subjects AS (
 									   ,'\s\([0-9]\)','')
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
-                        'Binimetinib'::text AS extrt,
+                        case when "EXOADJYN" = 'Yes' then concat('Binimetinib','-',"EXOADJDS") else 'Binimetinib' end ::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
-                        "EXOSDOSE2"::numeric AS exdose,
+                       case when "EXOADJYN" = 'No' then "EXOPDOSE2" else "EXOSDOSE2" end ::numeric AS exdose,
                         null::text AS exdostxt,
-                        "EXOSDOSE2_Units"::text AS exdosu,
+                        (case when "EXOADJYN" = 'No' then "EXOPDOSE2"::text else "EXOPDOSE2_Units"::text end) ::text AS exdosu,
                         null::text AS exdosfrm,
                         null::text AS exdosfrq,
                         null::numeric AS exdostot,
                        -- coalesce("EXOCYCSDT","EXOSTDAT")::date AS exstdtc,
-					   case when "EXOADJYN" = 'Yes' then "EXOSTDAT" else "EXOCYCSDT" end ::date AS exstdtc,
+					   case when "EXOADJYN" = 'No' then "EXOCYCSDT" else "EXOSTDAT" end ::date AS exstdtc,
                         null::time AS exsttm,
                         null::int AS exstdy,
                         --"EXOENDAT"::date AS exendtc,
-						case when "EXOADJYN" = 'Yes' then "EXOENDAT" else "EXOCYCEDT" end ::date AS exendtc,
+						case when "EXOADJYN" = 'No' then "EXOCYCEDT" else "EXOENDAT" end ::date AS exendtc,
                         null::time AS exendtm,
                         null::int AS exendy,
                         null::text AS exdur,
                         null::text AS drugrsp,
                         null::text AS drugrspcd
-                        from tas120_204."EXO2" exo2),
+                        from tas120_204."EXO2" exo2
+                         where "EXOADJYN"!= ''),
 						
 	site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 
@@ -114,11 +115,12 @@ SELECT
         ex.exdur::text AS exdur,
         ex.drugrsp::text AS drugrsp,
         ex.drugrspcd::text AS drugrspcd
-       /*KEY , (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey KEY*/
+       , (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey 
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM ex_data ex
 JOIN included_subjects s ON (ex.studyid = s.studyid AND ex.siteid = s.siteid AND ex.usubjid = s.usubjid)
 join site_data sd on (ex.studyid = sd.studyid AND ex.siteid = sd.siteid);
+
 
 
 
