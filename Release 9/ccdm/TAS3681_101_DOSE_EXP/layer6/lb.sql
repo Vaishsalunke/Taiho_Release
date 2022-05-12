@@ -215,13 +215,13 @@ end::text,concat("instanceId",14),null),
 ('GLUCSP',null,"GLUCSP"::text,concat("instanceId",47),null),
 ('UBILI','Urinary Bilirubin',"UBILI"::text,concat("instanceId",54),null),
 ('UKET','Urinary Ketones',"UKET"::text,concat("instanceId",68),null),
-('ULEK','Urinary Leukocytes',"ULEK"::text,concat("instanceId",79),null),
+('ULEK','Urinary Leukocytes',"ULEK"::text,concat("instanceId",799),null),
 ('UNITR','Urinary Nitrite',"UNITR"::text,concat("instanceId",81),null),
 ('UOCCB','Urinary Occult Blood',"UOCCB"::text,concat("instanceId",17),null),
 ('RBC','RBCs (Microscopic)',"RBC"::text,concat("instanceId",25),null),
 ('WBC','WBCs (Microscopic)',"WBC"::text,concat("instanceId",31),null),
 ('USPGRAV','Urine Specific Gravity Density',"USPGRAV"::text,concat("instanceId",41),"USPGRAV"),
-('PH','PH',"PH"::text,concat("instanceId",59),"PH")
+('PH','PH',"PH"::text,concat("instanceId",599),"PH")
 
 ) t (lbtestcd,lbtest,lborres,lbseq,lbstresn)
 where lbtestcd is not null and lbtest is not null
