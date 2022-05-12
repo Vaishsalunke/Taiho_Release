@@ -244,11 +244,11 @@ select   distinct		null::text AS comprehendid,
 from tas0612_101."TL" TL
 )tu
 left join ex_data ex
-on tu.usubjid=ex.usubjid
+on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
 left join cqs.dm
-on tu.usubjid=dm.usubjid
+on tu.studyid=dm.studyid and tu.siteid=dm.siteid and tu.usubjid=dm.usubjid
 left join ex_visit exv
-on tu.usubjid=exv.usubjid
+on tu.studyid=exv.studyid and tu.siteid=exv.siteid and tu.usubjid=exv.usubjid
 
                 )
 
