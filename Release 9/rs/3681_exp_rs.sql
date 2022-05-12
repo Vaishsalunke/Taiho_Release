@@ -120,7 +120,7 @@ WITH included_subjects AS (
 									("ORTLRES",'TRGRESP','Target Response',"ORTLRES",
 									"ORTLRES_STD",case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
 									("ORNTLRES",'NTRGRESP','Non-Target Response',"ORNTLRES",
-									"ORNTLRES_STD",null),
+									"ORNTLRES_STD",case when nullif("ORNTLRES",'') is not null then 'Completed' else 'Not Completed' end),
 									("ORRES",'OVRLRESP','Overall Response',"ORRES",
 									"ORRES_STD",case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end)
 					
