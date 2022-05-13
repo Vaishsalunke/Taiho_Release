@@ -17,7 +17,9 @@ WITH included_subjects AS (
 				 
 				 ),				
 				
-    rs_data AS (
+    rs_data AS ( select *, case when rsdtc1::date-prev_visit_date::date is not null then concat((rsdtc1::date-prev_visit_date::date)::numeric,' Days') 					   
+    					   end::text AS rsevlint
+    			 from(
         select distinct rs.comprehendid,
 						rs.studyid,
 						rs.siteid,
@@ -51,19 +53,22 @@ WITH included_subjects AS (
 						visitdy,
 						taetord,
 						dm.arm::text as epoch,
-						rsdtc::date as rsdtc,
+						to_char(rsdtc::date,'DD-MM-YYYY') as rsdtc,
 						(rsdtc::date - ex_dt::date)+1::numeric as rsdy,
 						rstpt,
 						rstptnum,
 						rseltm,
 						rstptref,
 						rsrftdtc,
-						rsevlint,
+						--rsevlint,
 						rsevintx,
 						rsstrtpt,
 						rssttpt,
 						rsenrtpt,
 						rsentpt
+						,rsdtc::date as rsdtc1
+						,lag(rsdtc::date)over(partition by rs.siteid,rs.usubjid order by rsdtc::date) as prev_visit_date
+
 
 		from(
 				SELECT  null::text AS comprehendid,
@@ -133,7 +138,7 @@ WITH included_subjects AS (
 		left join ex_visit exv
 		on rs.studyid=exv.studyid and rs.siteid=exv.siteid and rs.usubjid=exv.usubjid
 					
-                )
+                )rs)
 
 SELECT
     /*KEY (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid)::text AS comprehendid, KEY*/  

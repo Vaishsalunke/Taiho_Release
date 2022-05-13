@@ -19,7 +19,8 @@ WITH included_subjects AS (
 				 where visit like '%Cycle 01' and exdose is not null							 			 
 				),
 				
-    rs_data AS (
+    rs_data AS ( select *,case when rsdtc1::date-prev_visit_date::date is not null then concat((rsdtc1::date-prev_visit_date::date)::numeric,' Days') 					   end::text AS rsevlint
+    			 from(
         select distinct u.studyid,
                         u.siteid,
 						u.usubjid,						
@@ -52,19 +53,21 @@ WITH included_subjects AS (
 						null as visitdy,
 						null as taetord,
 						dm.arm::text as epoch,
-						rsdtc::date as rsdtc,
+						to_char(rsdtc::date,'DD-MM-YYYY') as rsdtc,
 						(u.rsdtc::date - ex.ex_dt::date)+1::numeric as rsdy,
 						null as rstpt,
 						rstptnum,
 						null as rseltm,
 						rstptref,
 						null as rsrftdtc,
-						rsevlint,
+						--null as rsevlint,
 						null as rsevintx,
 						null as rsstrtpt,
 						null as rssttpt,
 						null as rsenrtpt,
 						null as rsentpt
+						,rsdtc::date as rsdtc1
+						,lag(rsdtc::date)over(partition by u.siteid,u.usubjid order by rsdtc::date) as prev_visit_date
 		        from
 				(
 					select distinct	project::text AS studyid,
@@ -78,16 +81,12 @@ WITH included_subjects AS (
 									rsstresc::text AS rsstresc,
 									rsstat::text AS rsstat,									
 									"FolderName"::text AS visit,									
-									Or1."ORDAT"::text AS rsdtc,									
-									cast(or2."ORDAT"::date - or1."ORDAT"::date as int)::text AS rsevlint,
+									"ORDAT"::text AS rsdtc,									
+									null::text AS rsevlint,
 									0::numeric AS rstptnum,
 									'Unknown'::text AS rstptref
 				 from tas117_201."OR" or1
-				 left join 
-				 
-				(select "Subject","ORDAT",lead("ORDAT",1)over(partition by "Subject" order by "ORDAT") as ORDAT from tas117_201."OR")or2  
-			    ON or1."Subject"=or2."Subject" AND or1."ORDAT"=or2."ORDAT"
-					
+				 					
 					CROSS JOIN LATERAL(VALUES
 					("ORRES",'OVRLRESP','Overall Response', case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
 					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
@@ -128,7 +127,7 @@ WITH included_subjects AS (
 		on u.studyid=ex.studyid and u.siteid=ex.siteid and u.usubjid=ex.usubjid
 		left join ex_data1 ex1
 		on u.studyid=ex1.studyid and u.siteid=ex1.siteid and u.usubjid=ex1.usubjid
-                )
+                )rs)
 
 SELECT
     /*KEY (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid)::text AS comprehendid, KEY*/  

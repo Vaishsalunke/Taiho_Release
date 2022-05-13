@@ -18,7 +18,10 @@ WITH included_subjects AS (
 				 where visit like '%Cycle 01' and exdose is not null
 				),	
    
-	rs_data AS (
+	rs_data AS ( select *,case when rsdtc1::date-prev_visit_date::date is not null then concat((rsdtc1::date-prev_visit_date::date)::numeric,' Days') 					   
+    					   end::text AS rsevlint
+    			 from(	
+	
 				SELECT  DISTINCT
                 project::text AS studyid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
@@ -52,19 +55,21 @@ WITH included_subjects AS (
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 dm."arm"::text AS epoch,
-                ("ORDAT"::date)::text AS rsdtc,
+                to_char("ORDAT"::date,'DD-MM-YYYY')  AS rsdtc,
                 ("ORDAT"::date - b.ex_mindt_visit::date)+1::numeric  AS rsdy,
                 null::text AS rstpt,
                 0::numeric::numeric AS rstptnum,
                 null::text AS rseltm,
                 'Unknown'::text AS rstptref,
                 null::text AS rsrftdtc,
-                null::text AS rsevlint,
+                --null::text AS rsevlint,
                 null::text AS rsevintx,
                 null::text AS rsstrtpt,
                 null::text AS rssttpt,
                 null::text AS rsenrtpt,
                 null::text AS rsentpt
+                ,"ORDAT"::date AS rsdtc1
+                ,lag("ORDAT"::date)over(partition by concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT"::date) as prev_visit_date
 			from tas120_204."OR"
 						
 						CROSS JOIN LATERAL(values 
@@ -80,7 +85,7 @@ WITH included_subjects AS (
 		on project = a.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = a.siteid and "Subject" = a.usubjid
 		left join ex_visit b 
 		on project = b.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = b.siteid and "Subject" = b.usubjid
-)
+)rs)
 
 SELECT
     /*KEY (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid)::text AS comprehendid, KEY*/  
