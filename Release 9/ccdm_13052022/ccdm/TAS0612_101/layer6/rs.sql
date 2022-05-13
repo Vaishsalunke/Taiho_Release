@@ -18,7 +18,8 @@ WITH included_subjects AS (
 				 where visit like '%Cycle 01' and exdose is not null							 			 
 				),
 				
-    rs_data AS (
+    rs_data AS (select *,case when rsdtc1::date-prev_visit_date::date is not null then concat((rsdtc1::date-prev_visit_date::date)::numeric,' Days') end::text AS rsevlint
+    			 from(
         select distinct u.studyid,
                         u.siteid,
 						u.usubjid,						
@@ -51,19 +52,21 @@ WITH included_subjects AS (
 						null as visitdy,
 						null as taetord,
 						dm.arm::text as epoch,
-						u.rsdtc::date as rsdtc,
+						to_char(rsdtc::date,'DD-MM-YYYY') as rsdtc,
 						(u.rsdtc::date - ex.ex_dt::date)+1::numeric as rsdy,
 						null as rstpt,
 						0 as rstptnum,
 						null as rseltm,
 						'Unknown' as rstptref,
 						null as rsrftdtc,
-						rsevlint,
+						--rsevlint,
 						null as rsevintx,
 						null as rsstrtpt,
 						null as rssttpt,
 						null as rsenrtpt,
 						null as rsentpt
+						,rsdtc::date as rsdtc1
+						,lag(rsdtc::date)over(partition by u.siteid,u.usubjid order by rsdtc::date) as prev_visit_date
 		        from
 				(
 					select distinct	project::text AS studyid,
@@ -118,7 +121,7 @@ WITH included_subjects AS (
 		on u.studyid=ex.studyid and u.siteid=ex.siteid and u.usubjid=ex.usubjid
 		left join ex_data1 ex1
 		on u.studyid=ex1.studyid and u.siteid=ex1.siteid and u.usubjid=ex1.usubjid
-                )
+               )rs)  
 
 SELECT
     /*KEY (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid)::text AS comprehendid, KEY*/  
