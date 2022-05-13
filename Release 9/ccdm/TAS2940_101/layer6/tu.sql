@@ -14,13 +14,14 @@ WITH included_subjects AS (
 	ex_visit as (
 				 select 	studyid,siteid,usubjid,visit,exstdtc
 				 from 		cqs.ex
-				 where 		visit like '%Cycle 1 Day 1' 
+				 where 		visit like '%Cycle 01' 
 				 and 		exdose is not null	
-				 ),
+				),
     tu_data AS (
+    
         SELECT  distinct Study::text AS studyid,
-                SiteNumber::text AS siteid,
-                Subject::text AS usubjid,
+        		Study || '_' || split_part(SiteNumber,'_',2) ::text AS siteid,
+        		Subject::text AS usubjid,
                 ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
@@ -42,20 +43,20 @@ WITH included_subjects AS (
                 null::text AS tueval,
                 tuevalid::text AS tuevalid,
                 null::text AS tuacptfl,
-                visitnum::numeric AS visitnum,
+                ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric AS visitnum,
                 tu.visit::text AS visit,
                 Null::numeric AS visitdy,
                 null::numeric AS taetord,
                 epoch::text AS epoch,
-                tudtc::text AS tudtc,
-                (DATE_PART('day',tudtc::timestamp - e2.exstdtc::timestamp):: numeric) +1::numeric AS tudy
+                tudtc::text AS tudtc
+               ,(DATE_PART('day',tudtc::timestamp - e2.exstdtc::timestamp):: numeric) +1::numeric AS tudy
 		FROM	(
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 		"project":: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
-								case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
+								"NLNUM":: text as tulnkid,
+								case when nullif("NLSITE",'') is not null then concat("NLNUM",'-',"NLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'Present':: text as tuorres,
@@ -64,73 +65,73 @@ WITH included_subjects AS (
 								null::text as tulobxfl,
 								'N':: text as tublfl,
 								'Radiologist':: text as tuevalid,
-								"RecordPosition":: numeric as visitnum,
+								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NLIMGDAT":: date as tudtc,
+								"NLDAT":: date as tudtc,
 								null::text as  tudy
-					From 		tas3681_101."NL" nl
+					From 		tas2940_101."NL" nl
 					left join 	cqs.dm
 					on 			nl."Subject"=dm."usubjid"
 										
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 		"project":: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
-								case when nullif("NTLBSITE",'') is not null then concat("RecordPosition",'-',"NTLBSITE")
+								"NTLNUM":: text as tulnkid,
+								case when nullif("NTLBSITE",'') is not null then concat("NTLNUM",'-',"NTLBSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
-								"NTLBYN":: text as tuorres,
+								'Present':: text as tuorres,
 								"NTLBSITE":: text as tuloc,
 								case when "NTLBMETH"='Other' then "NTLBOTH" else "NTLBMETH" end:: Text as tumethod,
 								null::text as tulobxfl,
 								'Y':: text as tublfl,
 								'Radiologist':: text as tuevalid,
-								"RecordPosition":: numeric as visitnum,
+								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								"NTLBDAT":: date as tudtc,
 								null::text as  tudy
-					From 		tas3681_101."NTLB" ntlb
+					From 		tas2940_101."NTLB" ntlb
 					left join 	cqs.dm
 					on 			ntlb."Subject"=dm."usubjid"
 										
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 		"project":: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
-								case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
+								"NTLNUM":: text as tulnkid,
+								case when nullif("NTLSITE",'') is not null then concat("NTLNUM",'-',"NTLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
-								"NTLYN":: text as tuorres,
+								"NTLBSTAT":: text as tuorres,
 								"NTLSITE":: text as tuloc,
 								case when "NTLMETH"='Other' then "NTLOTH" else "NTLMETH" end:: Text as tumethod,
 								null::text as tulobxfl,
 								'N':: text as tublfl,
 								'Radiologist':: text as tuevalid,
-								"RecordPosition":: numeric as visitnum,
+								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								"NTLDAT":: date as tudtc,
 								null::text as  tudy
-					From 		tas3681_101."NTL" ntl
+					From 		tas2940_101."NTL" ntl
 					left join 	cqs.dm
 					on 			ntl."Subject"=dm."usubjid"
 									
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 		"project":: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
-								case when nullif("TLBSITE",'') is not null then concat("RecordPosition",'-',"TLBSITE")
+								"TLNUM":: text as tulnkid,
+								case when nullif("TLBSITE",'') is not null then concat("TLNUM",'-',"TLBSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLBDIM":: text as tuorres,
@@ -139,23 +140,23 @@ WITH included_subjects AS (
 								null::text as tulobxfl,
 								'Y':: text as tublfl,
 								'Radiologist':: text as tuevalid,
-								"RecordPosition":: numeric as visitnum,
+								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								"TLBDAT":: date as tudtc,
 								null::text as  tudy
-					From 		tas3681_101."TLB" tlb
+					From 		tas2940_101."TLB" tlb
 					left join 	cqs.dm
 					on 			tlb."Subject"=dm."usubjid"
 									
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 		"project":: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
-								case when nullif("TLSITE",'') is not null then concat("RecordPosition",'-',"TLSITE")
+								"TLNUM":: text as tulnkid,
+								case when nullif("TLSITE",'') is not null then concat("TLNUM",'-',"TLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLDIM":: text as tuorres,
@@ -164,12 +165,12 @@ WITH included_subjects AS (
 								null::text as tulobxfl,
 								'N':: text as tublfl,
 								'Radiologist':: text as tuevalid,
-								"RecordPosition":: numeric as visitnum,
+								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								"TLDAT":: date as tudtc,
 								null::text as  tudy
-					From 		tas3681_101."TL" tl
+					From 		tas2940_101."TL" tl
 					left join 	cqs.dm
 					on 			tl."Subject"=dm."usubjid"
 					
@@ -178,6 +179,7 @@ WITH included_subjects AS (
 		on			tu.Subject= e1.usubjid
 		left join	ex_visit e2
 		on			tu.Subject= e2.usubjid
+		
 		)
 
 SELECT
@@ -211,9 +213,9 @@ SELECT
     tu.visitdy::numeric AS visitdy,
     tu.taetord::numeric AS taetord,
     tu.epoch::text AS epoch,
-    tu.tudtc::text AS tudtc,
-    tu.tudy::numeric AS tudy
-    /*KEY, (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid || '~' || tu.tuseq )::text  AS objectuniquekey KEY*/
+    tu.tudtc::text AS tudtc
+    ,tu.tudy::numeric AS tudy
+    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid || '~' || tu.tuseq )::text  AS objectuniquekey KEY*/ 
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid);
 

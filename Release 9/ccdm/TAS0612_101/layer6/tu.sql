@@ -4,7 +4,8 @@ Notes: Standard mapping to CCDM TU table
 */
 
 WITH included_subjects AS (
-                SELECT DISTINCT studyid, siteid, usubjid FROM subject),
+                SELECT DISTINCT studyid, siteid, usubjid FROM subject
+                ),
 				
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
@@ -14,9 +15,9 @@ WITH included_subjects AS (
 	ex_visit as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
 				 from cqs.ex
-				 where visit like '%Day 1 Cycle 01' and exdose is not null
+				 where visit like '%Cycle 01' and exdose is not null
 				 
-				 ),			
+				 ),		
     tu_data AS (
         SELECT distinct
 		tu.comprehendid,
@@ -44,7 +45,7 @@ WITH included_subjects AS (
         tu.tueval,
         tu.tuevalid,
         tu.tuacptfl,
-        tu.visitnum,
+        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as visitnum,
         tu.visit,
         tu.visitdy,
         tu.taetord,
@@ -55,24 +56,21 @@ FROM (
 
 SELECT  	distinct	null::text AS comprehendid,
                 project::text AS studyid,
-                concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
                 "Subject"::text AS usubjid,
                 null::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "TUNUM2"::text AS tulnkid,
+                "NLNUM"::text AS tulnkid,
                 null::text AS tulnkgrp,
-                case when nullif("NLSITE",'') is not null then concat("TUNUM2",'-',"NLSITE")
-				else 'NA'
-                end::text AS tutestcd,
+                case when nullif("NLSITE",'') is not null then concat("NLNUM",'-',"NLSITE")
+				else 'NA' end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
-                case when "NLNO"=0 then 'Present'
-                	 else 'Absent'
-                end::text AS tuorres,
+                'Present'::text AS tuorres,
                 null::text AS tustresc,
                 null::text AS tunam,
-                case when "NLSITE"='29-Other' then "NLOTHST" else "NLSITE" end::text AS tuloc,
+                "NLSITE"::text AS tuloc,
                 null::text AS tulat,
                 null::text AS tudir,
                 null::text AS tuportot,
@@ -82,168 +80,168 @@ SELECT  	distinct	null::text AS comprehendid,
                 null::text AS tueval,
                 'Radiologist'::text AS tuevalid,
                 null::text AS tuacptfl,
-                "TUNUM2"::numeric AS visitnum,
+                null::numeric AS visitnum,
                 nl."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                -- dm.arm::text AS epoch,
                 nl."NLDAT"::text AS tudtc
                 --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas117_201."NL" nl
+from tas0612_101."NL" nl
 
 union all
 
 SELECT  distinct		null::text AS comprehendid,
                 project::text AS studyid,
-                concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
                 "Subject"::text AS usubjid,
                 null::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "TUNUM1"::text AS tulnkid,
+                "NTLSNUM"::text AS tulnkid,
                 null::text AS tulnkgrp,
-                case when nullif("NTLSITE",'') is not null then concat("TUNUM1",'-',"NTLSITE")
+                case when nullif("NTLSITE",'') is not null then concat("NTLSNUM",'-',"NTLSITE")
 				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
-                'Present'::text AS tuorres,
+                case when lower("NTLBYN")='yes' then 'Present' 
+					 when lower("NTLBYN")='no'  then  'Absent' 
+				end::text AS tuorres,
                 null::text AS tustresc,
                 null::text AS tunam,
-                case when "NTLSITE"='29-Other' then "TLOTHSP" else "NTLSITE" end::text AS tuloc,
+                "NTLSITE"::text AS tuloc,
                 null::text AS tulat,
                 null::text AS tudir,
                 null::text AS tuportot,
-                case when lower("TUMETH1")='other' then "EVALOTHSP" else "TUMETH1" end::text AS tumethod,
+                case when lower("NTLBMETH")='other' then "NTLBOTH" else "NTLBMETH" end::text AS tumethod,
                -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 'Y'::text AS tublfl,
                 null::text AS tueval,
                 'Radiologist'::text AS tuevalid,
                 null::text AS tuacptfl,
-                "TUNUM1"::numeric AS visitnum,
+                null::numeric AS visitnum,
                 ntlb."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                "TUSTDT"::text AS tudtc
+                ntlb."NTLBDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas117_201."NTLBASE" ntlb
+from tas0612_101."NTLB" ntlb
 
 union all 
 
 SELECT  distinct		null::text AS comprehendid,
                 project::text AS studyid,
-                concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
                 "Subject"::text AS usubjid,
                 null::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "TUNUM1"::text AS tulnkid,
+                "NTLSNUM"::text AS tulnkid,
                 null::text AS tulnkgrp,
-                case when nullif("NTLSITE",'') is not null then concat("TUNUM1",'-',"NTLSITE")
+                case when nullif("NTLSITE",'') is not null then concat("NTLSNUM",'-',"NTLSITE")
 				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
-                case when "NA"=1 then 'Not Assessed'
-                	 when "NA"=0 or "NA" is null then 'Assessed'
-                end::text AS tuorres,
+                "NTLBSTAT"::text AS tuorres,
                 null::text AS tustresc,
                 null::text AS tunam,
-                case when "NTLSITE"='29-Other' then "TLOTHSP" else "NTLSITE" end::text AS tuloc,
+                "NTLSITE"::text AS tuloc,
                 null::text AS tulat,
                 null::text AS tudir,
                 null::text AS tuportot,
-                case when lower("TUMETH1")='other' then "EVALOTHSP" else "TUMETH1" end::text AS tumethod,
+                case when lower("NTLMETH")='other' then "NTLOTH" else "NTLMETH" end::text AS tumethod,
                -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 'N'::text AS tublfl,
                 null::text AS tueval,
                 'Radiologist'::text AS tuevalid,
                 null::text AS tuacptfl,
-                "TUNUM1"::numeric AS visitnum,
+                null::numeric AS visitnum,
                 ntl."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                "TUSTDT"::text AS tudtc
+                ntl."NTLDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas117_201."NTLPB" ntl
+from tas0612_101."NTL" ntl
 
 union all 
 
 SELECT  distinct		null::text AS comprehendid,
                 project::text AS studyid,
-                concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
                 "Subject"::text AS usubjid,
                 null::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "TUNUM"::text AS tulnkid,
+                "LSNUM"::text AS tulnkid,
                 null::text AS tulnkgrp,
-                case when nullif("TLSITE",'') is not null then concat("TUNUM",'-',"TLSITE")
+                case when nullif("TLSITE",'') is not null then concat("LSNUM",'-',"TLSITE")
 				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
-                "MEASURMT"::text AS tuorres,
+                "TLBDIM"::text AS tuorres,
                 null::text AS tustresc,
                 null::text AS tunam,
-                case when "TLSITE"='27-Other' then "TLOTHSP" else "TLSITE" end::text AS tuloc,
+                "TLSITE"::text AS tuloc,
                 null::text AS tulat,
                 null::text AS tudir,
                 null::text AS tuportot,
-                case when lower("TUMETH1")='other' then "EVALOTHSP" else "TUMETH1" end::text AS tumethod,
+                case when lower("TLBMETH")='other' then "TLBOTH" else "TLBMETH" end::text AS tumethod,
                -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
-                'N'::text AS tublfl,
+                'Y'::text AS tublfl,
                 null::text AS tueval,
                 'Radiologist'::text AS tuevalid,
                 null::text AS tuacptfl,
-                "TUNUM"::numeric AS visitnum,
-                TL."FolderName"::text AS visit,
+                null::numeric AS visitnum,
+                TLB."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                "TUSTDT"::text AS tudtc
+                TLB."TLBDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas117_201."TLRN2" TL
+from tas0612_101."TLB" TLB
 
 union all 
 
 select   distinct		null::text AS comprehendid,
                 project::text AS studyid,
-                concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
                 "Subject"::text AS usubjid,
                 null::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "TUNUM"::text AS tulnkid,
+                "LSNUM"::text AS tulnkid,
                 null::text AS tulnkgrp,
-                case when nullif("TLSITE",'') is not null then concat("TUNUM",'-',"TLSITE")
+                case when nullif("TLSITE",'') is not null then concat("LSNUM",'-',"TLSITE")
 				else 'NA'
                 end::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
-                "MEASURMT"::text AS tuorres,
+                "TLDIM"::text AS tuorres,
                 null::text AS tustresc,
                 null::text AS tunam,
-                case when "TLSITE"='27-Other' then "TLOTHSP" else "TLSITE" end::text AS tuloc,
+                "TLSITE"::text AS tuloc,
                 null::text AS tulat,
                 null::text AS tudir,
                 null::text AS tuportot,
-                case when lower("TUMETH4")='other' then "EVALOTHSP" else "TUMETH4" end::text AS tumethod,
+                case when lower("TLMETH")='other' then "TLOTH" else "TLMETH" end::text AS tumethod,
                -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
-                'Y'::text AS tublfl,
+                'N'::text AS tublfl,
                 null::text AS tueval,
                 'Radiologist'::text AS tuevalid,
                 null::text AS tuacptfl,
-                "TUNUM"::numeric AS visitnum,
-                TLB."FolderName"::text AS visit,
+                null::numeric AS visitnum,
+                TL."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                "TUSTDT"::text AS tudtc
+                TL."TLDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas117_201."TLPB" TLB
+from tas0612_101."TL" TL
 )tu
 left join ex_data ex
 on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
@@ -287,7 +285,7 @@ SELECT
     tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc,
     tu.tudy::numeric AS tudy
-    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid ||'~' || tu.tuseq)::text  AS objectuniquekey KEY*/
+    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid|| '~' || tu.tuseq )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;

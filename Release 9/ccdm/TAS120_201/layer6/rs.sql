@@ -15,7 +15,7 @@ WITH included_subjects AS (
 	ex_data as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_dt
 				 from cqs.ex
-				 where visit like '%Cycle 01' and exdose is not null							 			 
+				 where visit like '%Cycle 1 Day 1' and exdose is not null							 			 
 				),
 				
     rs_data AS (
@@ -43,10 +43,10 @@ WITH included_subjects AS (
 						case when u.rsdtc::date <= ex1.ex_mindt then 'Y' else 'N' end::text AS rslobxfl,
 						null as rsblfl,
 						null as rsdrvfl,
-						null as rseval,
-						null as rsevalid,
+						'Unknown' as rseval,
+						concat('Unknown',row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc)) as rsevalid,
 						null as rsacptfl,
-						u.visitnum,
+						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as visitnum,
 						u.visit,
 						null as visitdy,
 						null as taetord,
@@ -54,9 +54,9 @@ WITH included_subjects AS (
 						rsdtc,
 						(u.rsdtc::date - ex.ex_dt::date)+1::numeric as rsdy,
 						null as rstpt,
-						null as rstptnum,
+						0 as rstptnum,
 						null as rseltm,
-						null as rstptref,
+						'Unknown' as rstptref,
 						null as rsrftdtc,
 						rsevlint,
 						null as rsevintx,
@@ -67,7 +67,7 @@ WITH included_subjects AS (
 		        from
 				(
 					select distinct	project::text AS studyid,
-									concat('TAS0612_101_',split_part("SiteNumber",'_',2))::text AS siteid,
+									"SiteNumber"::text AS siteid,
 									"Subject"::text AS usubjid,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
@@ -75,24 +75,24 @@ WITH included_subjects AS (
 									rsorres::text AS rsorres,
 									rsstresc::text AS rsstresc,
 									rsstat::text AS rsstat,									
-									concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
+									--concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
 									"FolderName"::text AS visit,									
 									"ORDAT"::text AS rsdtc,									
 									null::text AS rsevlint														
-				 from tas0612_101."OR"
-					
+				 from tas120_201."OR"
+					ORRES_STD
 					CROSS JOIN LATERAL(VALUES
-					("ORRES",'OVRLRESP','Overall Response', case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
-					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
+					("ORRES",'OVRLRESP','Overall Response', "ORRES", "ORRES_STD", case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
+					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when "ORTLRES" = 'Yes' then 'Completed' else 'Not Completed' end),
 					("ORNTLRES", 'NTRGRESP','Non-Target Response',"ORNTLRES","ORNTLRES_STD", case when "ORNTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
-					("ORNLYN", 'NEWLIND','New Lesion Indicator',"ORRES","ORRES_STD",case when "ORNLYN" = 'Yes' then 'Completed' else 'Not Completed' end)
+					("ORNLYN", 'NEWLIND','New Lesion Indicator',case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end,case when "ORNLYN" = 'Yes' then 'Completed' else 'Not Completed' end)
 					
 					) t (rstestcd_1,rstestcd,rstest,rsorres,rsstresc,rsstat)
 										
 					union 
 					
 					SELECT distinct project::text AS studyid,
-									concat('TAS0612_101_',split_part("SiteNumber",'_',2))::text AS siteid,
+									"SiteNumber"::text AS siteid,
 									"Subject"::text AS usubjid,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
@@ -100,11 +100,11 @@ WITH included_subjects AS (
 									rsorres::text AS rsorres,
 									rsstresc::text AS rsstresc,
 									rsstat::text AS rsstat,									
-									concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
+									--concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
 									"FolderName"::text AS visit,									
 									null::text AS rsdtc,									
 									null::text AS rsevlint														
-				 from tas0612_101."BOR"
+				 from tas120_201."BOR"
 					
 					CROSS JOIN LATERAL(VALUES
 					("BORTLRES",'BOVRLRESP','Best Overall Response', "BORTLRES", "BORTLRES_STD", case when nullif("BORTLRES",'') is not null then 'Completed' else 'Not Completed' end )					
@@ -170,4 +170,3 @@ SELECT
     /*KEY, (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
-

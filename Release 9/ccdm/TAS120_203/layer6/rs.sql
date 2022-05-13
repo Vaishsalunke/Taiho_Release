@@ -3,7 +3,6 @@ CCDM RS Table mapping
 Notes: Standard mapping to CCDM RS table
 */
 
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
                 
@@ -47,7 +46,7 @@ WITH included_subjects AS (
 						rseval,
 						'Unknown'||ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc) as rsevalid,
 						null as rsacptfl,
-						u.visitnum,
+						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as visitnum,
 						u.visit,
 						null as visitdy,
 						null as taetord,
@@ -69,25 +68,20 @@ WITH included_subjects AS (
 				(
 					select distinct	project::text AS studyid,
 									concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
-									or1."Subject"::text AS usubjid,
+									"Subject"::text AS usubjid,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
 									'RECIST 1.1'::text AS rscat,
-									'Unknown'::text AS rseval,
 									rsorres::text AS rsorres,
 									rsstresc::text AS rsstresc,
 									rsstat::text AS rsstat,									
-									concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
 									"FolderName"::text AS visit,									
-									Or1."ORDAT"::text AS rsdtc,									
-									cast(or2."ORDAT"::date - or1."ORDAT"::date as int)::text AS rsevlint,
+									"ORDAT"::text AS rsdtc,									
+									null::text AS rsevlint,
+									'Unknown'::text AS rseval,
 									0::numeric AS rstptnum,
 									'Unknown'::text AS rstptref
-				 from tas117_201."OR" or1
-				 left join 
-				 
-				(select "Subject","ORDAT",lead("ORDAT",1)over(partition by "Subject" order by "ORDAT") as ORDAT from tas117_201."OR")or2  
-			    ON or1."Subject"=or2."Subject" AND or1."ORDAT"=or2."ORDAT"
+				 from tas120_203."OR"
 					
 					CROSS JOIN LATERAL(VALUES
 					("ORRES",'OVRLRESP','Overall Response', case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
@@ -105,21 +99,19 @@ WITH included_subjects AS (
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
 									'RECIST 1.1'::text AS rscat,
-									'Unknown'::text as rseval,
 									rsorres::text AS rsorres,
 									rsstresc::text AS rsstresc,
-									rsstat::text AS rsstat,									
-									concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
+									rsstat::text AS rsstat,	
 									"FolderName"::text AS visit,									
 									null::text AS rsdtc,									
 									null::text AS rsevlint,
+									'Unknown'::text AS rseval,
 									0::numeric AS rstptnum,
 									'Unknown'::text AS rstptref
-									
-				 from tas117_201."BOR"
+				 from tas120_203."BOR"
 					
 					CROSS JOIN LATERAL(VALUES
-					("BORESPO",'BOVRLRESP','Best Overall Response', "BORESPO", "BORESPO_STD", case when nullif("BORESPO",'') is not null then 'Completed' else 'Not Completed' end )					
+					("BORTLRES",'BOVRLRESP','Best Overall Response', "BORTLRES", "BORTLRES_STD", case when nullif("BORTLRES",'') is not null then 'Completed' else 'Not Completed' end )					
 					) t (rstestcd_1,rstestcd,rstest,rsorres,rsstresc,rsstat)
 					
 					) u 
@@ -185,7 +177,3 @@ FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.sitei
 
 
 
-
-
-
-		

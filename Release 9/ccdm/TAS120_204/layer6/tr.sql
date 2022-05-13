@@ -2,7 +2,6 @@
 CCDM TR Table mapping
 Notes: Standard mapping to CCDM TR table
 */
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 	 ex_visit as (
@@ -10,10 +9,9 @@ WITH included_subjects AS (
 				 from 	cqs.ex
 				 where visit like '%Cycle 01' and exdose is not null
 				),	
-    tr_data AS (
-        
-		SELECT  DISTINCT
-                project::text AS studyid,
+	tr_data AS (
+				SELECT DISTINCT
+               	project::text AS studyid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS trseq,
@@ -29,23 +27,23 @@ WITH included_subjects AS (
                 trstresc::text AS trstresc,
                 null::numeric AS trstresn,
                 null::text AS trstresu,
-                trstat::text AS trstat,
+                null::text AS trstat,
                 null::text AS trreasnd,
                 null::text AS trnam,
-                null::text AS trmethod,
+               	Null::text AS trmethod,
                 null::text AS trlobxfl,
                 null::text AS trblfl,
                 null::text AS treval,
                 'Radiologist'::text AS trevalid,
                 null::text AS tracptfl,
-                "RecordPosition"::numeric AS visitnum,
-                "FolderName"::text AS visit,
+                row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS visitnum,
+               	"FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 dm."arm"::text AS epoch,
                 "ORDAT"::text AS trdtc,
-                ("ORDAT"::date - a.ex_mindt_visit::date)+1::numeric AS trdy
-				from tas2940_101."OR"
+                ("ORDAT"::date - a.ex_mindt_visit::date)+1::numeric  AS trdy
+				from tas120_204."OR" 
                 CROSS JOIN LATERAL(values 
 												("ORNLYN"::text,'New Lesion Response'::text,
 													case when "ORNLYN"='Yes' then 'New Lesion Present'::text
@@ -55,13 +53,13 @@ WITH included_subjects AS (
 												("ORTLRES"::text,'Target Lesion Response'::text,"ORTLRES","ORTLRES_STD",case when "ORTLYN" ='Yes' then 'Completed' else 'Not Completed' end),
 												("ORNTLRES"::text,'Non-Target Lesion Response'::text,"ORNTLRES","ORNTLRES_STD",case when "ORNTLYN" ='Yes' then 'Completed' else 'Not Completed' end),
 												("ORRES"::text,'Overall RECIST Response'::text,"ORRES","ORRES_STD",case when "ORRES"!='' then 'Completed' else 'Not Completed'end)
-												)as t (cd1,trtestcd,trorres,trstresc,trstat)
+									)as t (cd1,trtestcd,trorres,trstresc,trstat)
+			
 			left join cqs.dm								
-			on project = dm."studyid" and tr.siteid=dm.siteid and "Subject"= dm."usubjid"
+			on project = dm."studyid" and concat(project,'_',split_part("SiteNumber",'_',2))::text  = dm.siteid and "Subject"= dm."usubjid"
 			left join  ex_visit a
-			on project = a."studyid" and tr.siteid = a.siteid and "Subject"= a."usubjid"
-	)
-
+			on project = a."studyid"  and concat(project,'_',split_part("SiteNumber",'_',2))::text  = a.siteid and "Subject"= a."usubjid"
+			)
 SELECT
     /*KEY (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid)::text AS comprehendid, KEY*/  
     tr.studyid::text AS studyid,
@@ -96,7 +94,9 @@ SELECT
     tr.epoch::text AS epoch,
     tr.trdtc::text AS trdtc,
     tr.trdy::numeric AS trdy
-    /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum || '~' || tr.trseq )::text  AS objectuniquekey KEY*/
+    /*KEY, (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum ||'~'|| tr.trseq)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid)
-;
+FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid);
+
+	
+

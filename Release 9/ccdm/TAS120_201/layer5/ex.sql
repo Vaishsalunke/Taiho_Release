@@ -1,4 +1,3 @@
-
 /*
 CCDM EX mapping
 Notes: Standard mapping to CCDM EX table
@@ -53,9 +52,11 @@ SELECT
 		'TAS120-201'::text	AS	extrt,
         'Metastatic Breast Cancer'::text	AS	excat,
         NULL::text	AS	exscat,
-        "EXOSDOSE"::numeric	AS	exdose,
+        --"EXOSDOSE"::numeric	AS	exdose,
+        case when "EXOADJYN" = 'Yes' then "EXOSDOSE" else "EXOPDOSE" end::numeric	AS	exdose,
         NULL::text	AS	exdostxt,
-        "EXOSDOSE_Units"::text	AS	exdosu,
+        --"EXOSDOSE_Units"::text	AS	exdosu,
+        case when "EXOADJYN" = 'Yes' then "EXOSDOSE_Units" else "EXOPDOSE_Units" end::text	AS	exdosu,
         NULL::text	AS	exdosfrm,
         NULL::text	AS	exdosfrq,
         NULL::text	AS	exdostot,
@@ -88,9 +89,9 @@ SELECT
         'Fulvestrant'::text	AS	extrt,
         'Metastatic Breast Cancer'::text	AS	excat,
         NULL::text	AS	exscat,
-        "EXISDOSE"::numeric	AS	exdose,
+        case when "EXIREYN"='Yes' then "EXISDOSE" else "EXIPDOSE" end::numeric	AS	exdose,
         NULL::text	AS	exdostxt,
-        "EXISDOSE_Units"::text	AS	exdosu,
+        case when "EXIREYN"='Yes' then "EXISDOSE_Units" else "EXIPDOSE_Units" end::text	AS	exdosu,
         NULL::text	AS	exdosfrm,
         NULL::text	AS	exdosfrq,
         NULL::text	AS	exdostot,
@@ -138,7 +139,3 @@ SELECT
 FROM ex_data ex
 JOIN included_subjects s ON (ex.studyid = s.studyid AND ex.siteid = s.siteid AND ex.usubjid = s.usubjid)
 JOIN included_sites si ON (ex.studyid = si.studyid AND ex.siteid = si.siteid);
-
-
-
-

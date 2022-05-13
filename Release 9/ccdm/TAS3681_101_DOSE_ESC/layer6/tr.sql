@@ -11,8 +11,8 @@ WITH included_subjects AS (
 	ex_data as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_dt
 				 from cqs.ex
-				 where visit like '%Cycle 1 Day 1' and exdose is not null
-							 			 
+				 where visit like '%%Week 1 Day 1 Cycle 01' and exdose is not null
+				 			 
 				),
 				
     tr_data AS (
@@ -36,25 +36,25 @@ WITH included_subjects AS (
 						trstat,
 						trreasnd,
 						trnam,
-						trmethod,
+						trmethod::text as trmethod,
 						trlobxfl,
 						trblfl,
 						treval,
 						trevalid,
 						tracptfl,
-						u.visitnum,
+						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						u.visit,
 						u.visitdy,
 						u.taetord,
 						dm.arm::text as epoch,
-						trdtc::date
-						,(u.trdtc::date - ex.ex_dt::date)+1::numeric as trdy
+						trdtc::date,
+						(u.trdtc::date - ex.ex_dt::date)+1::numeric as trdy
 
 		from
 				(
 					SELECT  			
 									null::text AS comprehendid,
-									project::text AS studyid,
+									'TAS3681_101_DOSE_ESC'::text AS studyid,
 									"SiteNumber"::text AS siteid,
 									"Subject"::text AS usubjid,
 									null::numeric AS trseq,
@@ -79,7 +79,7 @@ WITH included_subjects AS (
 									null::text AS treval,
 									'Radiologist'::text AS trevalid,
 									null::text AS tracptfl,
-									"RecordPosition"::numeric AS visitnum,-----------------------to be mapped in outer query
+									null::numeric AS visitnum,-----------------------to be mapped in outer query
 									"FolderName"::text AS visit,
 									null::numeric AS visitdy,
 									null::numeric AS taetord,
@@ -88,15 +88,15 @@ WITH included_subjects AS (
 									null::numeric AS trdy----------------------------to be mapped in outer query
 									,trtestcd_1
 					
-				from tas120_201."OR"
+					 from tas3681_101."OR"
 					
 					CROSS JOIN LATERAL(VALUES
-					("ORNLYN",'New Lesion Response',"ORNLYN",case when lower("ORNLYN")='yes' then 'New Lesion Present' else 'New Lesion Absent' end,
+					("ORNLYN",'New Lesion Response',"ORNLYN_STD",case when lower("ORNLYN")='yes' then 'New Lesion Present' else 'New Lesion Absent' end,
 					case when lower("ORNLYN")='yes' then 'Completed' else 'Not Completed' end),
 					("ORTLRES",'Target Lesion Response',"ORTLRES_STD","ORTLRES",
-					case when lower("ORTLYN")='yes' then 'Completed' else 'Not Completed' end),
+					case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
 					("ORNTLRES",'Non-Target Lesion Response',"ORNTLRES_STD","ORNTLRES",
-					case when lower("ORNTLYN")='yes' then 'Completed' else 'Not Completed' end),
+					case when lower("ORYN")='yes' then 'Completed' else 'Not Completed' end),
 					("ORRES",'Overall RECIST Response',"ORRES_STD","ORRES",
 					case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end)
 					

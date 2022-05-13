@@ -42,7 +42,7 @@ WITH included_subjects AS (
 						treval,
 						trevalid,
 						tracptfl,
-						u.visitnum,
+						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						u.visit,
 						u.visitdy,
 						u.taetord,
@@ -79,7 +79,7 @@ WITH included_subjects AS (
 									null::text AS treval,
 									'Radiologist'::text AS trevalid,
 									null::text AS tracptfl,
-									"RecordPosition"::numeric AS visitnum,-----------------------to be mapped in outer query
+									null::numeric AS visitnum,-----------------------to be mapped in outer query
 									"FolderName"::text AS visit,
 									null::numeric AS visitdy,
 									null::numeric AS taetord,

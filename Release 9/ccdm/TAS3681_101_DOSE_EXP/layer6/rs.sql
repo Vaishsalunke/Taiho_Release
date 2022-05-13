@@ -22,7 +22,7 @@ WITH included_subjects AS (
 						rs.studyid,
 						rs.siteid,
 						rs.usubjid,
-						row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc)::text as rsseq,
+						row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc)::numeric as rsseq,
 						rsgrpid,
 						rsrefid,
 						rsspid,
@@ -46,7 +46,7 @@ WITH included_subjects AS (
 						rseval,
 						concat('Unknown ',row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc))::text as rsevalid,
 						rsacptfl,
-						rs.visitnum,
+						row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc)::numeric as visitnum,
 						rs.visit,
 						visitdy,
 						taetord,
@@ -67,7 +67,7 @@ WITH included_subjects AS (
 
 		from(
 				SELECT  null::text AS comprehendid,
-						'TAS3681_101_DOSE_ESC'::text AS studyid,
+						'TAS3681_101_DOSE_EXP'::text AS studyid,
 						"SiteNumber"::text AS siteid,
 						"Subject"::text AS usubjid,
 						null::numeric AS rsseq,
@@ -94,8 +94,8 @@ WITH included_subjects AS (
 						'Unknown'::text AS rseval,
 						null::text AS rsevalid,----------------to be handled in outer query
 						null::text AS rsacptfl,
-						"RecordPosition"::numeric AS visitnum,
-						REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE("FolderName",'<WK[0-9]DA[0-9]/>\sExpansion',''),'<WK[0-9]DA[0-9][0-9]/>\sExpansion',''),'<W[0-9]DA[0-9]/>\sExpansion',''),'<W[0-9]DA[0-9][0-9]/>\sExpansion',''),'<WK[0-9]D[0-9]/>\sEscalation',''),'<WK[0-9]D[0-9][0-9]/>\sEscalation',''),' Escalation ',' '),'\s\([0-9]\)',''),' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),'<WK[0-9]D[0-9][0-9]/>','')::text AS visit,
+						null::numeric AS visitnum,
+						REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE("FolderName",'<WK[0-9]DA[0-9]/>\sExpansion',''),'<WK[0-9]DA[0-9][0-9]/>\sExpansion',''),'<W[0-9]DA[0-9]/>\sExpansion',''),'<W[0-9]DA[0-9][0-9]/>\sExpansion',''),'<WK[0-9]D[0-9]/>\sEscalation',''),'<WK[0-9]D[0-9][0-9]/>\sEscalation',''),' Escalation ',' '),'\s\([0-9]\)',''),' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),'<WK[0-9]D[0-9][0-9]/>',''),'<WK[0-9]DA[0-9][0-9]/>','')::text AS visit,
 						null::numeric AS visitdy,
 						null::numeric AS taetord,
 						null::text AS epoch,

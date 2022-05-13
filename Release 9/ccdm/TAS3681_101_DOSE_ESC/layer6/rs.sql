@@ -13,7 +13,7 @@ WITH included_subjects AS (
 	ex_visit as (
 				  select studyid,siteid,usubjid,visit,exstdtc ex_dt
 				 from cqs.ex
-				 where visit like '%Day 1 of Cycle 1' and exdose is not null
+				 where visit like '%Week 1 Day 1 Cycle 01' and exdose is not null
 				 
 				 ),				
 				
@@ -22,7 +22,7 @@ WITH included_subjects AS (
 						rs.studyid,
 						rs.siteid,
 						rs.usubjid,
-						row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc)::text as rsseq,
+						row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc)::numeric as rsseq,
 						rsgrpid,
 						rsrefid,
 						rsspid,
@@ -46,7 +46,7 @@ WITH included_subjects AS (
 						rseval,
 						concat('Unknown ',row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc))::text as rsevalid,
 						rsacptfl,
-						rs.visitnum,
+						row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc)::numeric as visitnum,
 						rs.visit,
 						visitdy,
 						taetord,
@@ -67,7 +67,7 @@ WITH included_subjects AS (
 
 		from(
 				SELECT  null::text AS comprehendid,
-						project::text AS studyid,
+						'TAS3681_101_DOSE_ESC'::text AS studyid,
 						"SiteNumber"::text AS siteid,
 						"Subject"::text AS usubjid,
 						null::numeric AS rsseq,
@@ -94,8 +94,8 @@ WITH included_subjects AS (
 						'Unknown'::text AS rseval,
 						null::text AS rsevalid,----------------to be handled in outer query
 						null::text AS rsacptfl,
-						"RecordPosition"::numeric AS visitnum,
-						"FolderName"::text AS visit,
+						null::numeric AS visitnum,
+						REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE("FolderName",'<WK[0-9]DA[0-9]/>\sExpansion',''),'<WK[0-9]DA[0-9][0-9]/>\sExpansion',''),'<W[0-9]DA[0-9]/>\sExpansion',''),'<W[0-9]DA[0-9][0-9]/>\sExpansion',''),'<WK[0-9]D[0-9]/>\sEscalation',''),'<WK[0-9]D[0-9][0-9]/>\sEscalation',''),' Escalation ',' '),'\s\([0-9]\)',''),' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),'<WK[0-9]D[0-9][0-9]/>','')::text AS visit,
 						null::numeric AS visitdy,
 						null::numeric AS taetord,
 						null::text AS epoch,
@@ -112,74 +112,18 @@ WITH included_subjects AS (
 						null::text AS rssttpt,
 						null::text AS rsenrtpt,
 						null::text AS rsentpt
-				from tas120_202."OR1"
+				from tas3681_101."OR"
 
 				CROSS JOIN LATERAL(VALUES
 									("ORNLYN",'NEWLIND','New Lesion Indicator',case when lower("ORNLYN")='yes' then 'New Lesion' else '' end,
-									"ORNLYN_STD",case when lower("ORNLYN")='yes' then 'Completed' else 'Not Completed' end),
+									case when lower("ORNLYN")='yes' then 'New Lesion' else '' end,case when lower("ORNLYN")='yes' then 'Completed' else 'Not Completed' end),
 									("ORTLRES",'TRGRESP','Target Response',"ORTLRES",
 									"ORTLRES_STD",case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
 									("ORNTLRES",'NTRGRESP','Non-Target Response',"ORNTLRES",
-									"ORNTLRES_STD",case when lower("ORNTLYN")='yes' then 'Completed' else 'Not Completed' end),
+									"ORNTLRES_STD",case when nullif("ORNTLRES",'') is not null then 'Completed' else 'Not Completed' end),
 									("ORRES",'OVRLRESP','Overall Response',"ORRES",
 									"ORRES_STD",case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end)
 					
-									) t (rstestcd_1,rstestcd,rstest,rsorres,rsstresc,rsstat)
-					
-				UNION ALL 
-
-				SELECT  null::text AS comprehendid,
-						project::text AS studyid,
-						"SiteNumber"::text AS siteid,
-						"Subject"::text AS usubjid,
-						null::numeric AS rsseq,
-						null::text AS rsgrpid,
-						null::text AS rsrefid,
-						null::text AS rsspid,
-						null::text AS rslnkid,
-						null::text AS rslnkgrp,
-						rstestcd::text AS rstestcd,
-						rstest::text AS rstest,
-						'RECIST 1.1'::text AS rscat,
-						null::text AS rsscat,
-						rsorres::text AS rsorres,
-						null::text AS rsorresu,
-						rsstresc::text AS rsstresc,
-						null::numeric AS rsstresn,
-						null::text AS rsstresu,
-						rsstat::text AS rsstat,
-						null::text AS rsreasnd,
-						null::text AS rsnam,
-						null::text AS rslobxfl,
-						null::text AS rsblfl,
-						null::text AS rsdrvfl,
-						'Unknown'::text AS rseval,
-						null::text AS rsevalid,----------------to be handled in outer query
-						null::text AS rsacptfl,
-						"RecordPosition"::numeric AS visitnum,
-						"FolderName"::text AS visit,
-						null::numeric AS visitdy,
-						null::numeric AS taetord,
-						null::text AS epoch,
-						null::text AS rsdtc,
-						null::numeric AS rsdy,
-						null::text AS rstpt,
-						0::numeric AS rstptnum,
-						null::text AS rseltm,
-						'Unknown'::text AS rstptref,
-						null::text AS rsrftdtc,
-						null::text AS rsevlint,
-						null::text AS rsevintx,
-						null::text AS rsstrtpt,
-						null::text AS rssttpt,
-						null::text AS rsenrtpt,
-						null::text AS rsentpt
-				from tas120_202."BOR"
-
-				CROSS JOIN LATERAL(VALUES
-									("BORTLRES",'BOVRLRESP','Best Overall Response',"BORTLRES",
-									"BORTLRES_STD",case when nullif("BORTLRES",'') is not null then 'Completed' else 'Not Completed' end)
-									
 									) t (rstestcd_1,rstestcd,rstest,rsorres,rsstresc,rsstat)
 			) rs
 		left join 	ex_data ex
@@ -242,12 +186,6 @@ SELECT
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid)
 ;
-
-
-
-
-
-
 
 
 

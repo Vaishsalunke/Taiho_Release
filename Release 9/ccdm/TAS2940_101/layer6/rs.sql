@@ -47,7 +47,7 @@ WITH included_subjects AS (
                 'Unknown'::text AS rseval,
                 'Unknown'||ROW_NUMBER()OVER(PARTITION BY project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::text AS rsevalid,
                 null::text AS rsacptfl,
-                "RecordPosition"::numeric AS visitnum,
+                row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS visitnum,
                 "FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
@@ -65,7 +65,7 @@ WITH included_subjects AS (
                 null::text AS rssttpt,
                 null::text AS rsenrtpt,
                 null::text AS rsentpt
-			from tas120_204."OR"
+			from tas2940_101."OR"
 						
 						CROSS JOIN LATERAL(values 
 												("ORNLYN",'NEWLIND' ,'New Lesion Indicator',case when "ORNLYN" = 'Yes' then 'New lesion' else '' end ,case when "ORNLYN" = 'Yes' then 'New lesion' else '' end,case when "ORNLYN" ='Yes' then 'Completed' else 'Not Completed' end),

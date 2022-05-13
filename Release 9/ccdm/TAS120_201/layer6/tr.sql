@@ -11,7 +11,7 @@ WITH included_subjects AS (
 	ex_data as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_dt
 				 from cqs.ex
-				 where visit like '%Cycle 01' and exdose is not null
+				 where visit like '%Cycle 1 Day 1' and exdose is not null
 							 			 
 				),
 				
@@ -42,7 +42,7 @@ WITH included_subjects AS (
 						treval,
 						trevalid,
 						tracptfl,
-						u.visitnum,
+						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						u.visit,
 						u.visitdy,
 						u.taetord,
@@ -55,7 +55,7 @@ WITH included_subjects AS (
 					SELECT  			
 									null::text AS comprehendid,
 									project::text AS studyid,
-									concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
+									"SiteNumber"::text AS siteid,
 									"Subject"::text AS usubjid,
 									null::numeric AS trseq,
 									null::text AS trgrpid,
@@ -79,7 +79,7 @@ WITH included_subjects AS (
 									null::text AS treval,
 									'Radiologist'::text AS trevalid,
 									null::text AS tracptfl,
-									concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,-----------------------to be mapped in outer query
+									null::numeric AS visitnum,-----------------------to be mapped in outer query
 									"FolderName"::text AS visit,
 									null::numeric AS visitdy,
 									null::numeric AS taetord,
@@ -88,16 +88,16 @@ WITH included_subjects AS (
 									null::numeric AS trdy----------------------------to be mapped in outer query
 									,trtestcd_1
 					
-				from tas120_203."OR"
+				from tas120_201."OR"
 					
 					CROSS JOIN LATERAL(VALUES
-					("ORNLYN",'New Lesion Response',"ORNLYN_STD",case when lower("ORNLYN")='yes' then 'New Lesion Present' else 'New Lesion Absent' end,
+					("ORNLYN",'New Lesion Response',"ORNLYN",case when lower("ORNLYN")='yes' then 'New Lesion Present' else 'New Lesion Absent' end,
 					case when lower("ORNLYN")='yes' then 'Completed' else 'Not Completed' end),
 					("ORTLRES",'Target Lesion Response',"ORTLRES_STD","ORTLRES",
-					case when lower("ORTLRES")='yes' then 'Completed' else 'Not Completed' end),
+					case when lower("ORTLYN")='yes' then 'Completed' else 'Not Completed' end),
 					("ORNTLRES",'Non-Target Lesion Response',"ORNTLRES_STD","ORNTLRES",
 					case when lower("ORNTLYN")='yes' then 'Completed' else 'Not Completed' end),
-					("ORRES",'Overall RECIST Response',"ORRES_STD",case when "ORRES"='Progressive Disease' then "ORPD" else "ORRES" end,
+					("ORRES",'Overall RECIST Response',"ORRES_STD","ORRES",
 					case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end)
 					
 					) t (trtestcd_1,trtestcd,trstresc,trorres,trstat)
@@ -143,11 +143,9 @@ SELECT
     tr.epoch::text AS epoch,
     tr.trdtc::text AS trdtc,
     tr.trdy::numeric AS trdy
-    /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum || '~' || tr.trseq)::text  AS objectuniquekey KEY*/ 
+    /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum || '~' || tr.trseq)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid);
-
-
-
+FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid)
+;
 
 
