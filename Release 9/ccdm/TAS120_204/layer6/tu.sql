@@ -25,7 +25,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                tulnkid::text AS tulnkid,
+                concat(tulnkid,(ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc)))::text AS tulnkid,
                 null::text AS tulnkgrp,
                 tutestcd::text AS tutestcd,
                 tutest::text AS tutest,
@@ -240,11 +240,11 @@ null::text as  tudy
 From tas120_204."TL" tl
 )tu
 					left join 	ex_data ex1
-					on			tu."study" = ex1."studyid" and tu.siteid=ex1.siteid and tu.usubjid= ex1."usubjid"
+					on			tu."study" = ex1."studyid" and concat(study,'_',split_part(tu.siteid,'_',2))=ex1.siteid and tu.usubjid= ex1."usubjid"
 					left join	ex_visit ex2
-					on			tu."study"=ex2."studyid" and tu.siteid = ex2.siteid and tu.usubjid= ex2."usubjid" 
+					on			tu."study"=ex2."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = ex2.siteid and tu.usubjid= ex2."usubjid" 
 					left join 	cqs.dm
-					on 		tu."study" = dm."studyid" and tu.siteid = dm.siteid and tu.usubjid=dm."usubjid"
+					on 		tu."study" = dm."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = dm.siteid and tu.usubjid=dm."usubjid"
 )
 
 
@@ -282,7 +282,7 @@ SELECT
    tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc,
     tu.tudy::numeric AS tudy
-    /*KEY, (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid || '~' || tu.tuseq )::text  AS objectuniquekey KEY*/
+    /*KEY, (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;

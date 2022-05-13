@@ -3,6 +3,7 @@ CCDM TU Table mapping
 Notes: Standard mapping to CCDM TU table
 */
 
+
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 	
@@ -20,13 +21,13 @@ WITH included_subjects AS (
     tu_data AS (
     
         SELECT  distinct Study::text AS studyid,
-        		Study || '_' || split_part(SiteNumber,'_',2) ::text AS siteid,
+        		SiteNumber::text AS siteid,
         		Subject::text AS usubjid,
                 ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                tulnkid::text AS tulnkid,
+                concat(tulnkid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text AS tulnkid,
                 null::text AS tulnkgrp,
                 tutestcd::text AS tutestcd,
                 tutest::text AS tutest,
@@ -52,7 +53,7 @@ WITH included_subjects AS (
                ,(DATE_PART('day',tudtc::timestamp - e2.exstdtc::timestamp):: numeric) +1::numeric AS tudy
 		FROM	(
 					Select 		"project":: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
+								concat('TAS2940_101_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								"NLNUM":: text as tulnkid,
@@ -72,12 +73,12 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas2940_101."NL" nl
 					left join 	cqs.dm
-					on 			nl."Subject"=dm."usubjid"
+					on 			nl."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and nl."Subject"=dm.usubjid
 										
 					union all
 					
 					Select 		"project":: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
+								concat('TAS2940_101_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"NTLNUM":: text as tulnkid,
@@ -97,12 +98,12 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas2940_101."NTLB" ntlb
 					left join 	cqs.dm
-					on 			ntlb."Subject"=dm."usubjid"
+					on 			ntlb."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and ntlb."Subject"=dm.usubjid
 										
 					union all
 					
 					Select 		"project":: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
+								concat('TAS2940_101_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"NTLNUM":: text as tulnkid,
@@ -122,12 +123,12 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas2940_101."NTL" ntl
 					left join 	cqs.dm
-					on 			ntl."Subject"=dm."usubjid"
+					on 			ntl."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and ntl."Subject"=dm.usubjid
 									
 					union all
 					
 					Select 		"project":: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
+								concat('TAS2940_101_',split_part("SiteNumber",'_',2))  :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"TLNUM":: text as tulnkid,
@@ -147,12 +148,12 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas2940_101."TLB" tlb
 					left join 	cqs.dm
-					on 			tlb."Subject"=dm."usubjid"
+					on 			tlb."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and tlb."Subject"=dm.usubjid
 									
 					union all
 					
 					Select 		"project":: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
+								concat('TAS2940_101_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
 								"TLNUM":: text as tulnkid,
@@ -172,13 +173,13 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas2940_101."TL" tl
 					left join 	cqs.dm
-					on 			tl."Subject"=dm."usubjid"
+					on 			tl."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and tl."Subject"=dm.usubjid
 					
 		)tu	
 		left join 	ex_data e1
-		on			tu.Subject= e1.usubjid
+		on			'TAS2940_101'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		left join	ex_visit e2
-		on			tu.Subject= e2.usubjid
+		on			'TAS2940_101'=e2.studyid and SiteNumber=e2.siteid and tu.Subject= e2.usubjid
 		
 		)
 
@@ -215,8 +216,9 @@ SELECT
     tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc
     ,tu.tudy::numeric AS tudy
-    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid || '~' || tu.tuseq )::text  AS objectuniquekey KEY*/ 
+    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/ 
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid);
+FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
+;
 
 

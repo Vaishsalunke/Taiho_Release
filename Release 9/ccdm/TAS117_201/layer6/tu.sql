@@ -3,6 +3,7 @@ CCDM TU Table mapping
 Notes: Standard mapping to CCDM TU table
 */
 
+
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 				
@@ -23,11 +24,11 @@ WITH included_subjects AS (
         tu.studyid,
         tu.siteid,
         tu.usubjid,
-        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as tuseq,
+        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc)::numeric as tuseq,
         tu.tugrpid,
         tu.turefid,
         tu.tuspid,
-        tu.tulnkid,
+        concat(tu.tulnkid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tulnkid,
         tu.tulnkgrp,
         tu.tutestcd,
         tu.tutest,
@@ -287,7 +288,7 @@ SELECT
     tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc,
     tu.tudy::numeric AS tudy
-    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid ||'~' || tu.tuseq)::text  AS objectuniquekey KEY*/
+    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;

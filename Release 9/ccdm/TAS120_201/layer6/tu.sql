@@ -23,11 +23,11 @@ WITH included_subjects AS (
         tu.studyid,
         tu.siteid,
         tu.usubjid,
-        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as tuseq,
+        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc)::numeric as tuseq,
         tu.tugrpid,
         tu.turefid,
         tu.tuspid,
-        tu.tulnkid,
+        concat(tu.tulnkid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tulnkid,
         tu.tulnkgrp,
         tu.tutestcd,
         tu.tutest,
@@ -61,7 +61,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "RecordPosition"::text AS tulnkid,
+                concat("RecordPosition",1)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
 				else 'NA'
@@ -87,6 +87,7 @@ SELECT  	distinct	null::text AS comprehendid,
                -- dm.arm::text AS epoch,
                 nl."NLDAT"::text AS tudtc
                 --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+                --,"RecordId"
 from tas120_201."NL" nl
 
 union all
@@ -99,7 +100,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "RecordPosition"::text AS tulnkid,
+                concat("RecordPosition",2)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLBSITE",'') is not null then concat("RecordPosition",'-',"NTLBSITE")
 				else 'NA'
@@ -125,6 +126,7 @@ SELECT  distinct		null::text AS comprehendid,
                 --dm.arm::text AS epoch,
                 ntlb."NTLBDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+                --,"RecordId"
 from tas120_201."NTLB" ntlb
 
 union all 
@@ -137,7 +139,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "RecordPosition"::text AS tulnkid,
+                concat("RecordPosition",3)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
 				else 'NA'
@@ -163,6 +165,7 @@ SELECT  distinct		null::text AS comprehendid,
                 --dm.arm::text AS epoch,
                 ntl."NTLDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+                --,"RecordId"
 from tas120_201."NTL" ntl
 
 union all 
@@ -175,7 +178,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "RecordPosition"::text AS tulnkid,
+                concat("RecordPosition",4)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLBSITE",'') is not null then concat("RecordPosition",'-',"TLBSITE")
 				else 'NA'
@@ -201,6 +204,7 @@ SELECT  distinct		null::text AS comprehendid,
                 --dm.arm::text AS epoch,
                 TLB."TLBDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+                --,"RecordId"
 from tas120_201."TLB" TLB
 
 union all 
@@ -213,7 +217,7 @@ select   distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "RecordPosition"::text AS tulnkid,
+                concat("RecordPosition",5)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLSITE",'') is not null then concat("RecordPosition",'-',"TLSITE")
 				else 'NA'
@@ -239,6 +243,7 @@ select   distinct		null::text AS comprehendid,
                 --dm.arm::text AS epoch,
                 TL."TLDAT"::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+                
 from tas120_201."TL" TL
 )tu
 left join ex_data ex
@@ -283,7 +288,7 @@ SELECT
     tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc,
     tu.tudy::numeric AS tudy
-    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid || '~' || tu.tuseq  )::text  AS objectuniquekey KEY*/
+    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;

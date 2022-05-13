@@ -144,7 +144,7 @@ SELECT
     tr.epoch::text AS epoch,
     tr.trdtc::text AS trdtc,
     tr.trdy::numeric AS trdy
-    /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum || '~' || tr.trseq)::text  AS objectuniquekey  KEY*/
+    /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum)::text  AS objectuniquekey  KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid);
 

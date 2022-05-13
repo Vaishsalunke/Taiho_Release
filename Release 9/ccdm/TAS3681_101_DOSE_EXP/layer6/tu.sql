@@ -3,6 +3,7 @@ CCDM TU Table mapping
 Notes: Standard mapping to CCDM TU table
 */
 
+
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 	
@@ -25,7 +26,7 @@ WITH included_subjects AS (
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                tulnkid::text AS tulnkid,
+                concat(tulnkid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text AS tulnkid,
                 null::text AS tulnkgrp,
                 tutestcd::text AS tutestcd,
                 tutest::text AS tutest,
@@ -71,7 +72,7 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas3681_101."NL" nl
 					left join 	cqs.dm
-					on 			nl."Subject"=dm."usubjid"
+					on 			'TAS3681_101_DOSE_EXP'=dm.studyid and "SiteNumber"=dm.siteid and nl."Subject"=dm.usubjid
 										
 					union all
 					
@@ -96,7 +97,7 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas3681_101."NTLB" ntlb
 					left join 	cqs.dm
-					on 			ntlb."Subject"=dm."usubjid"
+					on 			'TAS3681_101_DOSE_EXP'=dm.studyid and "SiteNumber"=dm.siteid and ntlb."Subject"=dm.usubjid
 										
 					union all
 					
@@ -121,7 +122,7 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas3681_101."NTL" ntl
 					left join 	cqs.dm
-					on 			ntl."Subject"=dm."usubjid"
+					on 			'TAS3681_101_DOSE_EXP'=dm.studyid and "SiteNumber"=dm.siteid and ntl."Subject"=dm.usubjid
 									
 					union all
 					
@@ -146,7 +147,7 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas3681_101."TLB" tlb
 					left join 	cqs.dm
-					on 			tlb."Subject"=dm."usubjid"
+					on 			'TAS3681_101_DOSE_EXP'=dm.studyid and "SiteNumber"=dm.siteid and tlb."Subject"=dm.usubjid
 									
 					union all
 					
@@ -171,13 +172,13 @@ WITH included_subjects AS (
 								null::text as  tudy
 					From 		tas3681_101."TL" tl
 					left join 	cqs.dm
-					on 			tl."Subject"=dm."usubjid"
+					on 			'TAS3681_101_DOSE_EXP'=dm.studyid and "SiteNumber"=dm.siteid and tl."Subject"=dm.usubjid
 					
 		)tu	
 		left join 	ex_data e1
-		on			tu.Subject= e1.usubjid
+		on			'TAS3681_101_DOSE_EXP'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		left join	ex_visit e2
-		on			tu.Subject= e2.usubjid
+		on			'TAS3681_101_DOSE_EXP'=e2.studyid and SiteNumber=e2.siteid and tu.Subject= e2.usubjid
 		)
 
 SELECT
@@ -213,8 +214,9 @@ SELECT
     tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc,
     tu.tudy::numeric AS tudy
-    /*KEY, (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid || '~' || tu.tuseq )::text  AS objectuniquekey KEY*/
+    /*KEY, (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid);
+FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
+;
 
 
