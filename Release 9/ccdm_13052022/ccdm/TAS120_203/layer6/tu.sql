@@ -57,7 +57,7 @@ WITH included_subjects AS (
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
-								"RecordPosition" :: text as tulnkid,
+								coalesce(nullif("NLID",''),"RecordId"::text) :: text as tulnkid,
 								case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
@@ -84,7 +84,7 @@ WITH included_subjects AS (
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
                                  null::numeric as tuseq,								
-                                 "RecordPosition":: text as tulnkid,
+                                 coalesce(nullif("NTLBID",''),"RecordId"::text):: text as tulnkid,
 								 case when nullif("NTLBSITE",'') is not null then concat("RecordPosition",'-',"NTLBSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
@@ -112,7 +112,7 @@ WITH included_subjects AS (
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
+								coalesce(nullif("NTLID",''),"RecordId"::text):: text as tulnkid,
 								case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
@@ -139,7 +139,7 @@ WITH included_subjects AS (
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
+								coalesce(nullif("TLBID",''),"RecordId"::text):: text as tulnkid,
 								case when nullif("TLBSITE",'') is not null then concat("RecordPosition",'-',"TLBSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
@@ -166,7 +166,7 @@ WITH included_subjects AS (
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
+								coalesce(nullif("TLID",''),"RecordId"::text):: text as tulnkid,
 								case when nullif("TLSITE",'') is not null then concat("RecordPosition",'-',"TLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,

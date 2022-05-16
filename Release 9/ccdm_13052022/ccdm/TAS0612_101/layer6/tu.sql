@@ -62,7 +62,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "NLNUM"::text AS tulnkid,
+                coalesce(nullif("NLNUM",''),"RecordId"::text)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NLSITE",'') is not null then concat("NLNUM",'-',"NLSITE")
 				else 'NA' end::text AS tutestcd,
@@ -99,7 +99,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "NTLSNUM"::text AS tulnkid,
+                coalesce(nullif("NTLSNUM",''),"RecordId"::text)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLSITE",'') is not null then concat("NTLSNUM",'-',"NTLSITE")
 				else 'NA'
@@ -139,7 +139,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "NTLSNUM"::text AS tulnkid,
+                coalesce(nullif("NTLSNUM",''),"RecordId"::text)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLSITE",'') is not null then concat("NTLSNUM",'-',"NTLSITE")
 				else 'NA'
@@ -177,7 +177,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "LSNUM"::text AS tulnkid,
+                coalesce(nullif("LSNUM",''),"RecordId"::text)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLSITE",'') is not null then concat("LSNUM",'-',"TLSITE")
 				else 'NA'
@@ -215,7 +215,7 @@ select   distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                "LSNUM"::text AS tulnkid,
+                coalesce(nullif("LSNUM",''),"RecordId"::text)::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLSITE",'') is not null then concat("LSNUM",'-',"TLSITE")
 				else 'NA'
