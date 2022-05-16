@@ -36,7 +36,7 @@ WITH included_subjects AS (
                 null::text AS trlobxfl,
                 null::text AS trblfl,
                 null::text AS treval,
-                'Radiologist'::text AS trevalid,
+                "RecordId" || row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::text AS trevalid,
                 null::text AS tracptfl,
                 row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS visitnum,
                	"FolderName"::text AS visit,
