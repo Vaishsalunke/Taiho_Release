@@ -27,7 +27,7 @@ WITH included_subjects AS (
         tu.tugrpid,
         tu.turefid,
         tu.tuspid,
-        concat(tu.tulnkid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tulnkid,
+        tu.tulnkid::text as tulnkid,
         tu.tulnkgrp,
         tu.tutestcd,
         tu.tutest,
@@ -42,7 +42,7 @@ WITH included_subjects AS (
         case when tu.tudtc::date <= ex.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
         tu.tublfl,
         tu.tueval,
-        tu.tuevalid,
+        concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc)) as tuevalid,
         tu.tuacptfl,
         ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as visitnum,
         tu.visit,
@@ -61,7 +61,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                concat("RecordPosition",1)::text AS tulnkid,
+                "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
 				else 'NA'
@@ -100,7 +100,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                concat("RecordPosition",2)::text AS tulnkid,
+                "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLBSITE",'') is not null then concat("RecordPosition",'-',"NTLBSITE")
 				else 'NA'
@@ -139,7 +139,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                concat("RecordPosition",3)::text AS tulnkid,
+                "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
 				else 'NA'
@@ -178,7 +178,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                concat("RecordPosition",4)::text AS tulnkid,
+                "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLBSITE",'') is not null then concat("RecordPosition",'-',"TLBSITE")
 				else 'NA'
@@ -217,7 +217,7 @@ select   distinct		null::text AS comprehendid,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                concat("RecordPosition",5)::text AS tulnkid,
+                "RecordPosition"::text AS tulnkid,
                 null::text AS tulnkgrp,
                 case when nullif("TLSITE",'') is not null then concat("RecordPosition",'-',"TLSITE")
 				else 'NA'

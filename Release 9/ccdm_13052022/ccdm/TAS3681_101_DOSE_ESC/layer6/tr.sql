@@ -41,7 +41,7 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						trevalid,
+						concat(trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc)) as trevalid,
 						tracptfl,
 						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						u.visit,
@@ -78,10 +78,10 @@ WITH included_subjects AS (
 									null::text AS trlobxfl,
 									null::text AS trblfl,
 									null::text AS treval,
-									'Radiologist'::text AS trevalid,
+									"RecordId"::text AS trevalid,
 									null::text AS tracptfl,
 									null::numeric AS visitnum,-----------------------to be mapped in outer query
-									"FolderName"::text AS visit,
+									REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE("FolderName",'<WK[0-9]DA[0-9]/>\sExpansion',''),'<WK[0-9]DA[0-9][0-9]/>\sExpansion',''),'<W[0-9]DA[0-9]/>\sExpansion',''),'<W[0-9]DA[0-9][0-9]/>\sExpansion',''),'<WK[0-9]D[0-9]/>\sEscalation',''),'<WK[0-9]D[0-9][0-9]/>\sEscalation',''),' Escalation ',' '),'\s\([0-9]\)',''),' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),'<WK[0-9]D[0-9][0-9]/>',''),'<WK[0-9]DA[0-9][0-9]/>','')::text AS visit,
 									null::numeric AS visitdy,
 									null::numeric AS taetord,
 									null::text AS epoch,------------------------------to be mapped in outer query

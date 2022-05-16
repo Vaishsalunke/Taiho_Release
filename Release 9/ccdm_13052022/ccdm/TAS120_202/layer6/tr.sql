@@ -41,7 +41,7 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						trevalid,
+						concat(trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc)) as trevalid,
 						tracptfl,
 						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						u.visit,
@@ -78,7 +78,7 @@ WITH included_subjects AS (
 									null::text AS trlobxfl,
 									null::text AS trblfl,
 									null::text AS treval,
-									'Radiologist'::text AS trevalid,
+									"RecordId"::text AS trevalid,
 									null::text AS tracptfl,
 									null::numeric AS visitnum,-----------------------to be mapped in outer query
 									"FolderName"::text AS visit,

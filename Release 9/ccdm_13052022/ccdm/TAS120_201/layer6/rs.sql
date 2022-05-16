@@ -26,7 +26,7 @@ WITH included_subjects AS (
         select distinct u.studyid,
                         u.siteid,
 						u.usubjid,						
-						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as rsseq,
+						rsseq,
 						null as rsgrpid,
 						null as rsrefid,
 						null as rsspid,
@@ -50,7 +50,7 @@ WITH included_subjects AS (
 						'Unknown' as rseval,
 						concat('Unknown',row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc)) as rsevalid,
 						null as rsacptfl,
-						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as visitnum,
+						u.visitnum,
 						u.visit,
 						null as visitdy,
 						null as taetord,
@@ -75,13 +75,14 @@ WITH included_subjects AS (
 					select distinct	project::text AS studyid,
 									"SiteNumber"::text AS siteid,
 									"Subject"::text AS usubjid,
+									row_number()over(partition by project,siteid,"Subject" order by "ORDAT")::numeric as rsseq,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
 									'RECIST 1.1'::text AS rscat,
 									rsorres::text AS rsorres,
 									rsstresc::text AS rsstresc,
 									rsstat::text AS rsstat,									
-									--concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
+									row_number()over(partition by project,siteid,"Subject" order by "ORDAT")::numeric AS visitnum,
 									"FolderName"::text AS visit,									
 									"ORDAT"::text AS rsdtc								
 									--,null::text AS rsevlint														
@@ -100,13 +101,14 @@ WITH included_subjects AS (
 					SELECT distinct project::text AS studyid,
 									"SiteNumber"::text AS siteid,
 									"Subject"::text AS usubjid,
+									"RecordId"::numeric as rsseq,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
 									'RECIST 1.1'::text AS rscat,
 									rsorres::text AS rsorres,
 									rsstresc::text AS rsstresc,
 									rsstat::text AS rsstat,									
-									--concat("instanceId", "InstanceRepeatNumber", "DataPageId")::numeric AS visitnum,
+									"RecordId"::numeric AS visitnum,
 									"FolderName"::text AS visit,									
 									null::text AS rsdtc									
 									--,null::text AS rsevlint														
@@ -176,3 +178,6 @@ SELECT
     /*KEY, (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
+
+
+
