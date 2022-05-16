@@ -161,7 +161,7 @@ WITH included_subjects AS (
 				
 					union all
 					
-					Select 		'TAS120_202':: text as Study, 
+					Select 	distinct	'TAS120_202':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,

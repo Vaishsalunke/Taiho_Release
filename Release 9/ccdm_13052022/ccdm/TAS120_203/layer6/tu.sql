@@ -108,7 +108,7 @@ WITH included_subjects AS (
 					
 					union all
 					
-					Select 		distinct 'TAS120_203':: text as Study, 
+					Select 	distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
@@ -135,7 +135,7 @@ WITH included_subjects AS (
 				
 					union all
 					
-					Select 		'TAS120_203':: text as Study, 
+					Select 	distinct	'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
@@ -162,7 +162,7 @@ WITH included_subjects AS (
 				
 					union all
 					
-					Select 		'TAS120_203':: text as Study, 
+					Select 	distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,

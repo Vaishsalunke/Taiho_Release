@@ -51,7 +51,7 @@ WITH included_subjects AS (
                 tudtc::text AS tudtc,
                 (DATE_PART('day',tudtc::timestamp - e2.exstdtc::timestamp):: numeric) +1::numeric AS tudy
 		FROM	(
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
@@ -76,7 +76,7 @@ WITH included_subjects AS (
 										
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
@@ -101,7 +101,7 @@ WITH included_subjects AS (
 										
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
@@ -126,7 +126,7 @@ WITH included_subjects AS (
 									
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select distinct		'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,
@@ -151,7 +151,7 @@ WITH included_subjects AS (
 									
 					union all
 					
-					Select 		'TAS3681_101_DOSE_EXP':: text as Study, 
+					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								NULL::numeric as tuseq,

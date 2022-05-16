@@ -25,7 +25,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                tulnkid::text AS tulnkid,
+                concat(tulnkid,(ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc)))::text AS tulnkid,
                 null::text AS tulnkgrp,
                 tutestcd::text AS tutestcd,
                 tutest::text AS tutest,
@@ -40,7 +40,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                case when tudtc <= ex1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tublfl::text AS tublfl,
                 null::text AS tueval,
-               'Radiologist' || (ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc)) ::text AS tuevalid,
+                tuevalid::text AS tuevalid,
                 null::text AS tuacptfl,
                 (ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc))::numeric AS visitnum,
                 tu.visit::text AS visit,
@@ -52,7 +52,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                 from (
 
 --NL
-Select "project"::text as study,
+select distinct "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
 NULL::numeric as tuseq,
@@ -90,7 +90,7 @@ From tas120_204."NL" n1
 union all 
 ---NTLB
 
-Select
+select distinct
 "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
@@ -128,7 +128,7 @@ From tas120_204."NTLB" ntlb
 
 union all
 --NTL
-Select
+select distinct
 "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
@@ -166,7 +166,7 @@ From tas120_204."NTL" ntl
 
 union all
 --TLB
-Select "project"::text as study,
+Select distinct "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
 NULL::numeric::numeric as tuseq,
@@ -203,7 +203,7 @@ From tas120_204."TLB" tlb
 
 union all
 ---TL
-Select
+select distinct
 "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
