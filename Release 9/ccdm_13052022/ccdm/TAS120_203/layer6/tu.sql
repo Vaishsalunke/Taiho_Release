@@ -3,7 +3,6 @@ CCDM TU Table mapping
 Notes: Standard mapping to CCDM TU table
 */
 
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 	
@@ -28,7 +27,7 @@ WITH included_subjects AS (
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                concat(tulnkid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text AS tulnkid,
+                tulnkid::text as tulnkid,
                 null::text AS tulnkgrp,
                 tutestcd::text AS tutestcd,
                 tutest::text AS tutest,
@@ -43,7 +42,8 @@ WITH included_subjects AS (
                 case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tublfl::text AS tublfl,
                 null::text AS tueval,
-                tuevalid::text AS tuevalid,
+                --tuevalid::text AS tuevalid,
+                concat(tuevalid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)) as tuevalid,
                 null::text AS tuacptfl,
                 ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric as visitnum,
                 tu.visit::text AS visit,
@@ -57,7 +57,7 @@ WITH included_subjects AS (
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
-								"RecordPosition":: text as tulnkid,
+								"RecordPosition" :: text as tulnkid,
 								case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
@@ -228,9 +228,7 @@ SELECT
     tu.tudy::numeric AS tudy
     /*KEY, (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
-;
-
+FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid);
 
 
 

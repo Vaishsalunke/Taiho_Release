@@ -40,7 +40,8 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						trevalid,
+						--trevalid,
+						concat(trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc)) as trevalid,
 						tracptfl,
 						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						u.visit,
@@ -77,7 +78,7 @@ WITH included_subjects AS (
 									null::text AS trlobxfl,
 									null::text AS trblfl,
 									null::text AS treval,
-									'Radiologist'::text AS trevalid,
+									"RecordId"::text AS trevalid,
 									null::text AS tracptfl,
 									null::numeric AS visitnum,-----------------------to be mapped in outer query
 									"FolderName"::text AS visit,
@@ -145,9 +146,7 @@ SELECT
     tr.trdy::numeric AS trdy
     /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum)::text  AS objectuniquekey KEY*/ 
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid)
-;
-
+FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid);
 
 
 

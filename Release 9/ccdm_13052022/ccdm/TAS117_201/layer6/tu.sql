@@ -3,7 +3,6 @@ CCDM TU Table mapping
 Notes: Standard mapping to CCDM TU table
 */
 
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 				
@@ -28,7 +27,7 @@ WITH included_subjects AS (
         tu.tugrpid,
         tu.turefid,
         tu.tuspid,
-        concat(tu.tulnkid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tulnkid,
+        tulnkid,
         tu.tulnkgrp,
         tu.tutestcd,
         tu.tutest,
@@ -43,7 +42,8 @@ WITH included_subjects AS (
         case when tu.tudtc::date <= ex.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
         tu.tublfl,
         tu.tueval,
-        tu.tuevalid,
+        --tu.tuevalid,
+        concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tuevalid,
         tu.tuacptfl,
         ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as visitnum,
         tu.visit,
@@ -292,5 +292,8 @@ SELECT
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;
+
+
+
 
 

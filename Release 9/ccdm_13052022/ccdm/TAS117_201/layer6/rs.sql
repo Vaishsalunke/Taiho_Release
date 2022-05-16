@@ -24,7 +24,7 @@ WITH included_subjects AS (
         select distinct u.studyid,
                         u.siteid,
 						u.usubjid,						
-						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as rsseq,
+						coalesce(u.rsseq,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc)) as rsseq,
 						null as rsgrpid,
 						null as rsrefid,
 						null as rsspid,
@@ -48,7 +48,7 @@ WITH included_subjects AS (
 						rseval,
 						'Unknown'||ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc) as rsevalid,
 						null as rsacptfl,
-						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as visitnum,
+						coalesce(u.visitnum, row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc)) as visitnum,
 						u.visit,
 						null as visitdy,
 						null as taetord,
@@ -84,7 +84,9 @@ WITH included_subjects AS (
 									"ORDAT"::text AS rsdtc,									
 									null::text AS rsevlint,
 									0::numeric AS rstptnum,
-									'Unknown'::text AS rstptref
+									'Unknown'::text AS rstptref,
+									null::numeric as rsseq,
+									null::numeric as visitnum
 				 from tas117_201."OR" or1
 				 					
 					CROSS JOIN LATERAL(VALUES
@@ -111,7 +113,9 @@ WITH included_subjects AS (
 									null::text AS rsdtc,									
 									null::text AS rsevlint,
 									0::numeric AS rstptnum,
-									'Unknown'::text AS rstptref
+									'Unknown'::text AS rstptref,
+									"RecordId"::numeric as rsseq,
+									"RecordId"::numeric as visitnum
 									
 				 from tas117_201."BOR"
 					
@@ -183,6 +187,3 @@ FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.sitei
 
 
 
-
-
-		
