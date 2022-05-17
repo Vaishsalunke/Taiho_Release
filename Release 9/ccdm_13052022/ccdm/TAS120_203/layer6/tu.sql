@@ -58,7 +58,7 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								coalesce(nullif("NLID",''),"RecordId"::text) :: text as tulnkid,
-								case when nullif("NLSITE",'') is not null then concat("RecordPosition",'-',"NLSITE")
+								case when nullif("NLSITE",'') is not null then concat("NLID",'-',"NLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'Present':: text as tuorres,
@@ -85,7 +85,7 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
                                  null::numeric as tuseq,								
                                  coalesce(nullif("NTLBID",''),"RecordId"::text):: text as tulnkid,
-								 case when nullif("NTLBSITE",'') is not null then concat("RecordPosition",'-',"NTLBSITE")
+								 case when nullif("NTLBSITE",'') is not null then concat("NTLBID",'-',"NTLBSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								case when "NTLBYN" = 'Yes' then 'Present'
@@ -113,7 +113,7 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								coalesce(nullif("NTLID",''),"RecordId"::text):: text as tulnkid,
-								case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
+								case when nullif("NTLSITE",'') is not null then concat("NTLID",'-',"NTLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"NTLBSTAT":: text as tuorres,
@@ -140,7 +140,7 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								coalesce(nullif("TLBID",''),"RecordId"::text):: text as tulnkid,
-								case when nullif("TLBSITE",'') is not null then concat("RecordPosition",'-',"TLBSITE")
+								case when nullif("TLBSITE",'') is not null then concat("TLBID",'-',"TLBSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLBDIM":: text as tuorres,
@@ -167,7 +167,7 @@ WITH included_subjects AS (
 								"Subject" :: text as Subject,
 								null::numeric as tuseq,
 								coalesce(nullif("TLID",''),"RecordId"::text):: text as tulnkid,
-								case when nullif("TLSITE",'') is not null then concat("RecordPosition",'-',"TLSITE")
+								case when nullif("TLSITE",'') is not null then concat("TLID",'-',"TLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								"TLDIM":: text as tuorres,
