@@ -71,12 +71,13 @@ WITH included_subjects AS (
 			from tas2940_101."OR"
 						
 						CROSS JOIN LATERAL(values 
-												("ORNLYN",'NEWLIND' ,'New Lesion Indicator',case when "ORNLYN" = 'Yes' then 'New lesion' else '' end ,case when "ORNLYN" = 'Yes' then 'New lesion' else '' end,case when "ORNLYN" ='Yes' then 'Completed' else 'Not Completed' end),
+												("ORNLYN",'NEWLIND' ,'New Lesion Indicator',"ORRES","ORRES_STD",case when "ORNLYN" ='Yes' then 'Completed' else 'Not Completed' end),
 												("ORTLRES" ,'TRGRESP' , 'Target Response',"ORTLRES","ORTLRES_STD",case when "ORTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
 												("ORNTLRES",'NTRGRESP' , 'Non-Target Response',"ORNTLRES","ORNTLRES_STD",case when "ORNTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
-												("ORRES",'OVRLRESP' ,'Overall Response',"ORRES","ORRES_STD",case when "ORRES"!='' then 'Completed' else 'Not Completed' end )
+												("ORRES",'OVRLRESP' ,'Overall Response',case when "ORNLYN" = 'Yes' then 'New lesion' else '' end ,case when "ORNLYN" = 'Yes' then 'New lesion' else '' end,case when "ORRES"!='' then 'Completed' else 'Not Completed' end )
 				)as t (cd1,rstestcd,rstest,rsorres,rsstresc,rsstat)
 			
+				
 		left join cqs.dm
 		on project = dm.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = dm.siteid and "Subject" = dm.usubjid
 		left join ex_date a

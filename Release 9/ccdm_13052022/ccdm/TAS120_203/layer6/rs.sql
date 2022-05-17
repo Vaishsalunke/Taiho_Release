@@ -92,10 +92,10 @@ WITH included_subjects AS (
 				 from tas120_203."OR"
 					
 					CROSS JOIN LATERAL(VALUES
-					("ORRES",'OVRLRESP','Overall Response', case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
+					("ORRES",'OVRLRESP','Overall Response',"ORRES","ORRES_STD" , case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
 					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
 					("ORNTLRES", 'NTRGRESP','Non-Target Response',"ORNTLRES","ORNTLRES_STD", case when "ORNTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
-					("ORNLYN", 'NEWLIND','New Lesion Indicator',"ORRES","ORRES_STD",case when "ORNLYN" = 'Yes' then 'Completed' else 'Not Completed' end)
+					("ORNLYN", 'NEWLIND','New Lesion Indicator',case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN" = 'Yes' then 'Completed' else 'Not Completed' end)
 					
 					) t (rstestcd_1,rstestcd,rstest,rsorres,rsstresc,rsstat)
 										
