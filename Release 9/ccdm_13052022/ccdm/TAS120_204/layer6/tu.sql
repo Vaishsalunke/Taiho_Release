@@ -1,8 +1,3 @@
-/*
-CCDM TU Table mapping
-Notes: Standard mapping to CCDM TU table
-*/
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
                
@@ -25,7 +20,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                concat(tulnkid,(ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc)))::text AS tulnkid,
+                tulnkid::text AS tulnkid,
                 null::text AS tulnkgrp,
                 tutestcd::text AS tutestcd,
                 tutest::text AS tutest,
@@ -40,7 +35,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                case when tudtc <= ex1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tublfl::text AS tublfl,
                 null::text AS tueval,
-                tuevalid::text AS tuevalid,
+                concat(tuevalid,(ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc)))::text AS tuevalid,
                 null::text AS tuacptfl,
                 (ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc))::numeric AS visitnum,
                 tu.visit::text AS visit,
@@ -286,5 +281,6 @@ SELECT
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;
+
 
 

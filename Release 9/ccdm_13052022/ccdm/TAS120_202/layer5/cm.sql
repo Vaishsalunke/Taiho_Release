@@ -35,10 +35,16 @@ WITH included_subjects AS (
 						"CMTRT_ATC3"::text As CMATCTXT3
                 FROM 
 ( select *,case when ((length(trim("CMSTDAT_RAW"))= 11 or length(trim("CMSTDAT_RAW"))= 10) and "CMSTDAT_RAW" not like '%0000%') and "CMSTDAT_RAW" !=''
-then to_date(concat(replace (replace (substring (upper("CMSTDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("CMSTDAT_RAW"),3),'UNK','Jan')),'DD Mon YYYY')
+then (case when lower(reverse(substring(reverse("CMSTDAT_RAW"),1,3)))='unk' then null else
+to_date(
+concat(replace (replace (substring (upper("CMSTDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("CMSTDAT_RAW"),3),'UNK','Jan'))
+,'DD Mon YYYY') end)
 else null end as cmstdtc,
 case when ((length(trim("CMENDAT_RAW"))= 11 or length(trim("CMENDAT_RAW"))= 10) and "CMENDAT_RAW" not like '%0000%' ) and "CMENDAT_RAW" !=''
-then to_date(concat(replace(replace(substring(upper("CMENDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("CMENDAT_RAW"),3),'UNK','Jan')),'DD Mon YYYY') 
+then (case when lower(reverse(substring(reverse("CMENDAT_RAW"),1,3)))='unk' then null else
+to_date(
+concat(replace (replace (substring (upper("CMENDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("CMENDAT_RAW"),3),'UNK','Jan'))
+,'DD Mon YYYY') end)
 else null end AS cmendtc
 from "tas120_202"."CM"	
 )cm 
@@ -84,4 +90,3 @@ SELECT
 FROM cm_data cm
 JOIN included_subjects s ON (cm.studyid = s.studyid AND cm.siteid = s.siteid AND cm.usubjid = s.usubjid)
 JOIN included_site si ON (cm.studyid = si.studyid AND cm.siteid = si.siteid);
-
