@@ -51,7 +51,7 @@ WITH included_subjects AS (
 									   ,'\s\([0-9]\)','')
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
-                        'TAS120-204-Dose Adjusted'::text AS extrt,
+                        'Futibatinib-Dose Adjusted'::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
                         "EXOSDOSE"::numeric AS exdose,
@@ -91,7 +91,7 @@ WITH included_subjects AS (
 									   ,'\s\([0-9]\)','')
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
-                        'TAS120-204-Planned Dose'::text AS extrt,
+                        'Futibatinib-Planned Dose'::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
                         "EXOPDOSE"::numeric AS exdose,
@@ -131,7 +131,7 @@ WITH included_subjects AS (
 									   ,'\s\([0-9]\)','')
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
-                      'TAS120-204-Dose Adjusted'::text AS extrt,
+                    case when "EXOADJDS" is not null then  concat('Binimetinib','-',"EXOADJDS",'-Dose Adjusted') else 'Binimetinib-Dose Adjusted' end ::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
                      "EXOSDOSE2" ::numeric AS exdose,
@@ -169,7 +169,7 @@ WITH included_subjects AS (
 									   ,'\s\([0-9]\)','')
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
-                      'TAS120-204-Planned Dose'::text AS extrt,
+                      case when nullif ("EXOADJDS",'' )is not null then  concat('Binimetinib','-',"EXOADJDS",'-Planned Dose') else 'Binimetinib-Planned Dose' end::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
                      "EXOPDOSE2" ::numeric AS exdose,
@@ -227,6 +227,9 @@ SELECT
 FROM ex_data ex
 JOIN included_subjects s ON (ex.studyid = s.studyid AND ex.siteid = s.siteid AND ex.usubjid = s.usubjid)
 join site_data sd on (ex.studyid = sd.studyid AND ex.siteid = sd.siteid);
+
+
+
 
 
 

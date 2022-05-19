@@ -2,7 +2,6 @@
 CCDM EX mapping
 Notes: Standard mapping to CCDM EX table
 */
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
@@ -11,8 +10,8 @@ SELECT
      studyid,
      siteid,
      usubjid,
-     --row_number() over (partition by ex."studyid", ex."siteid", ex."usubjid" ORDER BY ex."exstdtc")::int AS exseq,
-	 exseq,
+     row_number() over (partition by ex."studyid", ex."siteid", ex."usubjid" ORDER BY ex."exstdtc")::int AS exseq,
+	--- exseq,
      visit,
      extrt,
      excat,
@@ -39,7 +38,7 @@ SELECT
         SELECT 
         "SiteNumber"::text	AS	siteid,
         "Subject"::text	AS	usubjid,
-        concat("instanceId","PageRepeatNumber","RecordPosition")::INT  AS exseq,
+        NULL::INT  AS exseq,
         "project"::text	AS	studyid,
         trim(REGEXP_REPLACE
 			(REGEXP_REPLACE
@@ -49,34 +48,34 @@ SELECT
 						   ,'\s\([0-9]\)','')
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
-		'TAS120-201'::text	AS	extrt,
+		'TAS120-201-Dose Adjusted'::text	AS	extrt,
         'Metastatic Breast Cancer'::text	AS	excat,
         NULL::text	AS	exscat,
-        --"EXOSDOSE"::numeric	AS	exdose,
-        case when "EXOADJYN" = 'Yes' then "EXOSDOSE" else "EXOPDOSE" end::numeric	AS	exdose,
+        "EXOSDOSE"::numeric	AS	exdose,
+        --case when "EXOADJYN" = 'Yes' then "EXOSDOSE" else "EXOPDOSE" end::numeric	AS	exdose,
         NULL::text	AS	exdostxt,
-        --"EXOSDOSE_Units"::text	AS	exdosu,
-        case when "EXOADJYN" = 'Yes' then "EXOSDOSE_Units" else "EXOPDOSE_Units" end::text	AS	exdosu,
+        "EXOSDOSE_Units"::text	AS	exdosu,
+        ---case when "EXOADJYN" = 'Yes' then "EXOSDOSE_Units" else "EXOPDOSE_Units" end::text	AS	exdosu,
         NULL::text	AS	exdosfrm,
         NULL::text	AS	exdosfrq,
         NULL::text	AS	exdostot,
         --coalesce("EXOCYCSDT","EXOSTDAT")::text	AS	exstdtc,
-		case when "EXOADJYN" = 'Yes' then "EXOSTDAT" else "EXOCYCSDT" end ::date AS exstdtc,
+		"EXOSTDAT"::date AS exstdtc,
         NULL::time without time zone	AS	exsttm,
         NULL::text	AS	exstdy,
-        --"EXOENDAT"::date	AS	exendtc,
-		case when "EXOADJYN" = 'Yes' then "EXOENDAT" else "EXOCYCEDT" end ::date AS exendtc,
+        "EXOENDAT"::date	AS	exendtc,
         NULL::time without time zone	AS	exendtm,
         NULL::text	AS	exendy,
         NULL::text	AS	exdur
        from tas120_201."EXO"
+       where "EXOSTDAT" is not null
         
-        UNION ALL
-        
-        SELECT 
+        UNION all
+        			
+         SELECT 
         "SiteNumber"::text	AS	siteid,
         "Subject"::text	AS	usubjid,
-       	concat("PageRepeatNumber","instanceId","RecordPosition")::INT  AS exseq,
+        NULL::INT  AS exseq,
         "project"::text	AS	studyid,
         trim(REGEXP_REPLACE
 			(REGEXP_REPLACE
@@ -86,12 +85,49 @@ SELECT
 						   ,'\s\([0-9]\)','')
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
-        'Fulvestrant'::text	AS	extrt,
+		'TAS120-201-Planned Dose'::text	AS	extrt,
         'Metastatic Breast Cancer'::text	AS	excat,
         NULL::text	AS	exscat,
-        case when "EXIREYN"='Yes' then "EXISDOSE" else "EXIPDOSE" end::numeric	AS	exdose,
+     	"EXOPDOSE"::numeric	AS	exdose,
+        --case when "EXOADJYN" = 'Yes' then "EXOSDOSE" else "EXOPDOSE" end::numeric	AS	exdose,
         NULL::text	AS	exdostxt,
-        case when "EXIREYN"='Yes' then "EXISDOSE_Units" else "EXIPDOSE_Units" end::text	AS	exdosu,
+        "EXOPDOSE_Units"::text	AS	exdosu,
+        ---case when "EXOADJYN" = 'Yes' then "EXOSDOSE_Units" else "EXOPDOSE_Units" end::text	AS	exdosu,
+        NULL::text	AS	exdosfrm,
+        NULL::text	AS	exdosfrq,
+        NULL::text	AS	exdostot,
+        --coalesce("EXOCYCSDT","EXOSTDAT")::text	AS	exstdtc,
+		"EXOCYCSDT"::date AS exstdtc,
+        NULL::time without time zone	AS	exsttm,
+        NULL::text	AS	exstdy,
+       "EXOCYCEDT"::date	AS	exendtc,
+        NULL::time without time zone	AS	exendtm,
+        NULL::text	AS	exendy,
+        NULL::text	AS	exdur
+       from tas120_201."EXO"
+       where "EXOCYCSDT" is not null
+        
+        union all 
+        
+        SELECT 
+        "SiteNumber"::text	AS	siteid,
+        "Subject"::text	AS	usubjid,
+       	NULL::INT  AS exseq,
+        "project"::text	AS	studyid,
+        trim(REGEXP_REPLACE
+			(REGEXP_REPLACE
+			(REGEXP_REPLACE
+			(REGEXP_REPLACE
+			("InstanceName",'\s\([0-9][0-9]\)','')
+						   ,'\s\([0-9]\)','')
+						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
+        'Fulvestrant-Dose Adjusted'::text	AS	extrt,
+        'Metastatic Breast Cancer'::text	AS	excat,
+        NULL::text	AS	exscat,
+        "EXISDOSE"::numeric	AS	exdose,
+        NULL::text	AS	exdostxt,
+        "EXISDOSE_Units"::text	AS	exdosu,
         NULL::text	AS	exdosfrm,
         NULL::text	AS	exdosfrq,
         NULL::text	AS	exdostot,
@@ -102,7 +138,44 @@ SELECT
         NULL::time without time zone	AS	exendtm,
         NULL::text	AS	exendy,
         NULL::text	AS	exdur
-        from tas120_201."EXI" ) ex )
+        from tas120_201."EXI"
+        where  "EXISTDAT" is not null 
+        
+union all 
+        	
+			        SELECT 
+        "SiteNumber"::text	AS	siteid,
+        "Subject"::text	AS	usubjid,
+       	NULL::INT  AS exseq,
+        "project"::text	AS	studyid,
+        trim(REGEXP_REPLACE
+			(REGEXP_REPLACE
+			(REGEXP_REPLACE
+			(REGEXP_REPLACE
+			("InstanceName",'\s\([0-9][0-9]\)','')
+						   ,'\s\([0-9]\)','')
+						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
+        'Fulvestrant-Planned Dose'::text	AS	extrt,
+        'Metastatic Breast Cancer'::text	AS	excat,
+        NULL::text	AS	exscat,
+       "EXIPDOSE"::numeric	AS	exdose,
+        NULL::text	AS	exdostxt,
+        "EXIPDOSE_Units"::text	AS	exdosu,
+        NULL::text	AS	exdosfrm,
+        NULL::text	AS	exdosfrq,
+        NULL::text	AS	exdostot,
+        "EXISTDAT"::date	AS	exstdtc,
+        NULL::time without time zone	AS	exsttm,
+        NULL::text	AS	exstdy,
+        null::date AS exendtc,
+        NULL::time without time zone	AS	exendtm,
+        NULL::text	AS	exendy,
+        NULL::text	AS	exdur
+        from tas120_201."EXI"
+        where  "EXISTDAT" is not null 
+        
+) ex )
 		,included_sites AS (
 SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregion FROM site)
 
@@ -139,3 +212,6 @@ SELECT
 FROM ex_data ex
 JOIN included_subjects s ON (ex.studyid = s.studyid AND ex.siteid = s.siteid AND ex.usubjid = s.usubjid)
 JOIN included_sites si ON (ex.studyid = si.studyid AND ex.siteid = si.siteid);
+
+
+
