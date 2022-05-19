@@ -26,8 +26,8 @@ WITH included_subjects AS (
 										,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 										,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 							) ::text AS visit,
-                        case when nullif("EXOADJDS",'') is not null then concat("EXOPFREQ",' -TAS2940- ',"EXOADJDS")
-                        else concat("EXOPFREQ",'-TAS2940-','NA') 
+                        case when nullif("EXOADJDS",'') is not null then concat("EXOPFREQ",' -TAS2940- ',"EXOADJDS",'-Dose Adjusted')
+                        else concat("EXOPFREQ",'-TAS2940-Dose Adjusted') 
                         end ::text AS extrt,
                         'Locally Advanced or Metastatic Solid Tumor Cancer'::text AS excat,
                         null::text AS exscat,
@@ -67,7 +67,7 @@ WITH included_subjects AS (
 										,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 										,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 							) ::text AS visit,
-                        Concat("EXOPFREQ",'-TAS2940')::text AS extrt,
+                        Concat("EXOPFREQ",'-TAS2940-Planned Dose')::text AS extrt,
                         'Locally Advanced or Metastatic Solid Tumor Cancer'::text AS excat,
                         null::text AS exscat,
                         "EXOPDOSE"::numeric AS exdose,
@@ -124,7 +124,9 @@ SELECT
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM ex_data ex
 JOIN included_subjects s ON (ex.studyid = s.studyid AND ex.siteid = s.siteid AND ex.usubjid = s.usubjid)
-join site_data sd on (ex.studyid = sd.studyid AND ex.siteid = sd.siteid);
+join site_data sd on (ex.studyid = sd.studyid AND ex.siteid = sd.siteid)
+;
+
 
 
 
