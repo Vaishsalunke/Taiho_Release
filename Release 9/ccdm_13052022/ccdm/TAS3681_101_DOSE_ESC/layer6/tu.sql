@@ -109,7 +109,7 @@ WITH included_subjects AS (
 								case when nullif("NTLSITE",'') is not null then concat("RecordPosition",'-',"NTLSITE")
 				                else 'NA' end::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
-								"NTLYN":: text as tuorres,
+								"NTLSTA":: text as tuorres,
 								"NTLSITE":: text as tuloc,
 								case when "NTLMETH"='Other' then "NTLOTH" else "NTLMETH" end:: Text as tumethod,
 								null::text as tulobxfl,
