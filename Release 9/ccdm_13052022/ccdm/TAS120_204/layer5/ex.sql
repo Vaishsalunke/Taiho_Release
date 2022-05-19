@@ -2,10 +2,38 @@
 CCDM EX mapping
 Notes: Standard mapping to CCDM EX table
 */
+
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      ex_data AS (
+     			SELECT
+     studyid,
+     siteid,
+     usubjid,
+     row_number() over (partition by ex."studyid", ex."siteid", ex."usubjid" ORDER BY ex."exstdtc")::int AS exseq,
+	 --exseq,
+     visit,
+     extrt,
+     excat,
+     exscat,
+     exdose,
+     exdostxt,
+     exdosu,
+     exdosfrm,
+     exdosfrq,
+     exdostot,
+     exstdtc,
+     exsttm,
+     exstdy,
+     exendtc,
+     exendtm,
+     exendy,
+     exdur
+	 ,null::text AS studyname
+	 ,null::text AS drugrsp
+	 ,null::text AS drugrspcd
+     from (
                 SELECT distinct project ::text AS studyid,
                         'TAS120_204'::text AS studyname,
                         project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
@@ -13,7 +41,7 @@ WITH included_subjects AS (
                         null::text AS sitecountry,
                         "Subject" ::text AS usubjid,
                         --concat("instanceId","RecordPosition") ::int AS exseq, 
-                        concat("RecordId","PageRepeatNumber","RecordPosition")::int as exseq,
+                        null::int as exseq,
                         /*(row_number() over (partition by [studyid],[siteid],[usubjid] order [exstdtc,exsttm]))::int AS exseq,*/
                         trim(REGEXP_REPLACE
 						(REGEXP_REPLACE
@@ -23,36 +51,77 @@ WITH included_subjects AS (
 									   ,'\s\([0-9]\)','')
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
-                        'Futibatinib'::text AS extrt,
+                        'TAS120-204-Dose Adjusted'::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
-                        case when "EXOADJYN" = 'No' then "EXOPDOSE" else "EXOSDOSE" end ::numeric AS exdose,
+                        "EXOSDOSE"::numeric AS exdose,
                         null::text AS exdostxt,
-                       (case when "EXOADJYN" = 'No' then "EXOPDOSE_Units"::text else "EXOSDOSE_Units" ::text end)::text AS exdosu,
+                       "EXOSDOSE_Units"::text AS exdosu,
                         null::text AS exdosfrm,
                         null::text AS exdosfrq,
                         null::numeric AS exdostot,
                         --coalesce("EXOCYCSDT","EXOSTDAT") ::date AS exstdtc,
-						case when "EXOADJYN" = 'Yes' then "EXOSTDAT" else "EXOCYCSDT" end ::date AS exstdtc,
+						"EXOSTDAT" ::date AS exstdtc,
                         null::time AS exsttm,
                         null::int AS exstdy,
                         --"EXOENDAT" ::date AS exendtc,
-						case when "EXOADJYN" = 'Yes' then "EXOENDAT" else "EXOCYCEDT" end ::date AS exendtc,
+						"EXOENDAT" ::date AS exendtc,
                         null::time AS exendtm,
                         null::int AS exendy,
                         null::text AS exdur,
                         null::text AS drugrsp,
                         null::text AS drugrspcd
                         from tas120_204."EXO" exo 
-                         where "EXOADJYN"!= '' 
+                        where "EXOSTDAT" is not null 
  union all
+ 						SELECT distinct project ::text AS studyid,
+                        'TAS120_204'::text AS studyname,
+                        project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
+                        null::text AS sitename,
+                        null::text AS sitecountry,
+                        "Subject" ::text AS usubjid,
+                        --concat("instanceId","RecordPosition") ::int AS exseq, 
+                        null::int as exseq,
+                        /*(row_number() over (partition by [studyid],[siteid],[usubjid] order [exstdtc,exsttm]))::int AS exseq,*/
+                        trim(REGEXP_REPLACE
+						(REGEXP_REPLACE
+						(REGEXP_REPLACE
+						(REGEXP_REPLACE
+						("InstanceName",'\s\([0-9][0-9]\)','')
+									   ,'\s\([0-9]\)','')
+									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
+                        'TAS120-204-Planned Dose'::text AS extrt,
+                        'KRAS Gene Mutation'::text AS excat,
+                        null::text AS exscat,
+                        "EXOPDOSE"::numeric AS exdose,
+                        null::text AS exdostxt,
+                       "EXOPDOSE_Units"::text AS exdosu,
+                        null::text AS exdosfrm,
+                        null::text AS exdosfrq,
+                        null::numeric AS exdostot,
+                        --coalesce("EXOCYCSDT","EXOSTDAT") ::date AS exstdtc,
+						"EXOCYCSDT" ::date AS exstdtc,
+                        null::time AS exsttm,
+                        null::int AS exstdy,
+                        --"EXOENDAT" ::date AS exendtc,
+						"EXOCYCEDT" ::date AS exendtc,
+                        null::time AS exendtm,
+                        null::int AS exendy,
+                        null::text AS exdur,
+                        null::text AS drugrsp,
+                        null::text AS drugrspcd
+                        from tas120_204."EXO" exo 
+                        where "EXOCYCSDT" is not null 
+ union all
+ 					
  SELECT  distinct project ::text AS studyid,
                         'TAS120_204'::text AS studyname,
                         project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
                         null::text AS sitename,
                         null::text AS sitecountry,
                         "Subject" ::text AS usubjid,
-                        concat("PageRepeatNumber","RecordId","RecordPosition")::int as exseq,
+                        null::int as exseq,
                        -- concat("instanceId","RecordPosition") ::int AS exseq, /*(row_number() over (partition by [studyid],[siteid],[usubjid] order [exstdtc,exsttm]))::int AS exseq,*/
                         trim(REGEXP_REPLACE
 						(REGEXP_REPLACE
@@ -62,30 +131,68 @@ WITH included_subjects AS (
 									   ,'\s\([0-9]\)','')
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
-                        case when "EXOADJYN" = 'Yes' then concat('Binimetinib','-',"EXOADJDS") else 'Binimetinib' end ::text AS extrt,
+                      'TAS120-204-Dose Adjusted'::text AS extrt,
                         'KRAS Gene Mutation'::text AS excat,
                         null::text AS exscat,
-                       case when "EXOADJYN" = 'No' then "EXOPDOSE2" else "EXOSDOSE2" end ::numeric AS exdose,
+                     "EXOSDOSE2" ::numeric AS exdose,
                         null::text AS exdostxt,
-                        (case when "EXOADJYN" = 'No' then "EXOPDOSE2_Units"::text else "EXOSDOSE2_Units"::text end) ::text AS exdosu,
+                        "EXOSDOSE2_Units"::text AS exdosu,
                         null::text AS exdosfrm,
                         null::text AS exdosfrq,
                         null::numeric AS exdostot,
                        -- coalesce("EXOCYCSDT","EXOSTDAT")::date AS exstdtc,
-					   case when "EXOADJYN" = 'No' then "EXOCYCSDT" else "EXOSTDAT" end ::date AS exstdtc,
+					 "EXOSTDAT"::date AS exstdtc,
                         null::time AS exsttm,
                         null::int AS exstdy,
-                        --"EXOENDAT"::date AS exendtc,
-						case when "EXOADJYN" = 'No' then "EXOCYCEDT" else "EXOENDAT" end ::date AS exendtc,
+                        "EXOENDAT"::date AS exendtc,
                         null::time AS exendtm,
                         null::int AS exendy,
                         null::text AS exdur,
                         null::text AS drugrsp,
                         null::text AS drugrspcd
                         from tas120_204."EXO2" exo2
-                         where "EXOADJYN"!= ''),
-						
-	site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
+                         where  "EXOSTDAT" is not null
+    union all       
+    					 SELECT  distinct project ::text AS studyid,
+                        'TAS120_204'::text AS studyname,
+                        project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
+                        null::text AS sitename,
+                        null::text AS sitecountry,
+                        "Subject" ::text AS usubjid,
+                       null::int as exseq,
+                       -- concat("instanceId","RecordPosition") ::int AS exseq, /*(row_number() over (partition by [studyid],[siteid],[usubjid] order [exstdtc,exsttm]))::int AS exseq,*/
+                        trim(REGEXP_REPLACE
+						(REGEXP_REPLACE
+						(REGEXP_REPLACE
+						(REGEXP_REPLACE
+						("InstanceName",'\s\([0-9][0-9]\)','')
+									   ,'\s\([0-9]\)','')
+									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
+                      'TAS120-204-Planned Dose'::text AS extrt,
+                        'KRAS Gene Mutation'::text AS excat,
+                        null::text AS exscat,
+                     "EXOPDOSE2" ::numeric AS exdose,
+                        null::text AS exdostxt,
+                        "EXOPDOSE2_Units"::text AS exdosu,
+                        null::text AS exdosfrm,
+                        null::text AS exdosfrq,
+                        null::numeric AS exdostot,
+                       -- coalesce("EXOCYCSDT","EXOSTDAT")::date AS exstdtc,
+					 "EXOCYCSDT"::date AS exstdtc,
+                        null::time AS exsttm,
+                        null::int AS exstdy,
+                        "EXOCYCEDT"::date AS exendtc,
+                        null::time AS exendtm,
+                        null::int AS exendy,
+                        null::text AS exdur,
+                        null::text AS drugrsp,
+                        null::text AS drugrspcd
+                        from tas120_204."EXO2" exo2
+                         where  "EXOCYCSDT" is not null
+ ) ex),
+                         
+site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 
 SELECT
         /*KEY (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid)::text AS comprehendid, KEY*/
@@ -115,11 +222,18 @@ SELECT
         ex.exdur::text AS exdur,
         ex.drugrsp::text AS drugrsp,
         ex.drugrspcd::text AS drugrspcd
-       , (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey 
+       /*KEY, (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM ex_data ex
 JOIN included_subjects s ON (ex.studyid = s.studyid AND ex.siteid = s.siteid AND ex.usubjid = s.usubjid)
 join site_data sd on (ex.studyid = sd.studyid AND ex.siteid = sd.siteid);
+
+
+
+
+
+
+
 
 
 
