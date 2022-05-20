@@ -91,7 +91,7 @@ WITH included_subjects AS (
 				 					
 					CROSS JOIN LATERAL(VALUES
 					("ORRES",'OVRLRESP','Overall Response', "ORRES","ORRES_STD" , case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
-					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
+					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when "ORTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
 					("ORNTLRES", 'NTRGRESP','Non-Target Response',"ORNTLRES","ORNTLRES_STD", case when "ORNTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
 					("ORNLYN", 'NEWLIND','New Lesion Indicator',case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end,case when "ORNLYN" = 'Yes' then 'Completed' else 'Not Completed' end)
 					
@@ -185,7 +185,6 @@ SELECT
     /*KEY , (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
-
 
 
 

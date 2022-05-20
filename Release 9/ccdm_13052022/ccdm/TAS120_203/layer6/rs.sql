@@ -3,6 +3,7 @@ CCDM RS Table mapping
 Notes: Standard mapping to CCDM RS table
 */
 
+
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
                 
@@ -26,7 +27,7 @@ WITH included_subjects AS (
         select distinct u.studyid,
                         u.siteid,
 						u.usubjid,						
-						coalesce(u.rsseq, row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc)) as rsseq,
+						rsseq,
 						null as rsgrpid,
 						null as rsrefid,
 						null as rsspid,
@@ -50,7 +51,7 @@ WITH included_subjects AS (
 						rseval,
 						'Unknown'||ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc) as rsevalid,
 						null as rsacptfl,
-						coalesce(u.visitnum,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc)) as visitnum,
+						u.visitnum,
 						u.visit,
 						null as visitdy,
 						null as taetord,
@@ -87,13 +88,13 @@ WITH included_subjects AS (
 									'Unknown'::text AS rseval,
 									0::numeric AS rstptnum,
 									'Unknown'::text AS rstptref,
-									null::numeric as rsseq,
-									null::numeric as visitnum
+									row_number()over(partition by project,siteid,"Subject" order by "ORDAT")::numeric AS rsseq,
+									row_number()over(partition by project,siteid,"Subject" order by "ORDAT")::numeric as visitnum
 				 from tas120_203."OR"
 					
 					CROSS JOIN LATERAL(VALUES
 					("ORRES",'OVRLRESP','Overall Response',"ORRES","ORRES_STD" , case when nullif("ORRES",'') is not null then 'Completed' else 'Not Completed' end ),
-					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when nullif("ORTLRES",'') is not null then 'Completed' else 'Not Completed' end),
+					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when "ORTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
 					("ORNTLRES", 'NTRGRESP','Non-Target Response',"ORNTLRES","ORNTLRES_STD", case when "ORNTLYN" = 'Yes' then 'Completed' else 'Not Completed' end),
 					("ORNLYN", 'NEWLIND','New Lesion Indicator',case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN" = 'Yes' then 'Completed' else 'Not Completed' end)
 					
