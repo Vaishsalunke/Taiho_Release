@@ -16,7 +16,6 @@ subject_count as (
 							from   tas2940_101."IE"
 							where "IEYN"='Yes'
 						  )w group by 2,3
-
 				  ),
 				 
 max_date_subject as (
@@ -31,21 +30,17 @@ max_date_subject as (
 						   					select coalesce("MinCreated","RecordDate") as IEDAT
 											from   tas2940_101."IE"
 						   				)	w   
-						
 							  )	e group by 1,2 
-
 					  )		,
 					  
 					  
 site_count as (
 				select count(*) as site_count,
-					   extract (month from "siv"::date) as month,
-					   extract (year from "siv"::date) as year
+					   extract (month from nullif("siv",'')::date) as month,
+					   extract (year from nullif("siv",'')::date) as year
    			    from tas2940_101_ctms.site_startup_metrics
    			    where trim(site_status_icon)='Ongoing'
 				group by 2,3
-				
-
 				)	,
 				
 max_date_site as (
@@ -53,12 +48,11 @@ max_date_site as (
 						   year,
 						   max("siv") as "siv"
 					from (
-							select extract (month from "siv"::date) as month,
-					   			   extract (year from "siv"::date) as year,
-					   			   "siv"::date
+							select extract (month from nullif("siv",'')::date) as month,
+					   			   extract (year from nullif("siv",'')::date) as year,
+					   			   nullif("siv",'')::date as "siv"
 					   		from tas2940_101_ctms.site_startup_metrics	   
 							)e group by 1,2	   
-
 				  ),
 				  
 				  
