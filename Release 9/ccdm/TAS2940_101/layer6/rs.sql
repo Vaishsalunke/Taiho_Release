@@ -8,13 +8,13 @@ WITH included_subjects AS (
 				
 		ex_date as (
 					select studyid,usubjid,siteid, min(exstdtc) ex_mindt 
-					from cqs.ex
+					from ex
 					group by 1,2,3
 				),
 		
 		 ex_visit as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
-				 from 	cqs.ex
+				 from 	ex
 				 where visit like '%Cycle 01' and exdose is not null
 				),	
    
@@ -78,7 +78,7 @@ WITH included_subjects AS (
 				)as t (cd1,rstestcd,rstest,rsorres,rsstresc,rsstat)
 			
 				
-		left join cqs.dm
+		left join dm
 		on project = dm.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = dm.siteid and "Subject" = dm.usubjid
 		left join ex_date a
 		on project = a.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = a.siteid and "Subject" = a.usubjid

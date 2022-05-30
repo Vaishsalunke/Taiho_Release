@@ -8,12 +8,12 @@ WITH included_subjects AS (
 	
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-				from cqs.ex
+				from ex
 				group by 1,2,3
 				),
 	ex_visit as (
 				 select 	studyid,siteid,usubjid,visit, exstdtc--min(exstdtc) ex_mindt_visit
-				 from 		cqs.ex
+				 from 		ex
 				 where 		visit like '%Cycle 1 Day 1' 
 				 and 		exdose is not null	
 				 --group by 	1,2,3,4
@@ -71,7 +71,7 @@ WITH included_subjects AS (
 								"NLIMGDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas3681_101."NL" nl
-					left join 	cqs.dm
+					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and nl."Subject"=dm.usubjid
 										
 					union all
@@ -96,7 +96,7 @@ WITH included_subjects AS (
 								"NTLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas3681_101."NTLB" ntlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntlb."Subject"=dm.usubjid
 										
 					union all
@@ -121,7 +121,7 @@ WITH included_subjects AS (
 								"NTLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas3681_101."NTL" ntl
-					left join 	cqs.dm
+					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntl."Subject"=dm.usubjid
 									
 					union all
@@ -146,7 +146,7 @@ WITH included_subjects AS (
 								"TLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas3681_101."TLB" tlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tlb."Subject"=dm.usubjid
 									
 					union all
@@ -171,7 +171,7 @@ WITH included_subjects AS (
 								"TLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas3681_101."TL" tl
-					left join 	cqs.dm
+					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tl."Subject"=dm.usubjid
 					
 		)tu	

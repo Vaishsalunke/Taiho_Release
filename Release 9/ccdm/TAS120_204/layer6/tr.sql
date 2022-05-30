@@ -8,7 +8,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 	 ex_visit as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
-				 from 	cqs.ex
+				 from 	ex
 				 where visit like '%Cycle 01' and exdose is not null
 				),	
 	tr_data AS (
@@ -57,7 +57,7 @@ WITH included_subjects AS (
 												("ORRES"::text,'Overall RECIST Response'::text,"ORRES","ORRES_STD",case when "ORRES"!='' then 'Completed' else 'Not Completed'end)
 									)as t (cd1,trtestcd,trorres,trstresc,trstat)
 			
-			left join cqs.dm								
+			left join dm								
 			on project = dm."studyid" and concat(project,'_',split_part("SiteNumber",'_',2))::text  = dm.siteid and "Subject"= dm."usubjid"
 			left join  ex_visit a
 			on project = a."studyid"  and concat(project,'_',split_part("SiteNumber",'_',2))::text  = a.siteid and "Subject"= a."usubjid"

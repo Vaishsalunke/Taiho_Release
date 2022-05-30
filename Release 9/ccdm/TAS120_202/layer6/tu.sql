@@ -9,13 +9,13 @@ WITH included_subjects AS (
 	
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-				from cqs.ex
+				from ex
 				group by 1,2,3
 				),
 				
 	ex_visit as (
 				 select 	studyid,siteid,usubjid,visit,exstdtc
-				 from 		cqs.ex
+				 from 		ex
 				 where 		visit in ('Cycle 1 Day 1','Day 01 Cycle 01')
 				 and 		exdose is not null	
 				),
@@ -73,7 +73,7 @@ WITH included_subjects AS (
 								"NLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."NL" nl
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_202'
 					            and nl."SiteNumber" = dm.siteid
 					            and nl."Subject"=dm.usubjid					             
@@ -90,6 +90,7 @@ WITH included_subjects AS (
 								'Lesion Identification':: text as tutest,
 								'Present':: text as tuorres,
 								"NTLBSITE":: text as tuloc,
+								--"NTLBSITE":: text as tuloc,
 								case when "NTLBMETH"='Other' then "NTLBOTH" else "NTLBMETH" end:: Text as tumethod,
 								null::text as tulobxfl,
 								'Y':: text as tublfl,
@@ -100,7 +101,7 @@ WITH included_subjects AS (
 								"NTLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."NTLB" ntlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_202'
 					            and ntlb."SiteNumber" = dm.siteid
 					            and ntlb."Subject"=dm.usubjid		
@@ -127,7 +128,7 @@ WITH included_subjects AS (
 							    "NTLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."NTL" ntl
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_202'
 					            and ntl."SiteNumber" = dm.siteid
 					            and ntl."Subject"=dm.usubjid		
@@ -154,7 +155,7 @@ WITH included_subjects AS (
 								"TLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."TLB" tlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_202'
 					            and tlb."SiteNumber" = dm.siteid
 					            and tlb."Subject"=dm.usubjid
@@ -181,7 +182,7 @@ WITH included_subjects AS (
 								"TLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."TL" tl
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_202'
 					            and tl."SiteNumber" = dm.siteid
 					            and tl."Subject"=dm.usubjid

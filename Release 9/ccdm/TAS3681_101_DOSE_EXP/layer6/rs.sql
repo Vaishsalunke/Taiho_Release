@@ -7,12 +7,12 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-				from cqs.ex
+				from ex
 				group by 1,2,3
 			),
 	ex_visit as (
 				  select studyid,siteid,usubjid,visit,exstdtc ex_dt
-				 from cqs.ex
+				 from ex
 				 where visit like '%Week 1 Day 1 Cycle 01' and exdose is not null
 				 
 				 ),				
@@ -133,7 +133,7 @@ WITH included_subjects AS (
 			) rs
 		left join 	ex_data ex
 		on rs.studyid=ex.studyid and rs.siteid=ex.siteid and rs.usubjid=ex.usubjid
-		left join cqs.dm
+		left join dm
 		on rs.studyid=dm.studyid and rs.siteid=dm.siteid and rs.usubjid=dm.usubjid
 		left join ex_visit exv
 		on rs.studyid=exv.studyid and rs.siteid=exv.siteid and rs.usubjid=exv.usubjid

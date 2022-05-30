@@ -3,12 +3,12 @@ WITH included_subjects AS (
                
 ex_data as (
     select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-from cqs.ex
+from ex
 group by studyid,siteid,usubjid
 ),
 ex_visit as (
 select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
-from cqs.ex
+from ex
 where visit like '%Cycle 1 Day 1' and exdose is not null
 ),
     tu_data AS (
@@ -238,7 +238,7 @@ From tas120_204."TL" tl
 					on			tu."study" = ex1."studyid" and concat(study,'_',split_part(tu.siteid,'_',2))=ex1.siteid and tu.usubjid= ex1."usubjid"
 					left join	ex_visit ex2
 					on			tu."study"=ex2."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = ex2.siteid and tu.usubjid= ex2."usubjid" 
-					left join 	cqs.dm
+					left join 	dm
 					on 		tu."study" = dm."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = dm.siteid and tu.usubjid=dm."usubjid"
 )
 

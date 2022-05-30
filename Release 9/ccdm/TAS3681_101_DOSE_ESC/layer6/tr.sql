@@ -11,7 +11,7 @@ WITH included_subjects AS (
 
 	ex_data as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_dt
-				 from cqs.ex
+				 from ex
 				 where visit like '%%Week 1 Day 1 Cycle 01' and exdose is not null
 				 			 
 				),
@@ -104,7 +104,7 @@ WITH included_subjects AS (
 					) t (trtestcd_1,trtestcd,trstresc,trorres,trstat)
 					) u 
 		
-		left join cqs.dm 
+		left join dm 
 		on u.studyid=dm.studyid and u.siteid=dm.siteid and u.usubjid=dm.usubjid
 		left join ex_data ex 
 		on u.studyid=ex.studyid and u.siteid=ex.siteid and u.usubjid=ex.usubjid

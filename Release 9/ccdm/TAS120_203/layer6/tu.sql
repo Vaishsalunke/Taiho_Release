@@ -8,13 +8,13 @@ WITH included_subjects AS (
 	
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-				from cqs.ex
+				from ex
 				group by 1,2,3
 				),
 				
 	ex_visit as (
 				 select 	studyid,siteid,usubjid,visit,exstdtc
-				 from 		cqs.ex
+				 from 		ex
 				 where 		visit in ('Cycle 1 Day 1','Day 01 Cycle 01')
 				 and 		exdose is not null	
 				),
@@ -73,7 +73,7 @@ WITH included_subjects AS (
 								"NLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		TAS120_203."NL" nl
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
 					            and concat('TAS120_203_',split_part("SiteNumber",'_',2)) = dm.siteid
 					            and nl."Subject"=dm.usubjid					           
@@ -101,7 +101,7 @@ WITH included_subjects AS (
 								"NTLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		TAS120_203."NTLB" ntlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
 					            and concat('TAS120_203_',split_part("SiteNumber",'_',2)) = dm.siteid
 					            and ntlb."Subject"=dm.usubjid		
@@ -128,7 +128,7 @@ WITH included_subjects AS (
 							    "NTLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		TAS120_203."NTL" ntl
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
 					            and concat('TAS120_203_',split_part("SiteNumber",'_',2)) = dm.siteid
 					            and ntl."Subject"=dm.usubjid		
@@ -155,7 +155,7 @@ WITH included_subjects AS (
 								"TLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		TAS120_203."TLB" tlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
 					            and concat('TAS120_203_',split_part("SiteNumber",'_',2)) = dm.siteid
 					            and tlb."Subject"=dm.usubjid
@@ -182,7 +182,7 @@ WITH included_subjects AS (
 								"TLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		TAS120_203."TL" tl
-					left join 	cqs.dm
+					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
 					            and concat('TAS120_203_',split_part("SiteNumber",'_',2)) = dm.siteid
 					            and tl."Subject"=dm.usubjid

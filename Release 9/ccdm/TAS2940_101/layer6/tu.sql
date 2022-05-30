@@ -9,12 +9,12 @@ WITH included_subjects AS (
 	
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-				from cqs.ex
+				from ex
 				group by 1,2,3
 				),
 	ex_visit as (
 				 select 	studyid,siteid,usubjid,visit,exstdtc
-				 from 		cqs.ex
+				 from 		ex
 				 where 		visit like '%Cycle 01' 
 				 and 		exdose is not null	
 				),
@@ -72,7 +72,7 @@ WITH included_subjects AS (
 								"NLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas2940_101."NL" nl
-					left join 	cqs.dm
+					left join 	dm
 					on 			nl."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and nl."Subject"=dm.usubjid
 										
 					union all
@@ -97,7 +97,7 @@ WITH included_subjects AS (
 								"NTLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas2940_101."NTLB" ntlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			ntlb."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and ntlb."Subject"=dm.usubjid
 										
 					union all
@@ -122,7 +122,7 @@ WITH included_subjects AS (
 								"NTLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas2940_101."NTL" ntl
-					left join 	cqs.dm
+					left join 	dm
 					on 			ntl."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and ntl."Subject"=dm.usubjid
 									
 					union all
@@ -147,7 +147,7 @@ WITH included_subjects AS (
 								"TLBDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas2940_101."TLB" tlb
-					left join 	cqs.dm
+					left join 	dm
 					on 			tlb."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and tlb."Subject"=dm.usubjid
 									
 					union all
@@ -172,7 +172,7 @@ WITH included_subjects AS (
 								"TLDAT":: date as tudtc,
 								null::text as  tudy
 					From 		tas2940_101."TL" tl
-					left join 	cqs.dm
+					left join 	dm
 					on 			tl."project"=dm.studyid and concat('TAS2940_101_',split_part("SiteNumber",'_',2))=dm.siteid and tl."Subject"=dm.usubjid
 					
 		)tu	

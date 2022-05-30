@@ -8,12 +8,12 @@ WITH included_subjects AS (
 				
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-				from cqs.ex
+				from ex
 				group by 1,2,3
 				),
 	ex_visit as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
-				 from cqs.ex
+				 from ex
 				 where visit like '%Day 1 Cycle 01' and exdose is not null
 				 
 				 ),			
@@ -248,7 +248,7 @@ from tas117_201."TLPB" TLB
 )tu
 left join ex_data ex
 on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
-left join cqs.dm
+left join dm
 on tu.studyid=dm.studyid and tu.siteid=dm.siteid and tu.usubjid=dm.usubjid
 left join ex_visit exv
 on tu.studyid=exv.studyid and tu.siteid=exv.siteid and tu.usubjid=exv.usubjid

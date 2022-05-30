@@ -9,7 +9,7 @@ WITH included_subjects AS (
                 
     ex_data1 as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
-				from cqs.ex
+				from ex
 				group by 1,2,3
 				),
                 
@@ -127,7 +127,7 @@ WITH included_subjects AS (
 					
 					) u 
 		
-		left join cqs.dm 
+		left join dm 
 		on u.studyid=dm.studyid and u.siteid=dm.siteid and u.usubjid=dm.usubjid
 		left join ex_data ex 
 		on u.studyid=ex.studyid and u.siteid=ex.siteid and u.usubjid=ex.usubjid
