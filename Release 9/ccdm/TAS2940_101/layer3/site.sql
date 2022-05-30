@@ -13,7 +13,7 @@ WITH included_studies AS (
                          from tas2940_101_ctms.milestone_status_site
                          group by 1,2  ),
  
-creationdate as (select site_number, case when ms.event_desc = 'Pre-Study Visit' then ms.actual_date
+creationdate as (select site_number, case when ms.event_desc = 'Pre-Study Visit' then nullif(ms.actual_date,'')
                         end ::date AS creationdate from tas2940_101_ctms.milestone_status_site ms where event_desc ='Pre-Study Visit'order by site_number ASC),
 activationdate as( select site_number, case when ms.event_desc = 'Site Ready to Enroll' then nullif(ms.actual_date,'')
                         end::date AS activationdate from tas2940_101_ctms.milestone_status_site ms where event_desc ='Site Ready to Enroll' order by site_number ASC),
@@ -95,7 +95,5 @@ SELECT
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM site_data s
 JOIN included_studies st ON (s.studyid = st.studyid);
-
-
 
 
