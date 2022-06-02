@@ -27,7 +27,10 @@ WITH included_subjects AS (
                   eg.egblfl, 
                   eg.visit, 
                   eg.egdtc, 
-                  eg.egtm 
+                  eg.egtm,
+				  eg.egtimpnt,
+				  eg.egstnrlo,
+				  eg.egstnrhi
          FROM     (
           SELECT     "project"::text    AS studyid, 
            "SiteNumber"::text AS siteid, 
@@ -56,7 +59,10 @@ WITH included_subjects AS (
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
            "ECGDAT"::timestamp without time zone AS egdtc, 
-           null::time without time zone AS egtm   
+           null::time without time zone AS egtm,
+           null::text AS egtimpnt,
+		   null::numeric AS egstnrlo,
+           null::numeric AS egstnrhi		   
 FROM       "tas120_202"."ECG" eg
 CROSS JOIN lateral( VALUES 
        (concat("instanceId",12),'RR Interval',"ECGRR"::text , "ECGRR_Units" , "ECGRR_Units" , "ECGRR"::text ),
@@ -88,7 +94,10 @@ SELECT
         eg.egblfl::text AS egblfl,
         eg.visit::text AS visit,
         eg.egdtc::timestamp without time zone AS egdtc,
-        eg.egtm::time without time zone AS egtm
+        eg.egtm::time without time zone AS egtm,
+		eg.egtimpnt::text AS egtimpnt,
+		eg.egstnrlo::numeric AS egstnrlo,
+		eg.egstnrhi::numeric AS egstnrhi
         /*KEY , (eg.studyid || '~' || eg.siteid || '~' || eg.usubjid || '~' || eg.egseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp without time zone AS comprehend_update_time KEY*/
 FROM eg_data eg

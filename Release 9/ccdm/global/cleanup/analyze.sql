@@ -54,6 +54,6 @@ analyze "sv";
 --analyze "te";
 --analyze "tsdv";
 analyze "tv";
---analyze "tva";
+analyze "tva";
 --analyze "visitform";
 --analyze "vs";

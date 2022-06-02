@@ -35,7 +35,10 @@ vsloc	,
 vsblfl	,
 visit	,
 vsdtc	,
-vstm
+vstm    ,
+vsstnrlo,
+vsstnrhi,
+vstimpnt
 
 from
 
@@ -65,7 +68,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-null::time without time zone	AS	vstm
+null::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS"
 
 UNION ALL
@@ -96,7 +102,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-null	::time without time zone	AS	vstm
+null	::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS"
 
 
@@ -128,7 +137,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-null::time without time zone	AS	vstm
+null::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS"
 
 UNION ALL
@@ -159,7 +171,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-null::time without time zone	AS	vstm
+null::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS"
 
 UNION ALL
@@ -190,7 +205,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-null::time without time zone	AS	vstm
+null::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS"
 
 UNION ALL
@@ -221,7 +239,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS"
 
 UNION ALL
@@ -252,7 +273,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS"
 
 UNION ALL
@@ -283,7 +307,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS2"
 						
 UNION ALL						
@@ -314,7 +341,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS2"
 						
 UNION ALL						
@@ -345,7 +375,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS2"
 						
 UNION ALL	
@@ -376,7 +409,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS2"
 						
 UNION ALL		
@@ -407,7 +443,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS2"
 						
 UNION ALL	
@@ -438,7 +477,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS2"
 						
 UNION ALL						
@@ -469,7 +511,10 @@ trim(REGEXP_REPLACE
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
 "VSDAT"::timestamp without time zone	AS	vsdtc	,
-NULL::time without time zone	AS	vstm
+NULL::time without time zone	AS	vstm,
+null::numeric AS vsstnrlo,
+null::numeric AS vsstnrhi,
+null::text AS vstimpnt
 FROM tas120_201."VS2" ) vs )
 
 SELECT
@@ -492,7 +537,10 @@ SELECT
         vs.vsblfl::text AS vsblfl,
         vs.visit::text AS visit,
         vs.vsdtc::timestamp without time zone AS vsdtc,
-        vs.vstm::time without time zone AS vstm
+        vs.vstm::time without time zone AS vstm,
+		vs.vsstnrlo::numeric AS vsstnrlo,
+		vs.vsstnrhi::numeric AS vsstnrhi,
+		vs.vstimpnt::text AS vstimpnt
         /*KEY, (vs.studyid || '~' || vs.siteid || '~' || vs.usubjid || '~' || vs.vsseq)::text  AS objectuniquekey KEY*/ 
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM vs_data vs

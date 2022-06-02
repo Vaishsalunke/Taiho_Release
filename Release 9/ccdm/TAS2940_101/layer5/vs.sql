@@ -34,7 +34,10 @@ WITH included_subjects AS (
 									,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						) ::text AS visit,
                     "VSDAT"::timestamp without time zone AS vsdtc,
-                    "VSTM"::time without time zone AS vstm
+                    "VSTM"::time without time zone AS vstm,
+					null::numeric AS vsstnrlo,
+					null::numeric AS vsstnrhi,
+					"VSTM"::text AS vstimpnt
                     from tas2940_101."VS" v 
                     cross join lateral(
 							values
@@ -68,7 +71,10 @@ SELECT
         vs.vsblfl::text AS vsblfl,
         vs.visit::text AS visit,
         vs.vsdtc::timestamp without time zone AS vsdtc,
-        vs.vstm::time without time zone AS vstm
+        vs.vstm::time without time zone AS vstm,
+		vs.vsstnrlo::numeric AS vsstnrlo,
+		vs.vsstnrhi::numeric AS vsstnrhi,
+		vs.vstimpnt::text AS vstimpnt
         /*KEY , (vs.studyid || '~' || vs.siteid || '~' || vs.usubjid || '~' || vs.vsseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM vs_data vs

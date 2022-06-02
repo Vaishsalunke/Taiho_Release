@@ -13,10 +13,16 @@ WITH included_sites AS (
                         "subject_key"::text AS usubjid,
                         null::text AS screenid,
                         null::text AS randid,
-                        null::text AS sitekey
+                        null::text AS sitekey,
                         --null::date AS exitdate,
-                        --null::text AS protver
-                        from TAS2940_101.__subjects)
+                        'TAS2940-101 Version 2.0'::text AS protver,
+						null::text AS armcd,
+						nullif(concat("ENRPHAS","ENRCOHO"),'')::text AS arm,
+                        'Not Available'::text AS visit_schedule_code,
+                        'Not Available'::text AS visit_schedule_desc
+                        from TAS2940_101.__subjects s
+						left join TAS2940_101."DM" e 
+							ON s."subject_key" = e."Subject")
 
 SELECT 
         /*KEY (sd.studyid || '~' || sd.siteid || '~' || sd.usubjid)::text AS comprehendid, KEY*/
@@ -29,7 +35,11 @@ SELECT
         sd.randid::text AS randid,
         null::text AS status,
         null::date AS exitdate,
-        null::text AS protver
+        sd.protver::text AS protver,
+		sd.armcd::text AS armcd,
+		sd.arm::text AS arm,
+		sd.visit_schedule_code::text AS visit_schedule_code,
+		sd.visit_schedule_desc::text AS visit_schedule_desc
          /*KEY , (sd.studyid || '~' || sd.siteid || '~' || sd.usubjid)::text AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM subject_data sd

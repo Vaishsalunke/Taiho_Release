@@ -40,7 +40,9 @@ WITH included_subjects AS (
                         null::int AS exendy,
                         null::text AS exdur,
                         null::text AS drugrsp,
-                        null::text AS drugrspcd
+                        null::text AS drugrspcd,
+						"EXOADJRE"::text AS exacn,
+						"EXOMIDRE"::text AS exreason
                         from tas120_203."EXO" e 
  union all
  SELECT  project ::text AS studyid,
@@ -75,7 +77,11 @@ WITH included_subjects AS (
                         null::int AS exendy,
                         null::text AS exdur,
                         null::text AS drugrsp,
-                        null::text AS drugrspcd
+                        null::text AS drugrspcd,
+						case when coalesce("EXIINYN",'') in ('Y','Yes') then 'Dose Modified'
+						when coalesce("EXIINYN",'') in ('N', 'No') then 'Dose Not Modified'
+						else "EXIINYN" end::text AS exacn,
+						"EXIIN"::text AS exreason
                         from tas120_203."EXI" e2 ),
                         
      site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
@@ -107,7 +113,9 @@ SELECT
         ex.exendy::int AS exendy,
         ex.exdur::text AS exdur,
         ex.drugrsp::text AS drugrsp,
-        ex.drugrspcd::text AS drugrspcd
+        ex.drugrspcd::text AS drugrspcd,
+		ex.exacn::text AS exacn,
+		ex.exreason::text AS exreason
         /*KEY , (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM ex_data ex

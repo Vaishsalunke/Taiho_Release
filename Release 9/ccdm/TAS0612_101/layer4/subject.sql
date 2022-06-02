@@ -15,7 +15,12 @@ WITH included_sites AS (
                         null::text AS screenid,
                         null::text AS randid,
                         null::text AS status,
-                        null::date AS exitdate
+                        null::date AS exitdate,
+						'TAS612-101 Version 1.0'::text AS protver,
+						null::text AS armcd,
+						null::text AS arm,
+                        'Not Available'::text AS visit_schedule_code,
+                        'Not Available'::text AS visit_schedule_desc
 				From 	TAS0612_101."__subjects"
 				/*LIMIT LIMIT 100 LIMIT*/)
 
@@ -30,7 +35,11 @@ SELECT
         sd.randid::text AS randid,
         sd.status::text AS status,
         sd.exitdate::date AS exitdate,
-        Null::text AS protver
+        sd.protver::text AS protver,
+		sd.armcd::text AS armcd,
+		sd.arm::text AS arm,
+		sd.visit_schedule_code::text AS visit_schedule_code,
+		sd.visit_schedule_desc::text AS visit_schedule_desc
         /*KEY , (sd.studyid || '~' || sd.siteid || '~' || sd.usubjid)::text AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/		
 FROM subject_data sd

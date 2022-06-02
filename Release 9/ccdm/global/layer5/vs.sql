@@ -25,7 +25,10 @@ WITH included_subjects AS (
                     null::text AS vsblfl,
                     null::text AS visit,
                     null::timestamp without time zone AS vsdtc,
-                    null::time without time zone AS vstm )
+                    null::time without time zone AS vstm,
+					null::numeric AS vsstnrlo,
+					null::numeric AS vsstnrhi,
+					null::text AS vstimpnt		)
 
 SELECT
         /*KEY (vs.studyid || '~' || vs.siteid || '~' || vs.usubjid)::text AS comprehendid, KEY*/
@@ -47,7 +50,10 @@ SELECT
         vs.vsblfl::text AS vsblfl,
         vs.visit::text AS visit,
         vs.vsdtc::timestamp without time zone AS vsdtc,
-        vs.vstm::time without time zone AS vstm
+        vs.vstm::time without time zone AS vstm,
+		vs.vsstnrlo::numeric AS vsstnrlo,
+		vs.vsstnrhi::numeric AS vsstnrhi,
+		vs.vstimpnt::text AS vstimpnt
         /*KEY , (vs.studyid || '~' || vs.siteid || '~' || vs.usubjid || '~' || vs.vsseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM vs_data vs

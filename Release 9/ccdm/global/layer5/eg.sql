@@ -25,7 +25,10 @@ WITH included_subjects AS (
                         null::text AS egblfl,
                         null::text AS visit,
                         null::timestamp without time zone AS egdtc,
-                        null::time without time zone AS egtm )
+                        null::time without time zone AS egtm,
+						null::text AS egtimpnt,
+						null::numeric AS egstnrlo,
+						null::numeric AS egstnrhi						)
 
 SELECT
         /*KEY (eg.studyid::text || '~' || eg.siteid::text || '~' || eg.usubjid::text) AS comprehendid, KEY*/
@@ -47,7 +50,10 @@ SELECT
         eg.egblfl::text AS egblfl,
         eg.visit::text AS visit,
         eg.egdtc::timestamp without time zone AS egdtc,
-        eg.egtm::time without time zone AS egtm
+        eg.egtm::time without time zone AS egtm,
+		eg.egtimpnt::text AS egtimpnt,
+		eg.egstnrlo::numeric AS egstnrlo,
+		eg.egstnrhi::numeric AS egstnrhi
         /*KEY , (eg.studyid || '~' || eg.siteid || '~' || eg.usubjid || '~' || eg.egseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM eg_data eg

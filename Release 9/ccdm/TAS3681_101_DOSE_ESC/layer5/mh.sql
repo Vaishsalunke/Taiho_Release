@@ -23,14 +23,21 @@ WITH included_subjects AS (
 						end ::date AS mhstdtc,
 						case when mhendtc='' or mhendtc like '%0000%' or mhendtc like '%YYYY%' then null
 							else to_date(mhendtc,'DD Mon YYYY') 
-						end ::date AS mhendtc
+						end ::date AS mhendtc,
+						mhsev::text AS mhsev,
+						mhongo::text as mhongo
                         from
                 ( select *,case when (length("MHSTDAT_RAW")<>11 and length("MHSTDAT_RAW")<>10) or  length(trim(substring(reverse("MHSTDAT_RAW"):: text, 1, 4 ))) <> 4 then null
 else concat(replace(replace(substring(upper("MHSTDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("MHSTDAT_RAW"),3),'UNK','Jan'))
 end as mhstdtc,
 case when (length("MHENDAT_RAW")<>11 and length("MHENDAT_RAW")<>10) or  length(trim(substring(reverse("MHENDAT_RAW"):: text, 1, 4 ))) <> 4 then null
 else concat(replace(replace(substring(upper("MHENDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("MHENDAT_RAW"),3),'UNK','Jan'))
-end as mhendtc
+end as mhendtc,
+"MHTOXGR"::text AS mhsev,
+case when coalesce("MHONGO"::text,'') = '1' then 'Yes' 
+     when coalesce("MHONGO"::text,'') = '0' then 'No'
+     else null
+end::text as mhongo
 from tas3681_101."MH"
      )a
      )
@@ -52,7 +59,9 @@ SELECT
         mh.mhsttm::time without time zone AS mhsttm,
 		null::text as mhendtc_iso,
         mh.mhendtc::date AS mhendtc,
-        mh.mhendtm::time without time zone AS mhendtm
+        mh.mhendtm::time without time zone AS mhendtm,
+		mh.mhsev::text AS mhsev,
+		mh.mhongo::text AS mhongo
         /*KEY , (mh.studyid || '~' || mh.siteid || '~' || mh.usubjid || '~' || mh.mhseq)::text AS objectuniquekey KEY*/
         /*KEY , now()::timestamp without time zone AS comprehend_update_time KEY*/
 FROM mh_data mh

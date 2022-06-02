@@ -22,7 +22,9 @@ WITH included_subjects AS (
                         null::time without time zone AS mhsttm,
                         null::text AS mhendtc_iso,
                         null::date AS mhendtc,
-                        null::time without time zone AS mhendtm )
+                        null::time without time zone AS mhendtm,
+						null::text AS mhsev,
+						null::text AS mhongo)
 
 SELECT
         /*KEY (mh.studyid || '~' || mh.siteid || '~' || mh.usubjid)::text AS comprehendid, KEY*/
@@ -41,7 +43,9 @@ SELECT
         mh.mhsttm::time without time zone AS mhsttm,
         mh.mhendtc_iso::text AS mhendtc_iso,
         mh.mhendtc::date AS mhendtc,
-        mh.mhendtm::time without time zone AS mhendtm
+        mh.mhendtm::time without time zone AS mhendtm,
+		mh.mhsev::text AS mhsev,
+		mh.mhongo::text AS mhongo
         /*KEY , (mh.studyid || '~' || mh.siteid || '~' || mh.usubjid || '~' || mh.mhseq)::text AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM mh_data mh

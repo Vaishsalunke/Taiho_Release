@@ -15,7 +15,11 @@ WITH included_sites AS (
                         null::text AS randid,
                         null::text AS status,
                         null::date AS exitdate,
-                        null::text AS protver)
+                        'Original'::text AS protver,
+						null::text AS armcd,
+						null::text AS arm,
+						'Not Available'::text AS visit_schedule_code,
+						'Not Available'::text AS visit_schedule_desc)
 
 SELECT 
         /*KEY (sd.studyid || '~' || sd.siteid || '~' || sd.usubjid)::text AS comprehendid, KEY*/
@@ -28,7 +32,11 @@ SELECT
         sd.randid::text AS randid,
         sd.status::text AS status,
         sd.exitdate::date AS exitdate,
-        sd.protver::text AS protver
+        sd.protver::text AS protver,
+		sd.armcd::text AS armcd,
+		sd.arm::text AS arm,
+		sd.visit_schedule_code::text AS visit_schedule_code,
+		sd.visit_schedule_desc::text AS visit_schedule_desc
         /*KEY , (sd.studyid || '~' || sd.siteid || '~' || sd.usubjid)::text AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM subject_data sd

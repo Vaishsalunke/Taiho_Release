@@ -90,3 +90,6 @@ SELECT
 FROM cm_data cm
 JOIN included_subjects s ON (cm.studyid = s.studyid AND cm.siteid = s.siteid AND cm.usubjid = s.usubjid)
 JOIN included_site si ON (cm.studyid = si.studyid AND cm.siteid = si.siteid);
+
+
+

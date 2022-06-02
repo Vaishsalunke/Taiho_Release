@@ -90,7 +90,6 @@ WITH included_subjects AS (
 								'Lesion Identification':: text as tutest,
 								'Present':: text as tuorres,
 								"NTLBSITE":: text as tuloc,
-								--"NTLBSITE":: text as tuloc,
 								case when "NTLBMETH"='Other' then "NTLBOTH" else "NTLBMETH" end:: Text as tumethod,
 								null::text as tulobxfl,
 								'Y':: text as tublfl,

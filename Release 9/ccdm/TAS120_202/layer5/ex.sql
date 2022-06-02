@@ -40,7 +40,9 @@ WITH included_subjects AS (
                         "EXOENDAT"::date AS exendtc,
                         null::time without time zone AS exendtm,
                         null::int AS exendy,
-                        null::text AS exdur 
+                        null::text AS exdur,
+						"EXOADJRE"::text AS exacn,
+						"EXOMIDRE"::text AS exreason
 				from "tas120_202"."EXO" )
 
 SELECT
@@ -70,7 +72,9 @@ SELECT
         ex.exendy::int AS exendy,
         ex.exdur::text AS exdur,
         null::text AS drugrsp,
-        null::text AS drugrspcd
+        null::text AS drugrspcd,
+		ex.exacn::text AS exacn,
+		ex.exreason::text AS exreason
         /*KEY , (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM ex_data ex

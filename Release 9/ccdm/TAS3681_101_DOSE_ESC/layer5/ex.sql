@@ -47,7 +47,9 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
 				exendtm,
 				exendy,
 				exdur,
-				exseq
+				exseq,
+				exacn,
+				exreason
 	--row_number() over (partition by studyid, siteid, usubjid ORDER BY exstdtc)::int AS exseq
 	  from(
              -- TAS3681-101
@@ -97,7 +99,11 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
                 ex."EXOENDAT"::			DATE      AS exendtc,
                 ex."EXOEMDAT"::time without time zone AS exendtm,
                 NULL::					INT       AS exendy,
-                NULL::					text      AS exdur
+                NULL::					text      AS exdur,
+				case when coalesce("EXOREYN",'') in ('Y','Yes') then 'Dose Modified'
+				when coalesce("EXOREYN",'') in ('N', 'No') then 'Dose Not Modified'
+				else "EXOREYN" end::text AS exacn,
+				"EXORE"::text AS exreason
            FROM tas3681_101."EXO" ex
 			
 			Union all
@@ -149,7 +155,9 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
                 --REGEXP_REPLACE(upper(nullif(ex2."EXOENDAT",'')),'[A-Z]',' ')::time without time zone AS exendtm,
 				ex2."EXOENDAT"::time without time zone AS exendtm,
                 NULL::					INT       AS exendy,
-                NULL::					text      AS exdur
+                NULL::					text      AS exdur,
+				NULL:: text AS exacn,
+				NULL:: text AS exreason
            FROM tas3681_101."EXO2" ex2
            )a         
      
@@ -182,7 +190,9 @@ SELECT
       ex.exendy::int AS exendy,
       ex.exdur::text AS exdur,
 	  null::text AS drugrsp,
-       null::text AS drugrspcd
+      null::text AS drugrspcd,
+	  ex.exacn::text AS exacn,
+	  ex.exreason::text AS exreason
       /*KEY , (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey KEY*/
       /*KEY , now()::timestamp without time zone AS comprehend_update_time KEY*/
 FROM ex_data ex

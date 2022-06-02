@@ -28,7 +28,9 @@ SELECT
      exendtc,
      exendtm,
      exendy,
-     exdur
+     exdur,
+	 exacn,
+	 exreason
 	 ,null::text AS studyname
 	 ,null::text AS drugrsp
 	 ,null::text AS drugrspcd
@@ -66,7 +68,9 @@ SELECT
         "EXOENDAT"::date	AS	exendtc,
         NULL::time without time zone	AS	exendtm,
         NULL::text	AS	exendy,
-        NULL::text	AS	exdur
+        NULL::text	AS	exdur,
+		"EXOADJRE"::text AS exacn,
+		"EXOMIDRE"::text AS exreason
        from tas120_201."EXO"
        where "EXOSTDAT" is not null
         
@@ -103,7 +107,9 @@ SELECT
        "EXOCYCEDT"::date	AS	exendtc,
         NULL::time without time zone	AS	exendtm,
         NULL::text	AS	exendy,
-        NULL::text	AS	exdur
+        NULL::text	AS	exdur,
+		"EXOADJRE"::text AS exacn,
+		"EXOMIDRE"::text AS exreason
        from tas120_201."EXO"
        where "EXOCYCSDT" is not null
         
@@ -137,7 +143,9 @@ SELECT
         null::date AS exendtc,
         NULL::time without time zone	AS	exendtm,
         NULL::text	AS	exendy,
-        NULL::text	AS	exdur
+        NULL::text	AS	exdur,
+		Null::text AS exacn,
+		Null::text AS exreason
         from tas120_201."EXI"
         where  "EXISTDAT" is not null 
         
@@ -171,7 +179,9 @@ union all
         null::date AS exendtc,
         NULL::time without time zone	AS	exendtm,
         NULL::text	AS	exendy,
-        NULL::text	AS	exdur
+        NULL::text	AS	exdur,
+		Null::text AS exacn,
+		Null::text AS exreason
         from tas120_201."EXI"
         where  "EXISTDAT" is not null 
         
@@ -206,7 +216,9 @@ SELECT
         ex.exendy::int AS exendy,
         ex.exdur::text AS exdur,
         ex.drugrsp::text AS drugrsp,
-        ex.drugrspcd::text AS drugrspcd
+        ex.drugrspcd::text AS drugrspcd,
+		ex.exacn::text AS exacn,
+		ex.exreason::text AS exreason
         /*KEY , (ex.studyid || '~' || ex.siteid || '~' || ex.usubjid || '~' || ex.exseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM ex_data ex

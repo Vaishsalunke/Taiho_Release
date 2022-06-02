@@ -22,7 +22,12 @@ WITH included_subjects AS (
                         null::time without time zone AS mhsttm,
                         null::text AS mhendtc_iso,
                         "MHENDAT"::date AS mhendtc,
-                        null::time without time zone AS mhendtm
+                        null::time without time zone AS mhendtm,
+						"MHTOXGR"::text AS mhsev,
+						case when coalesce("MHONGO"::text,'') = '1' then 'Yes' 
+						     when coalesce("MHONGO"::text,'') = '0' then 'No'
+						     else null
+					    end::text as mhongo
                         from tas120_203."MH"  )
 
 SELECT
@@ -42,7 +47,9 @@ SELECT
         mh.mhsttm::time without time zone AS mhsttm,
         mh.mhendtc_iso::text AS mhendtc_iso,
         mh.mhendtc::date AS mhendtc,
-        mh.mhendtm::time without time zone AS mhendtm
+        mh.mhendtm::time without time zone AS mhendtm,
+		mh.mhsev::text AS mhsev,
+		mh.mhongo::text AS mhongo
         /*KEY , (mh.studyid || '~' || mh.siteid || '~' || mh.usubjid || '~' || mh.mhseq)::text AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM mh_data mh

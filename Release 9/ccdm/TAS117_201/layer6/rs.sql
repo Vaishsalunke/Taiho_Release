@@ -15,7 +15,7 @@ WITH included_subjects AS (
                 
 	ex_data as (
 				 select studyid,siteid,usubjid,visit,exstdtc ex_dt
-				 from cqs.ex
+				 from ex
 				 where visit like '%Cycle 01' and exdose is not null							 			 
 				),
 				

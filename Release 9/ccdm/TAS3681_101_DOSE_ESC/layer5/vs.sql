@@ -50,7 +50,10 @@ WITH included_subjects AS (
 								
 				    ) as visit,
                      vsdtc,
-                     vstm
+                     vstm,
+					 vsstnrlo,
+					 vsstnrhi,
+					 vstimpnt
                      from
 (SELECT  'TAS3681_101_DOSE_ESC'::text AS studyid,
                     vs."SiteNumber"::text AS siteid, 
@@ -93,7 +96,10 @@ WITH included_subjects AS (
 									,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						):: text as visit,
                     vs."VSDAT"::timestamp without time zone AS vsdtc,
-                    null::time without time zone AS vstm
+                    null::time without time zone AS vstm,
+					null::numeric AS vsstnrlo,
+					null::numeric AS vsstnrhi,
+					null::text AS vstimpnt
                 FROM tas3681_101."VS" vs
                 cross join lateral(
 				values
@@ -151,7 +157,10 @@ WITH included_subjects AS (
 									,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						):: text as visit,
                     vsb."VSDAT"::timestamp without time zone AS vsdtc,
-                    null::time without time zone AS vstm
+                    null::time without time zone AS vstm,
+					null::numeric AS vsstnrlo,
+					null::numeric AS vsstnrhi,
+					null::text AS vstimpnt
                 FROM tas3681_101."VSB" vsb
                 cross join lateral(
 				values
@@ -187,7 +196,10 @@ WITH included_subjects AS (
                     vs.vsblfl::text AS vsblfl,
                     vs.visit::text AS visit,
                     vs.vsdtc::text::timestamp without time zone AS vsdtc,
-                    vs.vstm::text::time without time zone AS vstm
+                    vs.vstm::text::time without time zone AS vstm,
+					vs.vsstnrlo::numeric AS vsstnrlo,
+					vs.vsstnrhi::numeric AS vsstnrhi,
+					vs.vstimpnt::text AS vstimpnt
                 FROM vs_data vs
     )
 
@@ -211,7 +223,10 @@ SELECT
         vs.vsblfl::text AS vsblfl,
         vs.visit::text AS visit,
         vs.vsdtc::timestamp without time zone AS vsdtc,
-        vs.vstm::time without time zone AS vstm
+        vs.vstm::time without time zone AS vstm,
+		vs.vsstnrlo::numeric AS vsstnrlo,
+		vs.vsstnrhi::numeric AS vsstnrhi,
+		vs.vstimpnt::text AS vstimpnt
         /*KEY , (vs.studyid || '~' || vs.siteid || '~' || vs.usubjid || '~' || vs.vsseq)::text  AS objectuniquekeyKEY*/
         /*KEY , now()::timestamp without time zone AS comprehend_update_time KEY*/
 FROM all_data vs
