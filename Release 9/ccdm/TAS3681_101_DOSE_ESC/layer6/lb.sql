@@ -58,8 +58,8 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
                 THEN MAX(hem."LBDAT")
                 WHEN lb1."DataPageName" LIKE '%Coagulation%'
                 THEN MAX(coag."LBDAT")
-                WHEN lb1."DataPageName" LIKE '%Urinalysis%'
-                THEN MAX(urin."LBDAT")
+               -- WHEN lb1."DataPageName" LIKE '%Urinalysis%'
+                --THEN MAX(urin."LBDAT")
                 WHEN lb1."DataPageName" LIKE '%PSA Blood Sampling%'
                 THEN MAX(psa."LBDAT")
             END::TIMESTAMP without TIME zone                AS lbdtc,
@@ -120,14 +120,14 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
             AND lb1."SiteNumber" = hem."SiteNumber"
             AND lb1."Subject" = hem."Subject"
             AND lb1."InstanceName" = hem."InstanceName")
-        LEFT JOIN
+        /*LEFT JOIN
             tas3681_101."URIN" urin
         ON
             (
                 lb1."project" = urin."project"
             AND lb1."SiteNumber" = urin."SiteNumber"
             AND lb1."Subject" = urin."Subject"
-            AND lb1."InstanceName" = urin."InstanceName")
+            AND lb1."InstanceName" = urin."InstanceName")*/
         LEFT JOIN
             tas3681_101."PSA" psa
         ON
@@ -136,9 +136,98 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
             AND lb1."SiteNumber" = psa."SiteNumber"
             AND lb1."Subject" = psa."Subject"
             AND lb1."InstanceName" = psa."InstanceName")
+            
+            where lb1."DataPageName" not LIKE '%Urinalysis%'
         GROUP BY
             1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33
             ,34,35,36
+   
+union all
+
+
+select *
+from(select distinct
+                    'TAS3681_101_DOSE_ESC'::text                      AS studyid,
+                    "SiteNumber"::text                       AS siteid,
+                    "Subject"::text                      AS usubjid,
+                    
+                    trim(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				(REGEXP_REPLACE
+				("FolderName",'<WK[0-9]D[0-9]/>\sEscalation','')
+							,'<WK[0-9]D[0-9][0-9]/>\sEscalation','')
+							,'<WK[0-9]DA[0-9]/>\sEscalation','')
+							,'<WK[0-9]DA[0-9][0-9]/>\sEscalation','')
+							,'<W[0-9]DA[0-9]/>\sEscalation','')
+							,'<W[0-9]DA[0-9][0-9]/>\sEscalation','')
+							,' Escalation','')
+							,'\s\([0-9][0-9]\)','')
+							,'\s\([0-9]\)','')
+							,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+							,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+				) ::text                        AS visit,
+                    "LBDAT"::TIMESTAMP without TIME zone AS lbdtc,
+                    NULL::INTEGER                         AS lbdy,
+                    lbseq::INT                         AS lbseq,
+                     lbtestcd::text                     AS lbtestcd,
+                    lbtest::text                       AS lbtest,
+                    "DataPageName"::text                        AS lbcat,
+                    NULL::text                       AS lbscat,
+                    NULL::text                            AS lbspec,
+                    NULL::text                            AS lbmethod,
+                    lborres::text                      AS lborres,
+                    NULL::text                       AS lbstat,
+                    NULL::text                            AS lbreasnd,
+                    NULL::NUMERIC                         AS lbstnrlo,
+                    NULL::NUMERIC                         AS lbstnrhi,
+                    NULL::text                     AS lborresu,
+                    lbstresn::NUMERIC                  AS lbstresn,
+                    NULL::text                     AS lbstresu,
+                  NULL::TIME without TIME zone       AS lbtm,
+                    NULL::text                       AS lbblfl,
+                    NULL::text                            AS lbnrind,
+                    NULL::text                            AS lbornrhi,
+                    NULL::text                            AS lbornrlo,
+                    NULL::text                            AS lbstresc,
+                    NULL::text                            AS lbenint,
+                    NULL::text                            AS lbevlint,
+                    NULL::text                            AS lblat,
+                    NULL::NUMERIC                         AS lblloq,
+                    NULL::text                        AS lbloc,
+                    NULL::text                        AS lbpos,
+                    NULL::text                            AS lbstint,
+                    NULL::NUMERIC                         AS lbuloq,
+                    NULL::text                            AS lbclsig
+                FROM tas3681_101."URIN"
+                CROSS JOIN LATERAL(VALUES
+('PROT','Urinary Protein',case when UPPER("PROT") = 'OTHER' then "PROTSP"
+end::text,concat("instanceId",14),null),
+('PROTSP',null,"PROTSP"::text,concat("instanceId",26),null),
+('GLUC','Glucose (Sugar)',case when UPPER("GLUC") = 'OTHER' then "GLUCSP" END::text,concat("instanceId",38),null),
+('GLUCSP',null,"GLUCSP"::text,concat("instanceId",47),null),
+('UBILI','Urinary Bilirubin',"UBILI"::text,concat("instanceId",54),null),
+('UKET','Urinary Ketones',"UKET"::text,concat("instanceId",68),null),
+('ULEK','Urinary Leukocytes',"ULEK"::text,concat("instanceId",79),null),
+('UNITR','Urinary Nitrite',"UNITR"::text,concat("instanceId",81),null),
+('UOCCB','Urinary Occult Blood',"UOCCB"::text,concat("instanceId",17),null),
+('RBC','RBCs (Microscopic)',"RBC"::text,concat("instanceId",25),null),
+('WBC','WBCs (Microscopic)',"WBC"::text,concat("instanceId",39),null),
+('USPGRAV','Urine Specific Gravity Density',"USPGRAV"::text,concat("instanceId",41),"USPGRAV"),
+('PH','PH',"PH"::text,concat("instanceId",59),"PH")
+
+) t (lbtestcd,lbtest,lborres,lbseq,lbstresn)
+where lbtestcd is not null and lbtest is not null
+)p
+
+
     )
     ,
     	   ds_enrol AS
@@ -474,5 +563,4 @@ ON
 	JOIN included_sites si ON (lb.studyid = si.studyid AND lb.siteid = si.siteid);
 	
 	
-
 
