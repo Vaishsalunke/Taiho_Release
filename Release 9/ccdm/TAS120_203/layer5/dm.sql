@@ -2,9 +2,12 @@
 CCDM DM mapping
 Notes: Standard mapping to CCDM DM table
 */
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
+               
+    ex_data AS(select "project", "SiteNumber", "Subject",max("EXOENDAT") as max_exendtc
+    from tas120_203."EXO" group by 1,2,3),
+   
 
      dm_data AS (
                 select distinct  dm.project ::text AS studyid,
@@ -15,15 +18,15 @@ WITH included_subjects AS (
                         dm."Subject" ::text AS usubjid,
                         dm."FolderSeq" ::numeric AS visitnum,
                         trim(REGEXP_REPLACE
-			                (REGEXP_REPLACE
-			                (REGEXP_REPLACE
-			                (REGEXP_REPLACE
-			               (dm."InstanceName",'\s\([0-9][0-9]\)','')
-						   ,'\s\([0-9]\)','')
-						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
-						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
+               (REGEXP_REPLACE
+               (REGEXP_REPLACE
+               (REGEXP_REPLACE
+              (dm."InstanceName",'\s\([0-9][0-9]\)','')
+  ,'\s\([0-9]\)','')
+  ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+  ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')):: text as visit,
                         coalesce (dm."MinCreated" ,dm."RecordDate") ::date AS dmdtc,
-                        null::date AS brthdtc,
+                        coalesce(e1."EOTLDDAT",max_exendtc) ::date AS brthdtc,
                         "DMAGE" ::integer AS age,
                         "DMSEX" ::text AS sex,
                         coalesce("DMRACE" ,"DMOTH") ::text AS race,
@@ -31,15 +34,17 @@ WITH included_subjects AS (
                         null::text AS armcd,
                         nullif(enr."ENRCOHO",'')::text AS arm,
                         null::text AS brthdtc_iso
-                        from tas120_203."DM" dm
-                       	     left join tas120_203."ENR" enr
-                       	     on dm.project =enr.project
-								and dm."SiteNumber" =enr."SiteNumber"
-								and dm."Subject" =enr."Subject" ),
-                        
+                      from tas120_203."DM" dm
+                            left join tas120_203."ENR" enr
+                            on dm.project =enr.project
+and dm."SiteNumber" =enr."SiteNumber"
+and dm."Subject" =enr."Subject"
+left join ex_data e on dm.project = e.project and dm."SiteNumber" = e."SiteNumber" and dm."Subject" = e."Subject"
+left join tas120_203."EOT" e1 on dm.project = e1.project and dm."SiteNumber" = e1."SiteNumber" and dm."Subject" = e1."Subject" ),
+                       
      site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 
-SELECT 
+SELECT
         /*KEY (dm.studyid || '~' || dm.siteid || '~' || dm.usubjid)::text AS comprehendid, KEY*/
         dm.studyid::text AS studyid,
         dm.studyname::text AS studyname,

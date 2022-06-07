@@ -5,6 +5,10 @@ Notes: Standard mapping to CCDM DM table
 
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
+     
+     ex_data as (select "project","SiteNumber","Subject",max("DAENDAT") as exendtc
+     from tas117_201."DA" 
+     group by 1,2,3),
 
      dm_data AS (
                 SELECT  d.project ::text AS studyid,
@@ -23,7 +27,7 @@ WITH included_subjects AS (
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
                         coalesce (d."MinCreated",d."RecordDate")::date AS dmdtc,
-                        null::date AS brthdtc,
+                        coalesce(e2."EOTLDAT",e3.exendtc)::date AS brthdtc,
                         "DMAGE" ::integer AS age,
                         "DMSEX" ::text AS sex,
                         coalesce ("DMRACE","DMOTH")::text AS race,
@@ -33,7 +37,12 @@ WITH included_subjects AS (
                         null::text AS brthdtc_iso
                         from tas117_201."DM" d 
                         left join tas117_201."ENR" e 
-                        on d.project = e.project and d."SiteNumber"= e."SiteNumber" and d."Subject" =e."Subject"),
+                        on d.project = e.project and d."SiteNumber"= e."SiteNumber" and d."Subject" =e."Subject"
+                        left join tas117_201."EOT" e2 
+                        on d.project = e2.project and d."SiteNumber"= e2."SiteNumber" and d."Subject" =e2."Subject"
+                        left join ex_data e3 
+                        on d.project = e3.project and d."SiteNumber"= e3."SiteNumber"and d."Subject" =e3."Subject"
+                         ),
 	
      site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 
@@ -61,6 +70,7 @@ SELECT
 FROM dm_data dm
 JOIN included_subjects s ON (dm.studyid = s.studyid AND dm.siteid = s.siteid AND dm.usubjid = s.usubjid)
 join site_data sd on (dm.studyid = sd.studyid AND dm.siteid = sd.siteid);
+
 
 
 

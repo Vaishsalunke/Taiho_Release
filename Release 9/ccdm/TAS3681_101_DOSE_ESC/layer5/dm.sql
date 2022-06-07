@@ -9,7 +9,20 @@ with included_subjects as ( select 	distinct studyid, siteid, usubjid from subje
 included_sites AS (
 SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregion FROM site),	
 
-dm_dm2 as( select distinct 	a.studyid,
+
+ ex_data as (select		'TAS3681_101_DOSE_ESC' as "project","SiteNumber","Subject",max("exendtc") as max_exendtc
+				 from	(
+							select	"project","SiteNumber","Subject",e1."EXOENDAT" as exendtc from tas3681_101."EXO" e1
+							union all
+							select	"project","SiteNumber","Subject",e2."EXOENDAT" as exendtc from tas3681_101."EXO2" e2
+							
+				 )ex
+				group by	1,2,3
+				)
+
+
+,dm_dm2 as( 
+select distinct 	a.studyid,
 					a.siteid,
 					a.usubjid,
 					a.visitnum,
@@ -31,7 +44,7 @@ dm_dm2 as( select distinct 	a.studyid,
 								
 				    ) as visit,
 					a.dmdtc,
-					a.brthdtc,
+					max_exendtc:: date as brthdtc,
 					a.age,
 					a.sex,
 					a.race,
@@ -69,7 +82,7 @@ dm_dm2 as( select distinct 	a.studyid,
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 								 ) :: text as visit,
 							 COALESCE(dm."MinCreated", dm."RecordDate"):: date as dmdtc,
-							 dm."DMBRTDAT":: date as brthdtc,
+							 null:: date as brthdtc,
 							 dm."DMAGE"::integer as age,
 							 dm."DMSEX"::text as sex,
 							 coalesce(dm."DMRACE", dm."DMOTH")::text as race,
@@ -116,7 +129,7 @@ dm_dm2 as( select distinct 	a.studyid,
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 								 ) :: text as visit,
 							 COALESCE(dm2."MinCreated", dm2."RecordDate"):: date as dmdtc,
-							 dm2."DMBRTDAT":: date as brthdtc,
+							 null:: date as brthdtc,
 							 dm2."DMAGE"::integer as age,
 							 dm2."DMSEX"::text as sex,
 							 coalesce(dm2."DMRACE", dm2."DMOTH")::text as race,
@@ -132,6 +145,9 @@ dm_dm2 as( select distinct 	a.studyid,
 								dm2."SiteNumber" = dlt."SiteNumber" and 
 								dm2."Subject" = dlt."Subject")
 					  )a
+					  left join ex_data e3 
+                        on a.studyid = e3.project and a.siteid= e3."SiteNumber"and a.usubjid =e3."Subject"
+
 	)
 select
 	/*KEY (dm.studyid || '~' || dm.siteid || '~' || dm.usubjid)::text AS comprehendid, KEY*/
@@ -156,7 +172,8 @@ select
 	/*KEY , now()::timestamp without time zone AS comprehend_update_time KEY*/
 from
 	dm_dm2 dm join included_subjects s on (dm.studyid = s.studyid and dm.siteid = s.siteid and dm.usubjid = s.usubjid)
-	JOIN included_sites si ON (dm.studyid = si.studyid AND dm.siteid = si.siteid)
-;
-		
+	JOIN included_sites si ON (dm.studyid = si.studyid AND dm.siteid = si.siteid);
 
+
+
+		

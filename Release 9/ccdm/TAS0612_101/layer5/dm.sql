@@ -7,7 +7,14 @@ Notes: Standard mapping to CCDM DM table
 with included_subjects as ( select 	distinct studyid, siteid, usubjid from subject ),
 	
 	included_site AS (
-	SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),	
+	SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),
+	
+	ex_data as(
+				select  	"project","SiteNumber","Subject",max("EXOENDAT") as max_exendtc
+				FROM 		tas0612_101."EXO" 
+				group by	1,2,3
+			  ),
+	
 
 dm_dm2 as(select	dm."project"::text as studyid,
 					concat('TAS0612_101_',split_part(dm."SiteNumber",'_',2))::text as siteid,
@@ -22,7 +29,7 @@ dm_dm2 as(select	dm."project"::text as studyid,
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) :: text as visit,
 					COALESCE(dm."MinCreated", dm."RecordDate"):: date as dmdtc,
-					dm."DMBRTDAT":: date as brthdtc,
+					max_exendtc:: date as brthdtc,
 					dm."DMAGE"::integer as age,
 					dm."DMSEX"::text as sex,
 					coalesce(dm."DMRACE", dm."DMOTH")::text as race,
@@ -30,6 +37,7 @@ dm_dm2 as(select	dm."project"::text as studyid,
 					null:: text as armcd,
 					null:: text as arm
 		 from		tas0612_101."DM" dm
+		 left join ex_data e3 on dm."project" = e3.project and dm."SiteNumber"= e3."SiteNumber"and dm."Subject" =e3."Subject"
 		 ) 
 SELECT 
         /*KEY (dm.studyid || '~' || dm.siteid || '~' || dm.usubjid)::text AS comprehendid, KEY*/

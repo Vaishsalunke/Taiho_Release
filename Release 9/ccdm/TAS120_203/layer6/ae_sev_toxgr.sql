@@ -7,9 +7,9 @@ WITH included_subjects AS (
                         concat(concat("project",'_'),split_part("SiteNumber",'_',2))::text AS siteid,
                         "Subject"::text AS usubjid,
                         "AETERM_PT"::text AS aeterm,
-                        concat("RecordPosition","PageRepeatNumber")::integer AS aeseq,
+                        concat("RecordPosition","PageRepeatNumber", "serial_id")::integer AS aeseq,
                         "AESPID" ::text AS aespid,
-                        concat("RecordPosition","PageRepeatNumber")::integer AS faseq,
+                        concat("RecordPosition","PageRepeatNumber", "serial_id")::integer AS faseq,
                         'SEV'::text AS fatestcd,
                         'Severity'::text AS fatest,
                         CASE
@@ -45,4 +45,8 @@ SELECT
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM ae_sev_toxgr_data aegrd
 JOIN included_subjects s ON (aegrd.studyid = s.studyid AND aegrd.siteid = s.siteid AND aegrd.usubjid = s.usubjid);
+
+
+
+
 

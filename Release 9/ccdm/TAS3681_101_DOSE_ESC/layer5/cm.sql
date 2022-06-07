@@ -36,10 +36,10 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
 						"CMTRT_ATC2"::text As CMATCTXT2,
 						"CMTRT_ATC3"::text As CMATCTXT3
                 FROM 
-(select *,case when ((length(trim("CMSTDAT_RAW"))= 11 or length(trim("CMSTDAT_RAW"))= 10) and "CMSTDAT_RAW" not like '%0000%') and "CMSTDAT_RAW" !=''
+(select *,case when ((length(trim("CMSTDAT_RAW"))= 11 or length(trim("CMSTDAT_RAW"))= 10) and "CMSTDAT_RAW" not like '%0000%') and "CMSTDAT_RAW" !='' and "CMSTDAT_RAW" ~ '^[0-9\.]+$'
 then to_date(concat(replace (replace (substring (upper("CMSTDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("CMSTDAT_RAW"),3),'UNK','Jan')),'DD Mon YYYY')
 else null end as cmstdtc,
-case when ((length(trim("CMENDAT_RAW"))= 11 or length(trim("CMENDAT_RAW"))= 10) and "CMENDAT_RAW" not like '%0000%' ) and "CMENDAT_RAW" !=''
+case when ((length(trim("CMENDAT_RAW"))= 11 or length(trim("CMENDAT_RAW"))= 10) and "CMENDAT_RAW" not like '%0000%' ) and "CMENDAT_RAW" !='' and "CMENDAT_RAW" ~ '^[0-9\.]+$'
 then to_date(concat(replace(replace(substring(upper("CMENDAT_RAW"),1,2),'UN','01'),'UK','01'),replace(substring(upper("CMENDAT_RAW"),3),'UNK','Jan')),'DD Mon YYYY') 
 else null end AS cmendtc
 from tas3681_101."CM"	

@@ -5,6 +5,9 @@ Notes: Standard mapping to CCDM DM table
 
 with included_subjects as ( select 	distinct studyid, siteid, usubjid from subject ),
 
+ex_data AS(select "project", "SiteNumber", "Subject",max("EXOCYCEDT") as max_exendtc
+    from tas120_201."EXO" group by 1,2,3),
+
 dm_data as(select 	distinct	dm."project"::text as studyid,
 					dm."SiteNumber"::text as siteid,
 					dm."Subject"::text as usubjid,
@@ -18,7 +21,7 @@ dm_data as(select 	distinct	dm."project"::text as studyid,
 									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) :: text as visit,
 					COALESCE(dm."MinCreated", dm."RecordDate"):: date as dmdtc,
-					null:: date as brthdtc,
+					coalesce(DS."DSDAT"  ,max_exendtc):: date as brthdtc,
 					nullif(dm."DMAGE",'')::integer as age,
 					dm."DMSEX"::text as sex,
 					coalesce(dm."DMRACE", dm."DMOTH")::text as race,
@@ -31,7 +34,9 @@ dm_data as(select 	distinct	dm."project"::text as studyid,
 					,null::text AS brthdtc_iso
 		 from		tas120_201."DM" dm
 		 left join 	tas120_201."ENR" e  on dm.project=e.project  and dm."SiteNumber" =e."SiteNumber"  and dm."Subject" =e."Subject"
-		 )
+		 left join 	tas120_201."DS" DS on  dm.project=DS.project  and dm."SiteNumber" =DS."SiteNumber"  and dm."Subject" =DS."Subject"
+		 left join 	ex_data e2  on dm.project=e2.project  and dm."SiteNumber" =e2."SiteNumber"  and dm."Subject" =e2."Subject"
+		 	 )
 		,included_sites AS (
                 SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregion FROM site )
 SELECT 
@@ -58,6 +63,8 @@ SELECT
 FROM dm_data dm
 JOIN included_subjects s ON (dm.studyid = s.studyid AND dm.siteid = s.siteid AND dm.usubjid = s.usubjid)
 JOIN included_sites si ON(dm.siteid=si.siteid AND dm.studyid=si.studyid);
+
+
 
 
 

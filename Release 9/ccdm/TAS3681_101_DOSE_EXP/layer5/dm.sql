@@ -8,13 +8,23 @@ with included_subjects as ( select 	distinct studyid, siteid, usubjid from subje
 included_sites AS (
 SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregion FROM site),	
 
+ex_data as (select		'TAS3681_101_DOSE_EXP' as "project","SiteNumber","Subject",max("exendtc") as max_exendtc
+				 from	(
+							select	"project","SiteNumber","Subject",e1."EXOENDAT" as exendtc from tas3681_101."EXO" e1
+							union all
+							select	"project","SiteNumber","Subject",e2."EXOENDAT" as exendtc from tas3681_101."EXO2" e2
+							
+				 )ex
+				group by	1,2,3
+				),
+
 dm_dm2 as( select distinct 	a.studyid,
 					a.siteid,
 					a.usubjid,
 					a.visitnum,
 					a.visit,
 					a.dmdtc,
-					a.brthdtc,
+					max_exendtc:: date as brthdtc,
 					a.age,
 					a.sex,
 					a.race,
@@ -30,7 +40,7 @@ dm_dm2 as( select distinct 	a.studyid,
 							 --dm."FolderName" :: text as visit,
 							 dm."InstanceName" :: text as visit,
 							 COALESCE(dm."MinCreated", dm."RecordDate"):: date as dmdtc,
-							 dm."DMBRTDAT":: date as brthdtc,
+							 null:: date as brthdtc,
 							 dm."DMAGE"::integer as age,
 							 dm."DMSEX"::text as sex,
 							 coalesce(dm."DMRACE", dm."DMOTH")::text as race,
@@ -58,7 +68,7 @@ dm_dm2 as( select distinct 	a.studyid,
 							 dm2."FolderSeq"::numeric as visitnum,
 							 dm2."InstanceName" :: text as visit,
 							 COALESCE(dm2."MinCreated", dm2."RecordDate"):: date as dmdtc,
-							 dm2."DMBRTDAT":: date as brthdtc,
+							null:: date as brthdtc,
 							 dm2."DMAGE"::integer as age,
 							 dm2."DMSEX"::text as sex,
 							 coalesce(dm2."DMRACE", dm2."DMOTH")::text as race,
@@ -81,6 +91,8 @@ dm_dm2 as( select distinct 	a.studyid,
 						from tas3681_101."IE" ie 
 						group by 1,2)		
 					  )a
+					  left join ex_data e3 
+                        on a.studyid = e3.project and a.siteid= e3."SiteNumber"and a.usubjid =e3."Subject"
 	)
 select
 	/*KEY (dm.studyid || '~' || dm.siteid || '~' || dm.usubjid)::text AS comprehendid, KEY*/
