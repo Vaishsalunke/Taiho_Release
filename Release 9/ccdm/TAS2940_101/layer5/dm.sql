@@ -5,6 +5,11 @@ Notes: Standard mapping to CCDM DM table
 
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
+                
+                
+    exo_data AS(select project,"SiteNumber","Subject",max("EXOCYCEDT") as EXOCYCEDT from tas2940_101."EXO"
+    			group by 1,2,3			
+    ),          
 
      dm_data AS (
                 SELECT  distinct dm.project ::text AS studyid,
@@ -17,7 +22,7 @@ WITH included_subjects AS (
                         --dm."FolderName" ::text AS visit,
                         trim(dm."InstanceName") ::text AS visit,
                         coalesce (dm."MinCreated" ,dm."RecordDate") ::date AS dmdtc,
-                        null::date AS brthdtc,
+                        coalesce(eot."EOTLDDAT" ,exo.EXOCYCEDT)::date AS brthdtc,
                         "DMAGE" ::integer AS age,
                         "DMSEX" ::text AS sex,
                         coalesce(nullif("DMRACE",''),nullif("DMOTH",'')) ::text AS race,
@@ -26,9 +31,9 @@ WITH included_subjects AS (
                         nullif(concat("ENRPHAS","ENRCOHO"),'')::text AS arm,
                         null::text AS brthdtc_iso
                      from TAS2940_101."DM" dm
-                       	     --left join  tas120_204."ENR" enr
-                       	     
-							 ),
+                   	left join tas2940_101."EOT" eot on dm.project = eot.project and dm."SiteNumber"=eot."SiteNumber" and dm."Subject"=eot."Subject"
+                    left join exo_data exo on dm.project = exo.project and dm."SiteNumber"=exo."SiteNumber" and dm."Subject"=exo."Subject"  	     
+					 ),
 		site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 
 SELECT 
@@ -50,12 +55,12 @@ SELECT
         dm.armcd::text AS armcd,
         dm.arm::text AS arm,
         dm.brthdtc_iso::text AS brthdtc_iso
-        /*KEY,(dm.studyid || '~' || dm.siteid || '~' || dm.usubjid )::text  AS objectuniquekey KEY*/
+        ,(dm.studyid || '~' || dm.siteid || '~' || dm.usubjid )::text  AS objectuniquekey 
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM dm_data dm
 JOIN included_subjects s ON (dm.studyid = s.studyid AND dm.siteid = s.siteid AND dm.usubjid = s.usubjid)
-join site_data sd on (dm.studyid = sd.studyid AND dm.siteid = sd.siteid)
-;
+join site_data sd on (dm.studyid = sd.studyid AND dm.siteid = sd.siteid);
+
 
 
 
