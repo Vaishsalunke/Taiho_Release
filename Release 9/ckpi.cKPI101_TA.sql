@@ -1594,7 +1594,7 @@ st.C1D1,
 t.Order_of_Scan,
 date_part('DAY', t.DateofImage - st.C1D1)+1 as DaysFromC1D1, -- change as per UAT Log 16
 ROUND(  CASE
-WHEN Order_of_Scan <> 0 ---and (ORTLRES <>'NE' or t.SumTLMeasure <> 0)
+WHEN Order_of_Scan <> 0 
 THEN ( (t.SumTLMeasure / c.SumTLMeasure)-1) * 100
 ELSE 0
 END,2

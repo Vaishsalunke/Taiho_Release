@@ -42,7 +42,7 @@ From   (SELECT  'TAS3681_101_DOSE_ESC'::text AS studyid,
 
 union all 
 
---Disposition Event: Consented
+/*--Disposition Event: Consented
 
 SELECT  studyid,
 		siteid,
@@ -74,7 +74,7 @@ From   (SELECT  'TAS3681_101_DOSE_ESC'::text AS studyid,
 				null::text AS dsscat 
 	 	from 	tas3681_101."DM2" dm2) dm
 		
-union all 
+union all */ 
 
 --Disposition Event: Screened
 
@@ -223,7 +223,7 @@ from tas3681_101."EOS" es
 where es."EOSREAS" != 'Study Completion'
 
 
-union all 
+/*union all 
 
 --Disposition Event: Study Completion
 
@@ -236,7 +236,7 @@ es."Subject"::text AS usubjid,
 es."EOSDAT"::DATE AS dsstdtc,
 es."EOSREAS"::text AS dsscat  
 from tas3681_101."EOS" es
-where es."EOSREAS" = 'Study Completion'
+where es."EOSREAS" = 'Study Completion'*/
 /*
 union all
 
@@ -295,5 +295,8 @@ SELECT
         /*KEY , now()::TIMESTAMP WITH TIME ZONE AS comprehend_update_time KEY*/
 FROM ds_data ds
 JOIN included_subjects s ON (ds.studyid = s.studyid AND ds.siteid = s.siteid AND ds.usubjid = s.usubjid);
+
+
+
 
 

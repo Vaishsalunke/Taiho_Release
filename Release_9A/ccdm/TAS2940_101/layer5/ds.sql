@@ -2,7 +2,6 @@
 CCDM DS mapping
 Notes: Standard mapping to CCDM DS table
 */
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
@@ -20,7 +19,7 @@ WITH included_subjects AS (
                         
   
  	union all
-    --Disposition Event: Consented
+    /*--Disposition Event: Consented
 										 
   (select studyid,siteid,usubjid,dsseq,dscat,dsscat,dsterm,max(dsstdtc)  from (SELECT   "project" ::TEXT AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
@@ -35,7 +34,7 @@ WITH included_subjects AS (
 
                         )					
                         
- union all 
+ union all */
 
 --Disposition Event: Failed Screen										 
  
@@ -74,9 +73,9 @@ WITH included_subjects AS (
  (SELECT distinct project ::TEXT AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
-                        4.01::NUMERIC AS dsseq, --deprecated
+                        4.01::NUMERIC AS dsseq, 
                         'Treatment'::TEXT AS dscat,
-                        case when "EOTREAS" ='' or "EOTREAS" is null then 'Missing' else "EOTREAS" end::TEXT AS dsscat,
+                         "EOTREAS" ::TEXT AS dsscat,
                         'Early EOT'::TEXT AS dsterm,
                         "EOTDAT" ::DATE AS dsstdtc
                         from TAS2940_101."EOT" eot
@@ -89,7 +88,7 @@ WITH included_subjects AS (
  (SELECT distinct project ::TEXT AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
-                        4.4::NUMERIC AS dsseq, --deprecated
+                        4.4::NUMERIC AS dsseq,
                         'Completion'::TEXT AS dscat,
                         case when eos."EOSREAS" = '' or eos."EOSREAS" is null then 'Missing' else eos."EOSREAS" end::TEXT AS dsscat,
                         'Withdrawn'::TEXT AS dsterm,
@@ -99,7 +98,7 @@ WITH included_subjects AS (
                         
  union all 
 
---Disposition Event: Study Completion										 
+/*--Disposition Event: Study Completion										 
  
  (SELECT  distinct project ::TEXT AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
@@ -112,7 +111,7 @@ WITH included_subjects AS (
                         from tas2940_101."EOS" eos
                         where "EOSREAS"='Study Completion')
                         
- union all 
+ union all */
 
 --Disposition Event: Screened										 
  
@@ -121,7 +120,7 @@ WITH included_subjects AS (
                         "Subject" ::TEXT AS usubjid,
                         1.3::NUMERIC AS dsseq, --deprecated
                         'Enrollment'::TEXT AS dscat,
-                        null::TEXT AS dsscat,
+                        null::TEXT AS dsscat, -----logic is not given in usdm
                         'Screened'::TEXT AS dsterm,
                         COALESCE(ie."MinCreated",ie."RecordDate") ::DATE AS dsstdtc
                         from tas2940_101."IE" ie
@@ -185,6 +184,9 @@ SELECT
         /*KEY , now()::TIMESTAMP WITH TIME ZONE AS comprehend_update_time KEY*/
 FROM ds_data ds
 JOIN included_subjects s ON (ds.studyid = s.studyid AND ds.siteid = s.siteid AND ds.usubjid = s.usubjid);
+
+
+
 
 
 

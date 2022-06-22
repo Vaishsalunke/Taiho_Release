@@ -5,14 +5,12 @@ Notes: Standard mapping to CCDM LB table
 
 WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
-	 included_site AS (SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion from site),	
+     included_site AS (SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),  
 
-	 ds_en AS
-   (
-   SELECT distinct studyid,siteid,usubjid,dsstdtc FROM ds WHERE dsterm = 'Enrolled'
-   ),
-    lb_data AS
-    (
+     ds_en as ( SELECT distinct studyid,siteid,usubjid,dsstdtc FROM ds WHERE dsterm = 'Enrolled' ),
+    
+     lb_data AS
+            (
         select distinct
             lb.studyid,
             lb.siteid,
@@ -20,7 +18,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
             lb.visit,
             lbdtc,
             extract (days from (lbdtc-dsstdtc)::interval)::numeric as lbdy,
-			lbseq,
+            lbseq,
             lbtestcd,
             lbtest,
             lbcat,
@@ -57,18 +55,18 @@ SELECT distinct nl.project ::text AS studyid,
                         concat(nl.project,substring(nl."SiteNumber",position('_' in nl."SiteNumber")))::text AS siteid,
                         nl."Subject" ::text AS usubjid,
                         trim(REGEXP_REPLACE
-						(REGEXP_REPLACE
-						(REGEXP_REPLACE
-						(REGEXP_REPLACE
-						(nl."InstanceName",'\s\([0-9][0-9]\)','')
-									   ,'\s\([0-9]\)','')
-									   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
-									   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
+                        (REGEXP_REPLACE
+                        (REGEXP_REPLACE
+                        (REGEXP_REPLACE
+                        (nl."InstanceName",'\s\([0-9][0-9]\)','')
+                                       ,'\s\([0-9]\)','')
+                                       ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
+                                       ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')) ::text AS visit,
                         case when nl."DataPageName" like '%Chemistry%'      then c."LBDAT"
-                        	 when nl."DataPageName" like '%Hematology%'     then h."LBSDTC"
-                        	 when nl."DataPageName" like '%Coagulation%'    then c2."LBDAT"
-                        	 when nl."DataPageName" like '%Urinalysis%'     then u."URNDATE"
-                        	 when nl."DataPageName" like '%Hemoglobin A1C%' then hc."HGBDAT"
+                             when nl."DataPageName" like '%Hematology%'     then h."LBSDTC"
+                             when nl."DataPageName" like '%Coagulation%'    then c2."LBDAT"
+                             when nl."DataPageName" like '%Urinalysis%'     then u."URNDATE"
+                             when nl."DataPageName" like '%Hemoglobin A1C%' then hc."HGBDAT"
                         end ::timestamp without time zone AS lbdtc,
                         null::integer AS lbdy,
                         "DataPointId" ::integer AS lbseq,
@@ -86,7 +84,7 @@ SELECT distinct nl.project ::text AS studyid,
                         "LabUnits" ::text AS lborresu,
                         coalesce("StdValue", "NumericValue") ::numeric AS  lbstresn,
                         "StdUnits" ::text AS  lbstresu,
-						null::time without time zone AS lbtm,
+                        null::time without time zone AS lbtm,
                         null::text AS  lbblfl,
                         null::text AS  lbnrind,
                         "LabHigh" ::text AS  lbornrhi,
@@ -162,7 +160,7 @@ SELECT distinct nl.project ::text AS studyid,
                     'EXPOSURE'::text                        AS lbtestcd,
                     'EXPOSURE'::text                        AS lbtest,
                     'EXPOSURE'::text                        AS lbcat,
-					to_json((row(ex.extrt), row('Name of Actual Treatment')))::text AS lbscat,
+                    to_json((row(ex.extrt), row('Name of Actual Treatment')))::text AS lbscat,
                     --ex.extrt::text AS lbscat,
                     NULL::text                              AS lbspec,
                     NULL::text                              AS lbmethod,
@@ -273,12 +271,178 @@ SELECT distinct nl.project ::text AS studyid,
                     NULL::text                            AS lbclsig
                 FROM
                     pe ) lb left join ds_en ds 
-			on lb.studyid = ds.studyid
-			and lb.siteid = ds.siteid
-			and lb.usubjid = ds.usubjid
-        WHERE
-            lbdtc IS NOT NULL
-    )                      
+            on lb.studyid = ds.studyid
+            and lb.siteid = ds.siteid
+            and lb.usubjid = ds.usubjid
+            WHERE   lbdtc IS NOT NULL
+        ),
+    
+baseline as(
+select ex.studyid,ex.siteid,ex.usubjid,count(blfl) as blfl
+from(
+select studyid,siteid,usubjid,max(min_lbdtc) as blfl
+from(
+select lb.studyid,lb.siteid,lb.usubjid,case when min(exstdtc) > lbdtc then lbdtc end as min_lbdtc
+from cqs.ex
+left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
+group by lb.studyid,lb.siteid,lb.usubjid,lb.lbdtc
+having lb.lbdtc < min(exstdtc)
+)ex_max
+group by ex_max.studyid,ex_max.siteid,ex_max.usubjid
+)ex
+group by ex.studyid,ex.siteid,ex.usubjid),
+   
+final_lb as
+        (
+        select  distinct  lb.studyid,
+                    lb.siteid,
+                    lb.usubjid,
+                    lb.visit,
+                    lbdtc,
+                    lbdy,
+                    lbseq,
+                    lbtestcd,
+                    lbtest,
+                    lbcat,
+                    lbscat,
+                    lbspec,
+                    lbmethod,
+                    lborres,
+                    lbstat,
+                    lbreasnd,
+                    lbstnrlo,
+                    lbstnrhi,
+                    lborresu,
+                    lbstresn,
+                    lbstresu,
+                    case    when lbdtc<first_dose then 'Yes'
+                    when blfl=0 then case when lbdtc=first_dose then 'Yes' else 'No' end else 'No' end as lbblfl,
+                    lbnrind,
+                    lbornrhi,
+                    lbornrlo,
+                    lbstresc,
+                    lbenint,
+                    lbevlint,
+                    lblat,
+                    lblloq,
+                    lbloc,
+                    lbpos,
+                    lbstint,
+                    lbuloq,
+                    lbclsig,
+                    lbtm
+        FROM        lb_data lb
+        left join   (    
+        select studyid, siteid, usubjid, min(exstdtc) first_dose
+                        from   cqs.ex
+                        group by studyid, siteid, usubjid
+                    ) ex on lb.studyid = ex.studyid and lb.siteid = ex.siteid and ex.usubjid = lb.usubjid
+        left join     baseline on baseline.studyid = lb.studyid and lb.siteid = ex.siteid and lb.usubjid = baseline.usubjid      
+        )
+       
+,min_baseline as
+(
+    select
+        studyid,
+        siteid,
+        usubjid,
+        lbtestcd,
+        lbblfl,
+        visit,
+        min(lbdtc) min_lbdtc
+    from
+        final_lb lb
+    where
+        lbblfl = 'Yes'
+    group by
+        studyid,
+        siteid,
+        usubjid,
+        lbtestcd,
+        lbblfl,
+        visit
+        ),
+       
+       
+    bl_val as (
+    select
+        lb.studyid,
+        lb.siteid,
+        lb.usubjid,
+        lb.lbtestcd,
+        lb.visit,
+        lb.lbstresn bl_lbstresn,
+        case
+            when (lb.lbstresn > lb.lbstnrhi
+                or lb.lbstresn < lb.lbstnrlo) then 'abnormal'
+            when lb.lbstresn is null then null
+            else 'normal'
+        end as "result"
+    from
+        min_baseline
+    left join final_lb lb on
+        min_baseline.studyid = lb.studyid
+        and min_baseline.siteid = lb.siteid
+        and lb.usubjid = min_baseline.usubjid
+        and lb.lbtestcd = min_baseline.lbtestcd
+        and lb.lbdtc = min_baseline.min_lbdtc
+        and lb.visit = min_baseline.visit
+        AND lb.lbblfl = min_baseline.lbblfl
+    ),
+
+new_baseline as
+(
+    select distinct
+        lb.studyid,
+                    lb.siteid,
+                    lb.usubjid,
+                    lb.visit,
+                    lb.lbdtc,
+                    lb.lbdy,
+                    lb.lbseq,
+                    lb.lbtestcd,
+                    lb.lbtest,
+                    lb.lbcat,
+                    lb.lbscat,
+--                    lbspec,
+                    lb.lbmethod,
+                    lb.lborres,
+                    lb.lbstat,
+                    lb.lbreasnd,
+                    lb.lbstnrlo,
+                    lb.lbstnrhi,
+                    lb.lborresu,
+                    lb.lbstresn,
+                    lb.lbstresu,
+                    lb.lbblfl,
+                    /*case    when lbdtc<first_dose then 'Yes'
+                    when blfl=0 then case when lbdtc=first_dose then 'Yes' else 'No' end else 'No' end as lbblfl,*/
+                    lb.lbnrind,
+                    lb.lbornrhi,
+                    lb.lbornrlo,
+                    lb.lbstresc,
+                    lb.lbenint,
+                    lb.lbevlint,
+                    lb.lblat,
+                    lb.lblloq,
+                    --lbloc,
+                    lb.lbpos,
+                    lb.lbstint,
+                    lb.lbuloq,
+                    lb.lbclsig,
+                    lb.lbtm,
+        bl_val.bl_lbstresn as lbloc,
+       bl_val.result as lbspec
+    from
+        final_lb lb
+    left join bl_val on
+        bl_val.studyid = lb.studyid
+        and bl_val.siteid = lb.siteid
+        and lb.usubjid = bl_val.usubjid
+        and lb.lbtestcd = bl_val.lbtestcd
+        and lb.visit = bl_val.visit
+        AND lb.lbstresn = bl_val.bl_lbstresn
+        )                   
      SELECT 
         /*KEY (lb.studyid || '~' || lb.siteid || '~' || lb.usubjid)::text AS comprehendid, KEY*/
         lb.studyid::text AS studyid,
@@ -325,11 +489,7 @@ SELECT distinct nl.project ::text AS studyid,
         null::text AS  timpnt
          /*KEY, (lb.studyid || '~' || lb.siteid || '~' || lb.usubjid || '~' || lb.lbseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM lb_data lb
+FROM new_baseline lb
 JOIN included_subjects s ON (lb.studyid = s.studyid AND lb.siteid = s.siteid AND lb.usubjid = s.usubjid)
-LEFT JOIN included_site si ON (lb.studyid = si.studyid AND lb.siteid = si.siteid)
-;
-
-
-
+LEFT JOIN included_site si ON (lb.studyid = si.studyid AND lb.siteid = si.siteid);
 

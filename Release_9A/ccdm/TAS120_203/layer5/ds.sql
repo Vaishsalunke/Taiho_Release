@@ -2,27 +2,28 @@
 CCDM DS mapping
 Notes: Standard mapping to CCDM DS table
 */
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
      ds_data AS (
-                ---Disposition Event: All Subjects										
-(SELECT  project ::TEXT AS studyid,
-                        project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
-                        "Subject" ::TEXT AS usubjid,
-                        1.0::NUMERIC AS dsseq, --deprecated
-                        'All Subjects'::TEXT AS dscat,
-                        null::TEXT AS dsscat,
-                        'All Subjects'::TEXT AS dsterm,
-                        null::DATE AS dsstdtc
-                        from tas120_203."DM" d)
+---Disposition Event: All Subjects										
+					(SELECT  distinct
+						'TAS120_203' ::TEXT AS studyid,
+						concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
+						"patient" ::TEXT AS usubjid,
+						1.0::NUMERIC AS dsseq, 
+						'All Subjects'::TEXT AS dscat,
+						null::TEXT AS dsscat,
+						'All Subjects'::TEXT AS dsterm,
+						null::DATE AS dsstdtc
+						from tas120_203_irt.patient_visit_summary d)
                         
  union all 
  
-----Disposition Event: Consented
+/*----Disposition Event: Consented
 										 
- (SELECT  project ::TEXT AS studyid,
+                    (SELECT  
+						project ::TEXT AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         2.0::NUMERIC AS dsseq, --deprecated
@@ -30,66 +31,71 @@ WITH included_subjects AS (
                         null::TEXT AS dsscat,
                         'Consented'::TEXT AS dsterm,
                         "ICDAT" ::DATE AS dsstdtc
-                        from tas120_203."IC" i
+                        from tas120_203_irt.patient_visit_summary i
                         where "IEYN"='Yes')
                         
- union all 
+ union all */
 
 --Disposition Event: Failed Screen										 
  
- (SELECT  e.project ::TEXT AS studyid,
-                        e.project||substring(e."SiteNumber",position ('_' in e."SiteNumber")) ::TEXT AS siteid,
-                        e."Subject" ::TEXT AS usubjid,
+
+(SELECT  'TAS120_203' ::TEXT AS studyid,
+                        concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
+                        e."patient" ::TEXT AS usubjid,
                         2.1::NUMERIC AS dsseq, --deprecated
                         'Enrollment'::TEXT AS dscat,
                         i."IETESTCD" ::TEXT AS dsscat,
                         'Failed Screen'::TEXT AS dsterm,
-                        "EOSDAT" ::DATE AS dsstdtc
-                        from tas120_203."EOS" e
+                        "actual_date" ::DATE AS dsstdtc
+                        from tas120_203_irt.patient_visit_summary e
                         join tas120_203."IC" i
-                        on i.project=e.project and i."SiteNumber"=e."SiteNumber" and i."Subject"=e."Subject"
-                        and e."EOSREAS" ='Screen Failure'and i."IEYN"='No'
-                        )
-                        
+                        on   split_part(i."SiteNumber",'_',2)=e."study_site" and i."Subject"=e."patient"
+                        where e."visit_description" ='Screen Failure'and i."IEYN"='No'
+                        and i.project = 'TAS120_203'  and trim(e.number_of_pembrolizumab_doses_to_date ) ='' )
+                      
  union all 
 
 --Disposition Event: Enrollment										 
  
- (SELECT  project ::TEXT AS studyid,
-                        project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
-                        "Subject" ::TEXT AS usubjid,
+ (SELECT  distinct
+						'TAS120_203'::TEXT AS studyid,
+                        concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
+                        "patient" ::TEXT AS usubjid,
                         3.0::NUMERIC AS dsseq, --deprecated
                         'Enrollment'::TEXT AS dscat,
                         null::TEXT AS dsscat,
                         'Enrolled'::TEXT AS dsterm,
-                        "ENRDAT" ::DATE AS dsstdtc
-                        from tas120_203."ENR" enr 
-                        where "ENRYN" ='Yes'
+                        "actual_date" ::DATE AS dsstdtc
+                        from tas120_203_irt.patient_visit_summary
+                        where "visit_description" =  'Cycle 1'
                         )
                         
  union all 
 
 --Disposition Event: Early EOT 
  
- (SELECT  project ::TEXT AS studyid,
-                        project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
-                        "Subject" ::TEXT AS usubjid,
+ (SELECT  'TAS120_203' ::TEXT AS studyid,
+                        concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
+                        "patient" ::TEXT AS usubjid,
                         4.01::NUMERIC AS dsseq, --deprecated
                         'Treatment'::TEXT AS dscat,
-                        "EOTREAS" ::TEXT AS dsscat,
+                        i."EOTREAS" ::TEXT AS dsscat,
                         'Early EOT'::TEXT AS dsterm,
-                        "EOTDAT" ::DATE AS dsstdtc
-                        from tas120_203."EOT" eot
-                        where "EOTREAS" != 'Treatment Completion' )
+                        "actual_date" ::DATE AS dsstdtc
+                        from tas120_203_irt.patient_visit_summary b
+                        join tas120_203."EOT" i
+                        on  split_part(i."SiteNumber",'_',2)=b."study_site" and i."Subject"=b."patient"
+                        where "visit_description" = 'Discontinue'
+                        )
                         
  union all 
 
 --Disposition Event: Withdrawn										 
  
  (SELECT  project ::TEXT AS studyid,
-                        project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
+                        concat('TAS120_203','_',split_part("SiteNumber",'_',2)) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
-                        4.4::NUMERIC AS dsseq, --deprecated
+                        4.4::NUMERIC AS dsseq,
                         'Completion'::TEXT AS dscat,
                         case when eos."EOSREAS" = '' or eos."EOSREAS" is null then 'Missing' else eos."EOSREAS" end::TEXT AS dsscat,
                         'Withdrawn'::TEXT AS dsterm,
@@ -99,7 +105,7 @@ WITH included_subjects AS (
                         
  union all 
 
---Disposition Event: Study Completion										 
+/*--Disposition Event: Study Completion										 
  
  (SELECT  project ::TEXT AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
@@ -108,24 +114,24 @@ WITH included_subjects AS (
                         'Completion'::TEXT AS dscat,
                         null::TEXT AS dsscat,
                         'Completed'::TEXT AS dsterm,
-                        "EOSDAT" ::DATE AS dsstdtc
+                        case when "EOSREAS" ='' and "EOSREAS" is null then 'Missing' else "EOSREAS" ::DATE AS dsstdtc
                         from tas120_203."EOS" eos
                         where "EOSREAS"='Study Completion')
                         
- union all 
+ union all */
 
 --Disposition Event: Screened										 
  
- (SELECT  project ::TEXT AS studyid,
-                        project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
-                        "Subject" ::TEXT AS usubjid,
+ (SELECT  'TAS120_203' ::TEXT AS studyid,
+                        concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
+                        "patient" ::TEXT AS usubjid,
                         1.3::NUMERIC AS dsseq, --deprecated
                         'Enrollment'::TEXT AS dscat,
                         null::TEXT AS dsscat,
                         'Screened'::TEXT AS dsterm,
-                        "VISITDAT" ::DATE AS dsstdtc
-                        from tas120_203."IC" ic
-                        where "IEYN"='Yes')
+                        "actual_date" ::DATE AS dsstdtc
+                        from tas120_203_irt.patient_visit_summary 
+                        where "visit_description" = 'Screening')
  
 /* 
  union all 
@@ -182,8 +188,15 @@ SELECT
         null::TEXT AS epoch,
         null::TIMESTAMP WITHOUT TIME ZONE AS dsdtc,
         null::INTEGER AS dsstdy
-        /*KEY , (ds.studyid || '~' || ds.siteid || '~' || ds.usubjid || '~' || ds.dsseq)::TEXT  AS objectuniquekey KEY*/
+         /*KEY, (ds.studyid || '~' || ds.siteid || '~' || ds.usubjid || '~' || ds.dsseq)::TEXT  AS objectuniquekey KEY*/
         /*KEY , now()::TIMESTAMP WITH TIME ZONE AS comprehend_update_time KEY*/
 FROM ds_data ds
 JOIN included_subjects s ON (ds.studyid = s.studyid AND ds.siteid = s.siteid AND ds.usubjid = s.usubjid);
+
+
+
+
+
+
+
 
