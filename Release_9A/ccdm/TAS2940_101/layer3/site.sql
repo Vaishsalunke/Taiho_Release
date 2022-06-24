@@ -1,3 +1,4 @@
+
 /*
 CCDM Site mapping
 Notes: Standard mapping to CCDM Site table
@@ -19,7 +20,7 @@ activationdate as( select site_number, case when ms.event_desc = 'Site Ready to 
                         end::date AS activationdate from tas2940_101_ctms.milestone_status_site ms where event_desc ='Site Ready to Enroll' order by site_number ASC),
 deactivationdate as( select site_number, case when ms.event_desc = 'Site Closed' then nullif(ms.actual_date,'')
                         end::date AS deactivationdate from tas2940_101_ctms.milestone_status_site ms where event_desc ='Site Closed'order by site_number ASC),
-    site_data AS (
+site_data AS (
                 select distinct b.*, sr.siteregion::text AS siteregion from (
                 select a.*,
                 cc.countrycode3_iso::text AS sitecountrycode from (  
@@ -27,11 +28,13 @@ deactivationdate as( select site_number, case when ms.event_desc = 'Site Closed'
                 SELECT  distinct 'TAS2940_101'::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         'TAS2940_101_' || split_part("name",'_',1)::text AS siteid,
-                        split_part("name",'_',2)::text AS sitename,
+                        --split_part("name",'_',2)::text AS sitename,
+						case when tss.sitename_std is null then ms."center_name"
+                        else tss.sitename_std end::text AS sitename,
                         'UBC'::text AS croid,
                         'UBC'::text AS sitecro,
-                        case when "name" like '%201_Gustave Roussy_201%' then 'France'
-                        else 'United States' end::text AS sitecountry,
+                        --case when "name" like '%201_Gustave Roussy_201%' then 'France' else 'United States' end::text AS sitecountry,
+                        case when tss.sitecountry = 'United States of America' then 'United States' else tss.sitecountry end ::text AS sitecountry,
                         cd.creationdate::date AS sitecreationdate,
                       	ad.activationdate::date AS siteactivationdate,
                         dd.deactivationdate::date AS sitedeactivationdate,
@@ -56,16 +59,21 @@ deactivationdate as( select site_number, case when ms.event_desc = 'Site Closed'
                         	on split_part(s."name",'_',1)=ad.site_number
                         left join deactivationdate dd
                         	on split_part(s."name",'_',1)=dd.site_number
+						left join internal_config.taiho_sitename_standards tss
+                        on
+                         'TAS2940_101_'||ms."site_number" = tss.siteid
+                      --  and  ms."center_name" = tss.sitename
+                        where tss.studyid = 'TAS2940_101'
+                        
                         )a
                 left join sitecountrycode_data cc
                 on a.studyid = cc.studyid
                 AND LOWER(a.sitecountry)=LOWER(cc.countryname_iso)
+				
                 )b
                 left join internal_config.site_region_config sr
        on b.sitecountrycode = sr.alpha_3_code
-                )  
-               
-
+                ) 
 SELECT
         /*KEY (s.studyid || '~' || s.siteid)::text AS comprehendid, KEY*/
         s.studyid::text AS studyid,
@@ -95,6 +103,8 @@ SELECT
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM site_data s
 JOIN included_studies st ON (s.studyid = st.studyid);
+
+
 
 
 

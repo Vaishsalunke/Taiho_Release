@@ -15,10 +15,12 @@ sitecountrycode_data AS (
                  SELECT  distinct 'TAS120_204'::text AS studyid,
                         'TAS120_204'::text AS studyname,
                         'TAS120_204_' || split_part("name",'_',1)::text AS siteid,
-                        split_part("name",'_',2)::text AS sitename,
+                        --split_part("name",'_',2)::text AS sitename,
+                        case when tss.sitename_std is null then split_part(s."name",'_',2) else tss.sitename_std end::text AS sitename,
                         'Syneos'::text AS croid,
                         'Syneos'::text AS sitecro,
-                        'United States'::text AS sitecountry,                       
+                        --'United States'::text AS sitecountry, 
+                        case when tss.sitecountry = 'United States of America' then 'United States' else tss.sitecountry end ::text AS sitecountry,                    
                         TRUE::text as statusapplicable,
                         sm.site_selected_date::date AS sitecreationdate,
                         sm.site_activated_date::date AS siteactivationdate,
@@ -34,9 +36,14 @@ sitecountrycode_data AS (
 						case when lower(site_status)='activated' then sm.site_activated_date
                         	 when lower(site_status)='selected' then sm.site_selected_date
                         end::date AS sitestatusdate
-                        from tas120_204.__sites
+                        from tas120_204.__sites s
                         left join tas120_204_ctms.sites sm
 						on split_part("name",'_',1) = split_part(sm."site_number",'_',2)
+						left join internal_config.taiho_sitename_standards tss
+						on
+                         'TAS120_204_' || split_part(s."name",'_',1) = tss.siteid
+                        --and  ms."center_name" = tss.sitename
+                        where tss.studyid = 'TAS120_204'
                         )a 
                 		left join sitecountrycode_data cc 
                 		on a.studyid = cc.studyid 
@@ -75,7 +82,6 @@ SELECT
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM site_data s 
 JOIN included_studies st ON (s.studyid = st.studyid);
-
 
 
 

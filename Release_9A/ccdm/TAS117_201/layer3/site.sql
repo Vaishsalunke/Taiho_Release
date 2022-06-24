@@ -3,11 +3,6 @@ CCDM Site mapping
 Notes: Standard mapping to CCDM Site table
 */
 
-/*
-CCDM Site mapping
-Notes: Standard mapping to CCDM Site table
-*/
-
 WITH included_studies AS (
                 SELECT studyid FROM study ),
                
@@ -22,11 +17,13 @@ sitecountrycode_data AS (
                 SELECT  'TAS117_201'::text AS studyid,
                         null::text AS studyname,
                         'TAS117_201_' || split_part("name",'_',1) ::text AS siteid,
-                        substring("name",position('_' in "name")+1,length(trim("name"))-8) ::text AS sitename,
+                        --substring("name",position('_' in "name")+1,length(trim("name"))-8) ::text AS sitename,
+						case when tss.sitename_std is null then split_part(s."name",'_',2) else tss.sitename_std end::text AS sitename,
                         'Syneos'::text AS croid,
                         'Syneos'::text AS sitecro,
-                        case when split_part("name",'_',1) = '501' then 'Austria' else ss.country_name end::text AS sitecountry,
-						True::BOOLEAN AS statusapplicable,
+                        --case when split_part("name",'_',1) = '501' then 'Austria' else ss.country_name end::text AS sitecountry,
+						case when tss.sitecountry = 'United States of America' then 'United States' else tss.sitecountry end ::text AS sitecountry,
+                        True::BOOLEAN AS statusapplicable,
                         ss.site_selected_date::date AS sitecreationdate,
                         nullif(ss.site_activated_date,'')::date AS siteactivationdate,
                         coalesce(nullif(ss.site_closed_date,''),nullif(ss.site_terminated_date,''))::date AS sitedeactivationdate,
@@ -45,6 +42,11 @@ sitecountrycode_data AS (
                 from tas117_201."__sites" s
                 left join tas117_201_ctms.sites ss
                 on  split_part(s."name",'_',1) = split_part(ss.site_number,'_',2)
+                left join internal_config.taiho_sitename_standards tss
+                on
+                         'TAS117_201_'||split_part(ss.site_number,'_',2) = tss.siteid
+                        --and  ms."center_name" = tss.sitename
+                        where tss.studyid = 'TAS117_201'
                 )a
                 left join sitecountrycode_data cc
                 on a.studyid = cc.studyid

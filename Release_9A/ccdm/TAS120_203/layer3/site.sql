@@ -11,18 +11,20 @@ sitecountrycode_data AS (
 
     site_data AS (
                 select distinct b.*, 
-                sr.siteregion::text AS siteregion,
-                sr.country_name::text AS sitecountry 
+                sr.siteregion::text AS siteregion
+                --,sr.country_name::text AS sitecountry 
                 from (
                 select a.*, 
                 cc.countrycode3_iso::text AS sitecountrycode from (
                 SELECT  distinct 'TAS120_203'::text AS studyid,
                         null::text AS studyname,
                         'TAS120_203_' || split_part("name",'_',1)::text AS siteid,
-                        split_part("name",'_',2)::text AS sitename,
+                        --split_part("name",'_',2)::text AS sitename,
+						case when tss.sitename_std is null then split_part(s."name",'_',2) else tss.sitename_std end::text AS sitename,
                         'PXL'::text AS croid,
                         'PXL'::text AS sitecro,
-                         cn.country::text AS sitecountry1,
+                         --cn.country::text AS sitecountry1,
+						 case when tss.sitecountry = 'United States of America' then 'United States' else tss.sitecountry end ::text AS sitecountry,
                         TRUE::text as statusapplicable,
                         sm.actual_selected::date AS sitecreationdate,
                         nullif(sm.actual_activation,'')::date AS siteactivationdate,
@@ -39,15 +41,20 @@ sitecountrycode_data AS (
                              when sm.closeout_status = 'Start Up' then sm.actual_srp
                              when sm.closeout_status = 'Cancelled' then sm.actual_qual
                         end::date AS sitestatusdate 
-                        from tas120_203.__sites
+                        from tas120_203.__sites s
                         left join tas120_203_ctms.site_milestones sm on 
                         split_part("name",'_',1) = sm.site_number
 						left join tas120_203_ctms.center cn on 
 						split_part("name",'_',1) = cn.site_number
+						left join internal_config.taiho_sitename_standards tss
+						on
+                         'TAS120_203_' || split_part(s."name",'_',1) = tss.siteid
+                        --and  ms."center_name" = tss.sitename
+                        where tss.studyid = 'TAS120_203'
                         )a 
-                		left join sitecountrycode_data cc 
-                		on a.studyid = cc.studyid 
-                		AND LOWER(a.sitecountry1)=LOWER(cc.countrycode3_iso)
+                		left join sitecountrycode_data cc
+                		on a.studyid = cc.studyid
+                		AND LOWER(a.sitecountry)=LOWER(cc.countryname_iso)
                 		)b 
                 		left join internal_config.site_region_config sr
 				        on b.sitecountrycode = sr.alpha_3_code
