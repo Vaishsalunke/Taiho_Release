@@ -22,13 +22,17 @@ ds_data AS (
 SELECT distinct
 'TAS0612_101' ::text AS studyid,
 concat('TAS0612_101_',site_id) ::text AS siteid,
-subject_number ::text AS usubjid,
+s1.usubjid ::text AS usubjid,
 1.0::NUMERIC AS dsseq,
 'All Subjects'::text AS dscat,
 'All Subjects'::text AS dsterm,
 null::DATE AS dsstdtc,
 null::text AS dsscat
 from tas0612_101_irt.subject s
+left join subject s1 on
+s1.studyid = 'TAS0612_101' and
+s1.siteid = concat('TAS0612_101_',s.site_id) and
+case when s1.usubjid like '%-P1' then split_part(s1.usubjid,'-P1',1) else s1.usubjid end = s.subject_number
 
 
 /*
@@ -55,13 +59,17 @@ union all
 SELECT  distinct
 'TAS0612_101'::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
-subject_number ::text AS usubjid,
+s1.usubjid ::text AS usubjid,
 1.3::NUMERIC AS dsseq,
 'Screened'::text AS dscat,
 'Screened'::text AS dsterm,
 screening_date ::DATE AS dsstdtc,
 null::text AS dsscat
-from tas0612_101_irt.subject s4
+from tas0612_101_irt.subject s
+left join subject s1 on
+s1.studyid = 'TAS0612_101' and
+s1.siteid = concat('TAS0612_101_',s.site_id) and
+case when s1.usubjid like '%-P1' then split_part(s1.usubjid,'-P1',1) else s1.usubjid end = s.subject_number
 where nullif (screening_date,'') notnull
 
 union all
@@ -71,14 +79,21 @@ union all
 select studyid, siteid, usubjid, dsseq, dscat, dsterm, dsstdtc, string_agg(dsscat,';') as dsscat from (
 SELECT distinct 'TAS0612_101'::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
-subject_number ::text AS usubjid,
+s2.usubjid ::text AS usubjid,
 2.1::NUMERIC AS dsseq,
 'Enrollment'::text AS dscat,
 'Failed Screen'::text AS dsterm,
 screen_fail_date ::DATE AS dsstdtc,
 concat(i."IECAT",i."IETESTCD") ::text AS dsscat
 from tas0612_101_irt.subject s1
-left join tas0612_101."IE" i on ('TAS0612_101'=i.project and concat('TAS0612_101_',s1.site_id) = concat(split_part(i."SiteNumber",'_',1),'_101_',split_part(i."SiteNumber",'_',2)) and s1.subject_number = i."Subject")
+left join tas0612_101."IE" i on
+('TAS0612_101'=i.project and
+concat('TAS0612_101_',s1.site_id) = concat(split_part(i."SiteNumber",'_',1),'_101_',split_part(i."SiteNumber",'_',2)) and
+s1.subject_number = i."Subject")
+left join subject s2 on
+s2.studyid = 'TAS0612_101' and
+s2.siteid = concat('TAS0612_101_',s1.site_id) and
+case when s2.usubjid like '%-P1' then split_part(s2.usubjid,'-P1',1) else s2.usubjid end = s1.subject_number
 where subject_status = 'Screen Failed')a
 group by 1,2,3,4,5,6,7
 
@@ -89,13 +104,17 @@ union all
 SELECT  distinct
 'TAS0612_101' ::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
-subject_number ::text AS usubjid,
+s1.usubjid ::text AS usubjid,
 3.0::NUMERIC AS dsseq,
 'Enrollment'::text AS dscat,
 'Enrolled'::text AS dsterm,
 enrollment_date ::DATE AS dsstdtc,
 null::text AS dsscat  
-from tas0612_101_irt.subject s2
+from tas0612_101_irt.subject s
+left join subject s1 on
+s1.studyid = 'TAS0612_101' and
+s1.siteid = concat('TAS0612_101_',s.site_id) and
+case when s1.usubjid like '%-P1' then split_part(s1.usubjid,'-P1',1) else s1.usubjid end = s.subject_number
 where subject_status = 'Enrolled'
 
 union all
@@ -105,7 +124,7 @@ union all
 SELECT distinct
 'TAS0612_101'::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
-subject_number ::text AS usubjid,
+s1.usubjid ::text AS usubjid,
 4.01::NUMERIC AS dsseq,
 'Treatment'::text AS dscat,
 'Early EOT'::text AS dsterm,
@@ -113,6 +132,10 @@ end_of_treatment_date ::DATE AS dsstdtc,
 eot."EOTREAS"::text AS dsscat  
 from tas0612_101_irt.subject s3
 left join tas0612_101."EOT" eot on ('TAS0612_101'=eot.project and concat('TAS0612_101_',site_id) = concat(eot."SiteNumber",'_',split_part(eot."Subject",'-',1)) and s3.subject_number = concat(split_part(eot."Subject",'-',1),'-',split_part(eot."Subject",'-',2)))
+left join subject s1 on
+s1.studyid = 'TAS0612_101' and
+s1.siteid = concat('TAS0612_101_',s3.site_id) and
+case when s1.usubjid like '%-P1' then split_part(s1.usubjid,'-P1',1) else s1.usubjid end = s3.subject_number
 where subject_status = 'Discontinued Treatment'
 
 union all
@@ -212,4 +235,3 @@ SELECT
         /*KEY , now()::TIMESTAMP WITH TIME ZONE AS comprehend_update_time KEY*/
 FROM ds_data ds
 JOIN included_subjects s ON (ds.studyid = s.studyid AND ds.siteid = s.siteid AND ds.usubjid = s.usubjid);
-
