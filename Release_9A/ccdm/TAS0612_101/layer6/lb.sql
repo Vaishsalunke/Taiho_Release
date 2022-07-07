@@ -3,8 +3,6 @@ CCDM LB mapping
 Notes: Standard mapping to CCDM LB table
 */
 
-
-
 WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
         included_site AS (SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),   
@@ -84,28 +82,28 @@ WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM sub
                             lb.usubjid,
                             trim(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE
                                 (REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE
-                                (REGEXP_REPLACE(REPLACE(visit,'(1)',''),'<W[0-9]DA[0-9]/>\sExpansion','')
+                                (REGEXP_REPLACE(REPLACE(lb.visit,'(1)',''),'<W[0-9]DA[0-9]/>\sExpansion','')
                                 ,'<WK[0-9]DA[0-9]/>\sExpansion',''),'<WK[0-9]DA[0-9][0-9]/>\sExpansion','')
                                 , '<W[0-9]DA[0-9][0-9]/>\sExpansion',''), '<WK[0-9]D[0-9]/>\sEscalation','')
                                 ,'<WK[0-9]D[0-9][0-9]/>\sEscalation',''),'Escalation',''))::text as visit,
-                            lbdtc,
-                            extract (days from (lbdtc-dsstdtc)::interval)::numeric as lbdy,
+                            lb.lbdtc,
+                            extract (days from (lb.lbdtc-dsstdtc)::interval)::numeric as lbdy,
                             lbseq,
                             --(row_number() over (partition by lb.studyid, lb.siteid, lb.usubjid order by lb.lbtestcd, lb.lbdtc))::int as lbseq,
-                            lbtestcd as lbtestcd,
-                            lbtest as lbtest,
-                            lbcat,
+                            lb.lbtestcd as lbtestcd,
+                            lb.lbtest as lbtest,
+                            lb.lbcat,
                             lbscat,
                             lbspec,
                             lbmethod,
                             lborres,
                             lbstat,
                             lbreasnd,
-                            lbstnrlo,
-                            lbstnrhi,
-                            lborresu,
-                            lbstresn,
-                            lbstresu,
+                            lb.lbstnrlo,
+                            lb.lbstnrhi,
+                            lb.lborresu,
+                            lb.lbstresn,
+                            lb.lbstresu,
                             lbtm,
                             lbblfl,
                             lbnrind,
@@ -120,7 +118,7 @@ WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM sub
                             lbpos,
                             lbstint,
                             lbuloq,
-                            lbclsig
+                            c.lbtox as lbclsig
                 from (
                         --Normlab
                         SELECT  studyid,
@@ -330,7 +328,15 @@ WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM sub
                 )lb 
                 left join   ds_en ds
                 on          lb.studyid = ds.studyid and lb.siteid = ds.siteid and lb.usubjid = ds.usubjid
-                where       lbdtc is not Null
+				left join ctable_listing.ctcae_listing c
+on lb.studyid = c.studyid
+and lb.usubjid = c.usubjid
+and lb.lbtest = c.lbtest
+and lb.lbcat = c.lbcat
+and lb.visit = c.visit
+and lb.lbdtc = c.lbdtc
+and lb.lbstresn = c.lbstresn
+                where       lb.lbdtc is not Null
 
                     ),
                     
@@ -340,7 +346,7 @@ from(
 select studyid,siteid,usubjid,max(min_lbdtc) as blfl
 from(
 select lb.studyid,lb.siteid,lb.usubjid,case when min(exstdtc) > lbdtc then lbdtc end as min_lbdtc
-from cqs.ex
+from ex
 left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
 group by lb.studyid,lb.siteid,lb.usubjid,lb.lbdtc
 having lb.lbdtc < min(exstdtc)
@@ -391,7 +397,7 @@ final_lb as
         FROM        lb_data lb
         left join   (    
         select studyid, siteid, usubjid, min(exstdtc) first_dose
-                        from   cqs.ex
+                        from   ex
                         group by studyid, siteid, usubjid
                     ) ex on lb.studyid = ex.studyid and lb.siteid = ex.siteid and ex.usubjid = lb.usubjid
         left join     baseline on baseline.studyid = lb.studyid and lb.siteid = ex.siteid and lb.usubjid = baseline.usubjid      

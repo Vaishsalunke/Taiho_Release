@@ -16,23 +16,23 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
             lb.siteid,
             lb.usubjid,
             lb.visit,
-            lbdtc,
-            extract (days from (lbdtc-dsstdtc)::interval)::numeric as lbdy,
+            lb.lbdtc,
+            extract (days from (lb.lbdtc-dsstdtc)::interval)::numeric as lbdy,
             lbseq,
-            lbtestcd,
-            lbtest,
-            lbcat,
+            lb.lbtestcd,
+            lb.lbtest,
+            lb.lbcat,
             lbscat,
             lbspec,
             lbmethod,
             lborres,
             lbstat,
             lbreasnd,
-            lbstnrlo,
-            lbstnrhi,
+            lb.lbstnrlo,
+            lb.lbstnrhi,
             lborresu,
-            lbstresn,
-            lbstresu,
+            lb.lbstresn,
+            lb.lbstresu,
             lbblfl,
             lbnrind,
             lbornrhi,
@@ -46,7 +46,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
             lbpos,
             lbstint,
             lbuloq,
-            lbclsig,
+            c.lbtox as lbclsig,
             lbtm
         FROM
             (
@@ -270,11 +270,20 @@ SELECT distinct nl.project ::text AS studyid,
                     NULL::NUMERIC                         AS lbuloq,
                     NULL::text                            AS lbclsig
                 FROM
-                    pe ) lb left join ds_en ds 
+                    pe ) lb 
+					left join ds_en ds 
             on lb.studyid = ds.studyid
             and lb.siteid = ds.siteid
             and lb.usubjid = ds.usubjid
-            WHERE   lbdtc IS NOT NULL
+			left join ctable_listing.ctcae_listing c
+on lb.studyid = c.studyid
+and lb.usubjid = c.usubjid
+and lb.lbtest = c.lbtest
+and lb.lbcat = c.lbcat
+and lb.visit = c.visit
+and lb.lbdtc = c.lbdtc
+and lb.lbstresn = c.lbstresn
+            WHERE   lb.lbdtc IS NOT NULL
         ),
     
 baseline as(
@@ -283,7 +292,7 @@ from(
 select studyid,siteid,usubjid,max(min_lbdtc) as blfl
 from(
 select lb.studyid,lb.siteid,lb.usubjid,case when min(exstdtc) > lbdtc then lbdtc end as min_lbdtc
-from cqs.ex
+from ex
 left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
 group by lb.studyid,lb.siteid,lb.usubjid,lb.lbdtc
 having lb.lbdtc < min(exstdtc)
@@ -334,7 +343,7 @@ final_lb as
         FROM        lb_data lb
         left join   (    
         select studyid, siteid, usubjid, min(exstdtc) first_dose
-                        from   cqs.ex
+                        from   ex
                         group by studyid, siteid, usubjid
                     ) ex on lb.studyid = ex.studyid and lb.siteid = ex.siteid and ex.usubjid = lb.usubjid
         left join     baseline on baseline.studyid = lb.studyid and lb.siteid = ex.siteid and lb.usubjid = baseline.usubjid      
@@ -492,4 +501,6 @@ new_baseline as
 FROM new_baseline lb
 JOIN included_subjects s ON (lb.studyid = s.studyid AND lb.siteid = s.siteid AND lb.usubjid = s.usubjid)
 LEFT JOIN included_site si ON (lb.studyid = si.studyid AND lb.siteid = si.siteid);
+
+
 
