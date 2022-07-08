@@ -26,9 +26,7 @@ WITH included_subjects AS (
 										,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 										,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 							) ::text AS visit,
-                        case when nullif("EXOADJDS",'') is not null then concat("EXOPFREQ",' -TAS2940- ',"EXOADJDS",'-Dose Adjusted')
-                        else concat("EXOPFREQ",'-TAS2940-Dose Adjusted') 
-                        end ::text AS extrt,
+                        concat("EXOPFREQ",'-TAS2940-Dose Adjusted') ::text AS extrt,
                         'Locally Advanced or Metastatic Solid Tumor Cancer'::text AS excat,
                         null::text AS exscat,
                         "EXOSDOSE"::numeric AS exdose,
@@ -37,10 +35,10 @@ WITH included_subjects AS (
                         null::text AS exdosfrm,
                         null::text AS exdosfrq,
                         null::numeric AS exdostot,
-						"EXOSTDAT"::date AS exstdtc,
+						"EXOCYCSDT"::date AS exstdtc,
                         null::time AS exsttm,
                         null::int AS exstdy,
-						"EXOENDAT"::date AS exendtc,
+						"EXOCYCEDT"::date AS exendtc,
                         null::time AS exendtm,
                         null::int AS exendy,
                         null::text AS exdur,
@@ -49,7 +47,7 @@ WITH included_subjects AS (
 						"EXOADJRE"::text AS exacn,
 						"EXOMIDRE"::text AS exreason
                 from TAS2940_101."EXO" exo
-                where "EXOSTDAT" is not null 
+                where "EXOCYCSDT" is not null 
                 
                 UNION ALL
                 
