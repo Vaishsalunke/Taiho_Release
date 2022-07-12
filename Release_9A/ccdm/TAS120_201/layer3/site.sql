@@ -60,9 +60,9 @@ WITH included_studies AS (
 			from tas120_201."__sites" s left join internal_config.taiho_sitename_standards tss
 						on 
 						 s."oid" = tss.siteid
-						and split_part(s."name",'_',2) = tss.sitename
+						--and split_part(s."name",'_',2) = tss.sitename
 						left join tas120_201_ctms.site_closeout sc on split_part(s."name",'_',1) = sc.site_id
-						where tss.studyid = 'TAS120_201'
+						--where tss.studyid = 'TAS120_201'
 						/*LIMIT LIMIT 100 LIMIT*/
 						),
 						sitecountrycode_data AS (

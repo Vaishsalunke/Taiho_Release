@@ -63,7 +63,7 @@ site_data AS (
                         on
                          'TAS2940_101_'||ms."site_number" = tss.siteid
                       --  and  ms."center_name" = tss.sitename
-                        where tss.studyid = 'TAS2940_101'
+                        --where tss.studyid = 'TAS2940_101'
                         
                         )a
                 left join sitecountrycode_data cc

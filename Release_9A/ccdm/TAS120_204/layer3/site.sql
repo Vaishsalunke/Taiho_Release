@@ -43,7 +43,7 @@ sitecountrycode_data AS (
 						on
                          'TAS120_204_' || split_part(s."name",'_',1) = tss.siteid
                         --and  ms."center_name" = tss.sitename
-                        where tss.studyid = 'TAS120_204'
+                        --where tss.studyid = 'TAS120_204'
                         )a 
                 		left join sitecountrycode_data cc 
                 		on a.studyid = cc.studyid 

@@ -81,8 +81,8 @@ WITH included_studies AS (
 				     FROM tas120_202_ctms."project_site_contact" psc left join internal_config.taiho_sitename_standards tss
 						on 
 						 'TAS120_202_'||"site_#" = tss.siteid
-						and  psc."account_name" = tss.sitename
-						where tss.studyid = 'TAS120_202'
+						--and  psc."account_name" = tss.sitename
+						--where tss.studyid = 'TAS120_202'
 				/*LIMIT LIMIT 100 LIMIT*/)
 
 SELECT 

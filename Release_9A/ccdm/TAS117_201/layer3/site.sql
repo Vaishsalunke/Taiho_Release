@@ -44,9 +44,9 @@ sitecountrycode_data AS (
                 on  split_part(s."name",'_',1) = split_part(ss.site_number,'_',2)
                 left join internal_config.taiho_sitename_standards tss
                 on
-                         'TAS117_201_'||split_part(ss.site_number,'_',2) = tss.siteid
+                         'TAS117_201_'||split_part(s."name",'_',1) = tss.siteid
                         --and  ms."center_name" = tss.sitename
-                        where tss.studyid = 'TAS117_201'
+                        --where tss.studyid = 'TAS117_201'
                 )a
                 left join sitecountrycode_data cc
                 on a.studyid = cc.studyid

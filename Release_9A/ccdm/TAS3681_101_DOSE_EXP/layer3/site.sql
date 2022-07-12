@@ -66,10 +66,10 @@ WITH included_studies AS (
             From tas3681_101_ctms.sites s1 left join internal_config.taiho_sitename_standards tss
                         on 
                          s1."site_number" = tss.siteid
-                        and  s1."facility_name" = tss.sitename
-                        where tss.studyid = 'TAS3681_101' and s1."site_number" in (Select distinct "SiteNumber" From    tas3681_101."IE"
-        where "IERANDY" = 'Expansion')
-            and length(country_code)<=2 and country_code <> ''--siteid TAS3681101_105 excluded due to invalid data in source
+                        --and  s1."facility_name" = tss.sitename
+--                        where tss.studyid = 'TAS3681_101' and s1."site_number" in (Select distinct "SiteNumber" From    tas3681_101."IE"
+  --      where "IERANDY" = 'Expansion')
+    --        and length(country_code)<=2 and country_code <> ''--siteid TAS3681101_105 excluded due to invalid data in source
                 /*LIMIT LIMIT 100 LIMIT*/),
 
  sitecountrycode_data AS (
