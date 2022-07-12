@@ -576,7 +576,7 @@ Select "project" :: text as Study,
 "InstanceRepeatNumber" :: numeric as InstanceRepeatNumber,
 "TLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
-max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
+case when(max("TLSMM")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
 "TLSITE":: text as tlsite,
 regexp_replace("TLTERM", E'[\\n\\r]+', ' ' ):: text as tlterm,
 "TLDIM":: numeric as tldim,
@@ -591,7 +591,7 @@ group by 1, 2, 3, 4, 5, 6, 7,9,10,11,12,13,14
 
   Union all
 
-  Select Study,
+Select Study,
 SiteNumber,
 Subject,
 InstanceName,
@@ -614,7 +614,8 @@ Select "project" :: text as Study,
 "InstanceRepeatNumber" :: numeric as InstanceRepeatNumber,
 "TLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
-max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
+--max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
+case when(max("TLSMALL")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
 "TLSITE":: text as tlsite,
 "TLTERM":: text as tlterm,
 "TLDIM":: numeric as tldim,
@@ -622,7 +623,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "PageRepeatNumber",
 "RecordPosition",
 min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
-   From tas120_204."TL"
+From tas120_204."TL"
 WHERE   "TLDIM" IS NOT null or "TLDAT" IS NOT NULL
 group by 1, 2, 3, 4, 5, 6, 7,9,10,11,12,13,14
 ) a
@@ -1486,6 +1487,7 @@ bestoverallresponse,
 "Measurement of Target Lesion",
 "Imaging Method",
 DENSE_RANK () over( partition by Study, SiteNumber, Subject order BY order_date, "Date of Tumor Assessment", FolderSeq )-1 :: int as Order_of_Scan
+,Isntlb_present
 From
 (
 Select Study,
@@ -1508,6 +1510,7 @@ tlterm as "Lesion Description",
 tldim as "Measurement of Target Lesion",
 tlmeth as "Imaging Method",
 min(DateofImage) OVER (PARTITION BY Study, SiteNumber, Subject, InstanceName, InstanceRepeatNumber, FolderSeq ) AS order_date
+,case when (Study, SiteNumber, Subject) in (select Study, SiteNumber, Subject from ALLNTLB) then 'Yes' end  as Isntlb_present
 From ALLTL_NTL_OR_BOR
      
 Union all
@@ -1532,6 +1535,7 @@ tlbterm as "Lesion Description",
 tlbdim as "Measurement of Target Lesion",
 tlbmeth as "Imaging Method",
 min(DateofImage) OVER (PARTITION BY Study, SiteNumber, Subject, InstanceName, InstanceRepeatNumber, FolderSeq ) AS order_date
+,null as Isntlb_present
 From ALLTLB
 
 Union ALL
@@ -1556,6 +1560,7 @@ Select Study
 ,NULL --tlbdim as "Measurement of Target Lesion",
 ,NULL --::ntlbmeth as "Imaging Method",
 ,min(DateofImage) OVER (PARTITION BY Study, SiteNumber, Subject, InstanceName, InstanceRepeatNumber, FolderSeq ) AS order_date
+,null as Isntlb_present
 From ALLNTLB
 WHERE concat(Study,Subject) NOT IN (Select DISTINCT concat(Study,Subject) From ALLTLB)
 
@@ -1594,7 +1599,7 @@ st.C1D1,
 t.Order_of_Scan,
 date_part('DAY', t.DateofImage - st.C1D1)+1 as DaysFromC1D1, -- change as per UAT Log 16
 ROUND(  CASE
-WHEN Order_of_Scan <> 0 and (ORTLRES <>'NE' or t.SumTLMeasure <> 0)
+WHEN Order_of_Scan <> 0 
 THEN ( (t.SumTLMeasure / c.SumTLMeasure)-1) * 100
 ELSE 0
 END,2
@@ -1636,7 +1641,7 @@ t.Order_of_Scan > B.Order_of_Scan
 ,case when lower(status) in ('enrolled','completed') then 'Ongoing'
  when lower(status) in ('early eot','withdrawn') then 'Discontinued'
 end "Subject Enrollment Status"
-
+,t.Isntlb_present
 From ALLDATA t
 left join ALLTLB c
 on (t.Study = c.Study AND
