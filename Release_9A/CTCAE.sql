@@ -1,9 +1,13 @@
+/*Mapping script for Cancer Diagnosis - Listing
+Table name : "ctable_listing"."ctcae_listing"
+Project name : Taiho*/
 
-CREATE SCHEMA IF NOT EXISTS "ctable_listing";
+CREATE SCHEMA IF NOT EXISTS ctable_listing;
 
-drop table if exists "ctable_listing"."ctcae_listing";
+drop table if exists ctable_listing.ctcae_listing;
 
-create table ctable_listing.ctcae_listing as (
+create table ctable_listing.ctcae_listing as
+(
 with ae as
 (
 select distinct
@@ -51,7 +55,7 @@ from
         usubjid,
         lbtestcd,
         lbblfl,
-        min(lbdtc) min_lbdtc
+        max(lbdtc) min_lbdtc
     from
         cqs.rpt_lab_information lb
     where
@@ -107,7 +111,57 @@ group by 1,2,3,4)k
 ),
 	aeterm as
 (
-
+(
+	select
+		distinct
+studyid,
+		lbtestcd test,
+		case
+			when lbtestcd = 'APTT' then 'Activated partial thromboplastin time prolonged'
+			when lbtestcd = 'FIBRINO' then 'Fibrinogen decreased'
+			when lbtestcd = 'INR' then 'INR increased'
+			when lbtestcd = 'HGB' then 'Hemoglobin increased'
+			--when lbtestcd = 'HGB' then 'Anemia'
+			when lbtestcd = 'EOS' then 'Eosinophilia'
+			when lbtestcd = 'NEUT' then 'Neutrophil count decreased'
+			when lbtestcd = 'LYM' then 'Lymphocyte count increased'
+			--when lbtestcd = 'LYM' then 'Lymphocyte count decreased'
+			when lbtestcd = 'PLAT' then 'Platelet count decreased'
+			when lbtestcd = 'WBC' then 'Leukocytosis'
+			--when lbtestcd = 'WBC' then 'White blood cell decreased'
+			when lbtestcd = 'ALB' then 'Hypoalbuminemia'
+			when lbtestcd = 'ALP' then 'Alkaline phosphatase increased'
+			when lbtestcd = 'ALT' then 'Alanine aminotransferase increased'
+			when lbtestcd = 'AST' then 'Aspartate aminotransferase increased'
+			when lbtestcd = 'BICARB' then 'Blood bicarbonate decreased'
+			when lbtestcd = 'BILI' then 'Blood bilirubin increased'
+			when lbtestcd = 'LDH' then 'Blood lactate dehydrogenase increased'
+			when lbtestcd = 'LIPASET' then 'Lipase increased'
+			--when lbtestcd = 'LIPASE' then 'Lipase increased'
+			when lbtestcd = 'CK' then 'CPK increased'
+			when lbtestcd = 'CREAT' then 'Creatinine increased'
+			when lbtestcd = 'CHOL' then 'Cholesterol high'
+			when lbtestcd = 'GGT' then 'GGT increased'
+			when lbtestcd = 'AMYLASE' then 'serum amylase increased'
+			when lbtestcd = 'CACR' then 'Hypercalcemia'
+			--when lbtestcd = 'CACR' then 'Hypocalcemia'
+			--when lbtestcd = 'GLUC' then 'Hyperglycemia' --Asked to remove
+			when lbtestcd = 'GLUC' then 'Hypoglycemia'
+			when lbtestcd = 'K' then 'Hyperkalemia'
+			--when lbtestcd = 'K' then 'Hypokalemia'
+			when lbtestcd = 'MG' then 'Hypermagnesemia'
+			--when lbtestcd = 'MG' then 'Hypomagnesemia'
+			when lbtestcd = 'SODIUM' then 'Hypernatremia'
+			--when lbtestcd = 'SODIUM' then 'Hyponatremia'
+			when lbtestcd = 'TRIG' then 'Hypertriglyceridemia'
+			when lbtestcd = 'PHOS' then 'Hyperphosphatemia'
+			--when lbtestcd = 'PHOS' then 'Hypophosphatemia' --Asked to remove
+			when lbtestcd = 'URATE' then 'Hyperuricemia'
+			else null
+		end as "aeterm"
+	from
+		cqs.rpt_lab_information lb)
+union all
 (
 select
 	distinct
@@ -118,14 +172,14 @@ studyid,
 		when lbtestcd = 'FIBRINO' then 'Fibrinogen decreased'
 		when lbtestcd = 'INR' then 'INR increased'
 		when lbtestcd = 'HGB' then 'Anemia'
-		when lbtestcd = 'HGB' then 'Hemoglobin increased'
+		--when lbtestcd = 'HGB' then 'Hemoglobin increased'
 		when lbtestcd = 'EOS' then 'Eosinophilia'
 		when lbtestcd = 'NEUT' then 'Neutrophil count decreased'
 		when lbtestcd = 'LYM' then 'Lymphocyte count decreased'
-		when lbtestcd = 'LYM' then 'Lymphocyte count increased'
+		--when lbtestcd = 'LYM' then 'Lymphocyte count increased'
 		when lbtestcd = 'PLAT' then 'Platelet count decreased'
 		when lbtestcd = 'WBC' then 'White blood cell decreased'
-		when lbtestcd = 'WBC' then 'Leukocytosis'
+		--when lbtestcd = 'WBC' then 'Leukocytosis'
 		when lbtestcd = 'ALB' then 'Hypoalbuminemia'
 		when lbtestcd = 'ALP' then 'Alkaline phosphatase increased'
 		when lbtestcd = 'ALT' then 'Alanine aminotransferase increased'
@@ -134,29 +188,31 @@ studyid,
 		when lbtestcd = 'BILI' then 'Blood bilirubin increased'
 		when lbtestcd = 'LDH' then 'Blood lactate dehydrogenase increased'
 		when lbtestcd = 'LIPASET' then 'Lipase increased'
+		--when lbtestcd = 'LIPASE' then 'Lipase increased'
 		when lbtestcd = 'CK' then 'CPK increased'
 		when lbtestcd = 'CREAT' then 'Creatinine increased'
 		when lbtestcd = 'CHOL' then 'Cholesterol high'
 		when lbtestcd = 'GGT' then 'GGT increased'
 		when lbtestcd = 'AMYLASE' then 'serum amylase increased'
 		when lbtestcd = 'CACR' then 'Hypocalcemia'
-		when lbtestcd = 'CACR' then 'Hypercalcemia'
+		--when lbtestcd = 'CACR' then 'Hypercalcemia'
 		when lbtestcd = 'GLUC' then 'Hypoglycemia'
-		when lbtestcd = 'GLUC' then 'Hyperglycemia'
+		--when lbtestcd = 'GLUC' then 'Hyperglycemia' --Asked to remove
 		when lbtestcd = 'K' then 'Hypokalemia'
-		when lbtestcd = 'K' then 'Hyperkalemia'
+		--when lbtestcd = 'K' then 'Hyperkalemia'
 		when lbtestcd = 'MG' then 'Hypomagnesemia'
-		when lbtestcd = 'MG' then 'Hypermagnesemia'
+		--when lbtestcd = 'MG' then 'Hypermagnesemia'
 		when lbtestcd = 'SODIUM' then 'Hyponatremia'
-		when lbtestcd = 'SODIUM' then 'Hypernatremia'
+		--when lbtestcd = 'SODIUM' then 'Hypernatremia'
 		when lbtestcd = 'TRIG' then 'Hypertriglyceridemia'
-		when lbtestcd = 'PHOS' then 'Hypophosphatemia'
+		--when lbtestcd = 'PHOS' then 'Hypophosphatemia' --Asked to remove
 		when lbtestcd = 'PHOS' then 'Hyperphosphatemia'
 		when lbtestcd = 'URATE' then 'Hyperuricemia'
 		else null
 	end as "aeterm"
 from
-	cqs.rpt_lab_information lb))
+	cqs.rpt_lab_information lb)
+	)
 	select
 		distinct
 baseline.studyid,
@@ -228,11 +284,11 @@ baseline.studyid,
 			and (lbstresn > lbstnrhi
 				and lbstresn <= 5.5)
 			then 'G1'
-			when lbtestcd = 'K'
+			/*when lbtestcd = 'K'
 			and lbstresu in ('mmol/L', 'mmol/l')
 			and (lbstresn > 5.5
 				and lbstresn <= 6.0)
-			then 'G2'
+			then 'G2'*/
 			when lbtestcd = 'K'
 			and lbstresu in ('mmol/L', 'mmol/l')
 			and (lbstresn > 6.0
@@ -454,14 +510,14 @@ baseline.studyid,
 			and (lbstresn > lbstnrhi
 				and lbstresn <= 150)
 			then 'G1'
-			when lbtestcd = 'SODIUM'
+			/*when lbtestcd = 'SODIUM'
 			and (lbstresn > 150
 				and lbstresn <= 155)
 			then 'G2'
 			when lbtestcd = 'SODIUM'
 			and (lbstresn > 155
 				and lbstresn <= 160)
-			then 'G3'
+			then 'G3'*/
 			when lbtestcd = 'SODIUM'
 			and (lbstresn > 160)
 			then 'G4'
@@ -1078,7 +1134,7 @@ baseline.studyid,
 			and (lbstresn > 1000)
 			then 'G4'
 			when lbstresn is null or lbstnrhi is null or lbstnrlo is null then null
-			else 'G0'
+			else null
 		end as lbtox,
 		case
 			when lbstresn is null then null
@@ -1095,10 +1151,22 @@ baseline.studyid,
 left join ae on
 	ae.studyid = a.studyid
 	and a.usubjid = ae.usubjid
-	and trim(lower(ae.aeterm)) = trim(lower(a.aeterm))
+	--and trim(lower(ae.aeterm)) = trim(lower(a.aeterm))
+	and trim(lower(ae.aeverbatim)) = trim(lower(a.aeterm))
 	and a.lbdtc = ae.aestdtc
+	where lbcat not in ('Thyroid Function Test','Physical Examination','Hemoglobin A1C','ECG','PSA Blood Sampling','Urinalysis',
+'Vital Signs','ECG - Triplicate Assessments','EXPOSURE')
+and lbtestcd not in ('BICARB', 'CL', 'URATE', 'UREA', 'GFRE', 'NEUTLE','CA', 'NEUT', 'CAPHOSPD', 'BILDIR','BASOLE', 'TROPONT', 
+'RETIRBC', 'TESTOS', 'MONO', 'UACID', 'BUN', 'NEUTB', 'CK', 'BASO', 'CREATCLR', 'PLAT','EOSLE','FIBRINO','ANC','LYMLE','INR',
+'MONOLE','HCT','TRIG','PT','BILUNCON','CHOL','TROPONI','BILCON','BILIND','RBC')
+)
 
-	)
+--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-dev-app-clinical-master-write";
+
+--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-stage-app-clinical-master-write";
+
+--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-app-clinical-master-write";
+
 	
 	
 	
