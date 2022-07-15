@@ -48,10 +48,10 @@ WITH included_subjects AS (
                         'Failed Screen'::TEXT AS dsterm,
                         "actual_date" ::DATE AS dsstdtc
                         from tas120_203_irt.patient_visit_summary e
-                        join tas120_203."IC" i
-                        on   split_part(i."SiteNumber",'_',2)=e."study_site" and i."Subject"=e."patient"
-                        where e."visit_description" ='Screen Failure'and i."IEYN"='No'
-                        and i.project = 'TAS120_203'  and trim(e.number_of_pembrolizumab_doses_to_date ) ='' )
+                        left join tas120_203."IC" i
+                        on   split_part(i."SiteNumber",'_',2)=e."study_site" and i."Subject"=e."patient" and i."IEYN"='No'
+                        where e."visit_description" ='Screen Failure' 
+                          and trim(e.number_of_pembrolizumab_doses_to_date ) ='' )
                       
  union all 
 
@@ -83,7 +83,7 @@ WITH included_subjects AS (
                         'Early EOT'::TEXT AS dsterm,
                         "actual_date" ::DATE AS dsstdtc
                         from tas120_203_irt.patient_visit_summary b
-                        join tas120_203."EOT" i
+                        left join tas120_203."EOT" i
                         on  split_part(i."SiteNumber",'_',2)=b."study_site" and i."Subject"=b."patient"
                         where "visit_description" = 'Discontinue'
                         )

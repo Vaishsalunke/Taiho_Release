@@ -68,8 +68,8 @@ union all
 
 --Disposition Event: Failed Screen
 
-select
-'TAS120_202' ::TEXT AS studyid,
+select studyid,siteid,usubjid,dsseq,dscat,dsterm,dsstdtc, string_agg(dsscat,';') from (
+select 'TAS120_202' ::TEXT AS studyid,
                         concat('TAS120_202_',study_site) ::TEXT AS siteid,
                       patient ::TEXT AS usubjid,
                         2.1::NUMERIC AS dsseq, --deprecated
@@ -79,7 +79,8 @@ select
                         concat(concat("IECAT",' '), "IETESTCD")  ::TEXT AS dsscat
                         from tas120_202_irt.patient_visit_summary pvs2
                         left join tas120_202."IE" i on ('TAS120_202'=i."project" and concat('TAS120_202_',pvs2.study_site) = i."SiteNumber" and pvs2.patient = i."Subject")
-                        where visit_description = 'Screen Failure' and nullif (tas_120_required, '') notnull
+                        where visit_description = 'Screen Failure' and nullif (tas_120_required, '') is null) fs
+                        group by 1,2,3,4,5,6,7
 union all
 
 --Disposition Event: Enrollment

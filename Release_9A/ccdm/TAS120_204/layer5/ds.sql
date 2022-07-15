@@ -49,7 +49,7 @@ SELECT  				'TAS120_204' ::TEXT AS studyid,
                         'Failed Screen'::TEXT AS dsterm,
                         "actual_date" ::DATE AS dsstdtc
                         from tas120_204_irt.patient_visit_summary e
-                        join tas120_204."IE" i
+                        left join tas120_204."IE" i
                         on   split_part(i."SiteNumber",'_',2)=e."study_site" and i."Subject"=e."patient"
                         where e."visit_description" ='Screen Failure' and
                         i.project = 'TAS120_204'  and trim(e.binimetinib_dose ) ='' 
@@ -83,7 +83,7 @@ SELECT  				'TAS120_204' ::TEXT AS studyid,
                         'Early EOT'::TEXT AS dsterm,
                         "actual_date" ::DATE AS dsstdtc
                         from tas120_204_irt.patient_visit_summary b
-                        join tas120_204."EOT" i
+                        left join tas120_204."EOT" i
                         on  split_part(i."SiteNumber",'_',2)=b."study_site" and i."Subject"=b."patient"
                         where "visit_description" = 'Discontinuation'
                         ) 
