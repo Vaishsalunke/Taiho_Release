@@ -451,7 +451,7 @@ and lb.lbstresn = c.lbstresn
             WHERE       lb.lbdtc IS NOT NULL
     ),
     baseline as(
-select ex.studyid,ex.siteid,ex.usubjid,count(blfl) as blfl
+select ex.studyid,ex.siteid,ex.usubjid,blfl,count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid ) as blfl_count
 from(
 select studyid,siteid,usubjid,max(min_lbdtc) as blfl
 from(
@@ -463,7 +463,8 @@ having lb.lbdtc < min(exstdtc)
 )ex_max
 group by ex_max.studyid,ex_max.siteid,ex_max.usubjid
 )ex
-group by ex.studyid,ex.siteid,ex.usubjid),
+--group by ex.studyid,ex.siteid,ex.usubjid
+),
    
 final_lb as
         (
@@ -488,8 +489,9 @@ final_lb as
                     lborresu,
                     lbstresn,
                     lbstresu,
-                    case    when lbdtc<first_dose then 'Yes'
-                    when blfl=0 then case when lbdtc=first_dose then 'Yes' else 'No' end else 'No' end as lbblfl,
+                    case when lbdtc<first_dose and lbdtc = blfl then 'Yes'
+                    --when blfl=0 then case when lbdtc=first_dose then 'Yes' else 'No' end 
+                    else 'No' end as lbblfl,
                     lbnrind,
                     lbornrhi,
                     lbornrlo,
@@ -511,6 +513,7 @@ final_lb as
                         group by studyid, siteid, usubjid
                     ) ex on lb.studyid = ex.studyid and lb.siteid = ex.siteid and ex.usubjid = lb.usubjid
         left join     baseline on baseline.studyid = lb.studyid and lb.siteid = ex.siteid and lb.usubjid = baseline.usubjid      
+        and blfl_count = 1
         )
        
 ,min_baseline as
