@@ -202,7 +202,7 @@ from 	tas3681_101."DS2" ds2
 where ("project","SiteNumber", "Subject", "serial_id")
 	in (
 	select "project","SiteNumber", "Subject", max(serial_id)  as serial_id
-	from tas3681_101."DS"
+	from tas3681_101."DS2"
 	group by 1,2,3
 	)) dm 
 

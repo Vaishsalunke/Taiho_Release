@@ -6,7 +6,7 @@ CREATE SCHEMA IF NOT EXISTS ctable_listing;
 
 drop table if exists ctable_listing.ctcae_listing;
 
-create table ctable_listing.ctcae_listing as
+create table ctable_listing.ctcae_listing as select * from
 (
 with ae as
 (
@@ -24,6 +24,7 @@ cqs.ae
 left join cqs.ae_sev_toxgr aetx on ae.studyid = aetx.studyid
 	and aetx.usubjid = ae.usubjid
 	and ae.aeterm = aetx.aeterm
+	and ae.aestdtc = aetx.fastdtc
 )
 select
 	distinct
@@ -42,13 +43,16 @@ select
 	a.result,
 	a.bl_lbstresn,
 	ae.aeterm,
-	ae.aeverbatim,
+	trim(ae.aeverbatim) as aeverbatim,
 	ae.preferredterm,
 	ae.aesev,
 	ae.aestdtc,
-	ae.aeendtc
+	ae.aeendtc,
+	row_number() over (partition by a.studyid,a.usubjid, a.lbtest, a.visit, a.lbdtc order by ae.aeterm ) as rnk
 from
-	(with min_baseline as
+	(
+	
+with min_baseline as
 (
     select 
         studyid,
@@ -1159,7 +1163,8 @@ left join ae on
 and lbtestcd not in ('BICARB', 'CL', 'URATE', 'UREA', 'GFRE', 'NEUTLE','CA', 'NEUT', 'CAPHOSPD', 'BILDIR','BASOLE', 'TROPONT', 
 'RETIRBC', 'TESTOS', 'MONO', 'UACID', 'BUN', 'NEUTB', 'CK', 'BASO', 'CREATCLR', 'PLAT','EOSLE','FIBRINO','ANC','LYMLE','INR',
 'MONOLE','HCT','TRIG','PT','BILUNCON','CHOL','TROPONI','BILCON','BILIND','RBC')
-)
+)a
+where rnk =1
 
 --ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-dev-app-clinical-master-write";
 
@@ -1168,5 +1173,5 @@ and lbtestcd not in ('BICARB', 'CL', 'URATE', 'UREA', 'GFRE', 'NEUTLE','CA', 'NE
 --ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-app-clinical-master-write";
 
 	
-	
+
 	
