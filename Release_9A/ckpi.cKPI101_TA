@@ -576,10 +576,11 @@ Select "project" :: text as Study,
 "InstanceRepeatNumber" :: numeric as InstanceRepeatNumber,
 "TLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
-case when(max("TLSMM")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
+max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
+--case when(max("TLSMM")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
 "TLSITE":: text as tlsite,
 regexp_replace("TLTERM", E'[\\n\\r]+', ' ' ):: text as tlterm,
-"TLDIM":: Text as tldim,
+"TLDIM":: numeric as tldim,
 /*case when((max("TLSMM"))::text='1') and nullif("TLDIM"::text,'') is null 		then	'Too Small < 5 mm' 
 	 when((max("TLSMM"))::text='1') and nullif("TLDIM"::text,'') is not null 	then	'Too Small'||("TLDIM"::text)
 	 else	 ("TLDIM":: text)
@@ -619,8 +620,8 @@ Select "project" :: text as Study,
 "InstanceRepeatNumber" :: numeric as InstanceRepeatNumber,
 "TLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
---max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
-case when(max("TLSMALL")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
+max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
+--case when(max("TLSMALL")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
 "TLSITE":: text as tlsite,
 "TLTERM":: text as tlterm,
 --"TLSMALL",
@@ -664,12 +665,12 @@ Select "project" :: text as Study,
 "InstanceRepeatNumber" :: numeric as InstanceRepeatNumber,
 "TLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
---max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure1,
-case when(max("TLSMALL")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
+max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
+--case when(max("TLSMALL")=1) and  (max(nullif("TLSUM"::text,'')) is null) then '0' else max(nullif("TLSUM"::text,'')) end :: numeric as SumTLMeasure,
 "TLSMALL",
 "TLSITE":: text as tlsite,
 "TLTERM":: text as tlterm,
-"TLDIM":: Text as tldim_org,
+"TLDIM":: numeric as tldim,
 /*case when((max("TLSMALL"))::text='1') and nullif("TLDIM"::text,'') is null 		then	'Too Small < 5 mm' 
 	 when((max("TLSMALL"))::text='1') and nullif("TLDIM"::text,'') is not null 	then	'Too Small'||("TLDIM"::text)
 	 else	 ("TLDIM":: text)
@@ -709,22 +710,22 @@ Select "project" :: text as Study,
 "TUSTDT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
 "TTSMALL",
---max(nullif("TUTLSUM"::text,'')) :: numeric as SumTLMeasure1,
-case when(max("TTSMALL")=1) and  (max(nullif("TUTLSUM"::text,'')) is null) then '0' else max(nullif("TUTLSUM"::text,'')) end :: numeric as SumTLMeasure,
+max(nullif("TUTLSUM"::text,'')) :: numeric as SumTLMeasure,
+--case when(max("TTSMALL")=1) and  (max(nullif("TUTLSUM"::text,'')) is null) then '0' else max(nullif("TUTLSUM"::text,'')) end :: numeric as SumTLMeasure,
 "TLSITE":: text as tlbsite,
 "LESDESC":: text as tlbterm,
-"MEASURMT":: numeric as tlbdim_org,
-case when((max("TTSMALL"))::text='1') and nullif("MEASURMT"::text,'') is null 		then	'Too Small < 5 mm' 
-	 when((max("TTSMALL"))::text='1') and nullif("MEASURMT"::text,'') is not null 	then	'Too Small'||("MEASURMT"::text)
-	 else	 (round("MEASURMT",2):: text)
-	 end:: text as tlbdim,
+"MEASURMT":: numeric as tlbdim,
+--case when((max("TTSMALL"))::text='1') and nullif("MEASURMT"::text,'') is null 		then	'Too Small < 5 mm' 
+--	 when((max("TTSMALL"))::text='1') and nullif("MEASURMT"::text,'') is not null 	then	'Too Small'||("MEASURMT"::text)
+--	 else	 (round("MEASURMT",2):: text)
+--	 end:: text as tlbdim,
 "TUMETH4":: text as tlbmeth,
 "PageRepeatNumber",
 "RecordPosition",
 min("TUSTDT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TUTLSUM") ) AS order_date
 From tas117_201."TLPB"
 WHERE "MEASURMT" IS NOT null or "TUSTDT" IS NOT NULL
-group by 1,2,3,4,5,6,7,8,10,11,12,14,15,"PageRepeatNumber","RecordPosition"
+group by 1,2,3,4,5,6,7,8,10,11,12,13,14,15
 )a
 ),
 
@@ -1704,8 +1705,7 @@ then t.SiteNumber
 else t.study||'_'||split_part(t.SiteNumber,'_',2)
 end) = s.siteid and
 t.Subject = s.usubjid
-)
-;
+);
 
 
 
@@ -1718,6 +1718,6 @@ alter table if exists ckpi."cKPI101_TA" rename to "cKPI101_TA_orig";
 
 alter table if exists ckpi."cKPI101_TA_new" rename to "cKPI101_TA";
 
---ALTER TABLE ckpi."cKPI101_TA" OWNER TO "taiho-dev-app-clinical-master-write";
+--ALTER TABLE ckpi."cKPI101_TA" OWNER TO "taiho-stage-app-clinical-master-write";
 
---ALTER TABLE ckpi."cKPI101_TA_orig" OWNER TO "taiho-dev-app-clinical-master-write";
+--ALTER TABLE ckpi."cKPI101_TA_orig" OWNER TO "taiho-stage-app-clinical-master-write";
