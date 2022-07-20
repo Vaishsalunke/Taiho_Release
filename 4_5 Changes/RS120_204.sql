@@ -48,11 +48,10 @@ WITH included_subjects AS (
                 null::text AS rsblfl,
                 null::text AS rsdrvfl,
                 'INDEPENDENT ASSESSOR'::text AS rseval,
-                --'Unknown'||ROW_NUMBER()OVER(PARTITION BY project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")
-                'Investigator'::text AS rsevalid,
+                'Investigator'||ROW_NUMBER()OVER(PARTITION BY project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::text AS rsevalid,
                 null::text AS rsacptfl,
                 --row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS 
-                sv.visitnum,
+                coalesce(sv.visitnum,0) as visitnum,
                 "FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,

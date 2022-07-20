@@ -45,7 +45,7 @@ WITH included_subjects AS (
 						null as rsblfl,
 						null as rsdrvfl,
 						'INDEPENDENT ASSESSOR' as rseval,
-						'Investigator' as rsevalid,
+						concat('Investigator',ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc)) as rsevalid,
 						null as rsacptfl,
 						u.visitnum,
 						u.visit,
@@ -80,12 +80,12 @@ WITH included_subjects AS (
 									rsstresc::text AS rsstresc,
 									rsstat::text AS rsstat,									
 									--row_number()over(partition by project,siteid,"Subject" order by "ORDAT")::numeric AS 
-									sv.visitnum,
+									coalesce(sv.visitnum,0) as visitnum,
 									"FolderName"::text AS visit,									
 									"ORDAT"::text AS rsdtc,									
 									null::text AS rsevlint														
 				 from tas0612_101."OR" or1
-				  join sv
+				 left join sv
 		on project = sv.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = sv.siteid and "Subject" = sv.usubjid and to_char("ORDAT"::date,'YYYY-MM-DD')::text = svstdtc::text
 					
 					CROSS JOIN LATERAL(VALUES

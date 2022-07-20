@@ -49,8 +49,7 @@ WITH included_subjects AS (
 						null as rsblfl,
 						null as rsdrvfl,
 						'INDEPENDENT ASSESSOR':: text as rseval,
-						--'Unknown'||ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc) as 
-						'Investigator':: text as rsevalid,
+						'Investigator'||ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc):: text as rsevalid,
 						null as rsacptfl,
 						u.visitnum,
 						u.visit,
@@ -91,7 +90,7 @@ WITH included_subjects AS (
 									'Unknown'::text AS rstptref,
 									row_number()over(partition by project,or1.siteid,or1."Subject" order by "ORDAT")::numeric AS rsseq,
 									--row_number()over(partition by project,siteid,"Subject" order by "ORDAT")::numeric as 
-									sv.visitnum
+									coalesce(sv.visitnum,0) as visitnum
 				 from tas120_203."OR" or1
 				  join sv on or1.project = sv.studyid and sv.siteid = or1."SiteNumber" and sv.usubjid = or1."Subject" and to_char(or1."ORDAT"::date,'YYYY-MM-DD') = svstdtc::text
 					

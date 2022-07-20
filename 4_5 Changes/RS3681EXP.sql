@@ -5,8 +5,6 @@ Notes: Standard mapping to CCDM RS table
 
 */
 
-
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 	ex_data as (
@@ -50,11 +48,10 @@ WITH included_subjects AS (
 						rsblfl,
 						rsdrvfl,
 						rseval,
-						--concat('Unknown ',row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc))::text as rsevalid,
-						rsevalid,
+						concat(rsevalid,row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc))::text as rsevalid,						
 						rsacptfl,
 						--row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc)::numeric as 
-						sv.visitnum,
+						coalesce(sv.visitnum,0) as visitnum,
 						rs.visit,
 						visitdy,
 						taetord,
@@ -143,7 +140,7 @@ WITH included_subjects AS (
 		on rs.studyid=dm.studyid and rs.siteid=dm.siteid and rs.usubjid=dm.usubjid
 		left join ex_visit exv
 		on rs.studyid=exv.studyid and rs.siteid=exv.siteid and rs.usubjid=exv.usubjid
-		 join sv
+		left join sv
 		on  rs.studyid = sv.studyid and rs.siteid = sv.siteid and rs.usubjid = sv.usubjid and to_char(rsdtc::date,'YYYY-MM-DD')::text = svstdtc::text
 					
                 )rs)

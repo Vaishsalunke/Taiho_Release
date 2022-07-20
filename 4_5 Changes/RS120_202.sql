@@ -48,8 +48,7 @@ WITH included_subjects AS (
 						rsblfl,
 						rsdrvfl,
 						'INDEPENDENT ASSESSOR':: text as rseval,
-						--concat('Unknown ',row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc))::text as 
-						'Investigator':: text as rsevalid,
+						concat('Investigator ',row_number() over (partition by rs.studyid,rs.siteid,rs.usubjid order by rsdtc))::text as rsevalid,
 						rsacptfl,
 						rs.visitnum,
 						rs.visit,
@@ -102,7 +101,7 @@ WITH included_subjects AS (
 						null::text AS rsevalid,----------------to be handled in outer query
 						null::text AS rsacptfl,
 						--row_number()over(partition by project,siteid,"Subject" order by "ORDAT")::numeric AS 
-						sv.visitnum,
+						coalesce (sv.visitnum,0) as visitnum,
 						"FolderName"::text AS visit,
 						null::numeric AS visitdy,
 						null::numeric AS taetord,
@@ -121,7 +120,7 @@ WITH included_subjects AS (
 						null::text AS rsenrtpt,
 						null::text AS rsentpt
 				from tas120_202."OR1" or1
-				 join sv on or1.project = sv.studyid and sv.siteid = or1."SiteNumber" and sv.usubjid = or1."Subject" and to_char(or1."ORDAT"::date,'YYYY-MM-DD') = svstdtc::text
+				left join sv on or1.project = sv.studyid and sv.siteid = or1."SiteNumber" and sv.usubjid = or1."Subject" and to_char(or1."ORDAT"::date,'YYYY-MM-DD') = svstdtc::text
 
 				CROSS JOIN LATERAL(VALUES
 									("ORNLYN",'NEWLIND','New Lesion Indicator',case when lower("ORNLYN")='yes' then 'New Lesion' else '' end,
@@ -249,8 +248,7 @@ SELECT
     rs.rsentpt::text AS rsentpt
     /*KEY , (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid)
-;
+FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
 
 
 

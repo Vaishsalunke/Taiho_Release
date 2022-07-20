@@ -3,7 +3,6 @@ CCDM RS Table mapping
 Notes: Standard mapping to CCDM RS table
 */
 
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
                 
@@ -46,9 +45,8 @@ WITH included_subjects AS (
 						null as rsblfl,
 						null as rsdrvfl,
 						rseval,
-						--'Unknown'||ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc) as 
-						rsevalid,
-						null as rsacptfl,
+						rsevalid||ROW_NUMBER()OVER(PARTITION BY u.studyid,u.siteid,u.usubjid ORDER BY rsdtc) as rsevalid						
+						,null as rsacptfl,
 						--coalesce(u.visitnum, row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc)) as 
 						u.visitnum,
 						u.visit,
@@ -89,7 +87,7 @@ WITH included_subjects AS (
 									0::numeric AS rstptnum,
 									'Unknown'::text AS rstptref,
 									null::numeric as rsseq,
-									sv.visitnum
+									coalesce(sv.visitnum,0) as visitnum
 				 from tas117_201."OR" or1
 				 		left join sv on or1.project = sv.studyid and sv.siteid = concat(or1.project,'_',split_part(or1."SiteNumber",'_',2)) and sv.usubjid = or1."Subject"  and to_char(or1."ORDAT"::date,'YYYY-MM-DD') = svstdtc::text
 				 					
@@ -188,7 +186,7 @@ SELECT
     rs.rssttpt::text AS rssttpt,
     rs.rsenrtpt::text AS rsenrtpt,
     rs.rsentpt::text AS rsentpt
-    /*KEY , (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref )::text  AS objectuniquekey KEY*/
+    /*KEY, (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
 

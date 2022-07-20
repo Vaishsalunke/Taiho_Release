@@ -11,12 +11,14 @@ WITH included_subjects AS (
 				from ex
 				group by 1,2,3
 				),
-	ex_visit as (
-				 select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
-				 from ex
-				 where visit like '%Day 1 Cycle 01' and exdose is not null
+	sv_visit as (
+				 select studyid,siteid,usubjid,visit,svstdtc
+				 from sv
+				 where visit like '%Day 1 Cycle 01' 
+				 or visit like '%Day 01 Cycle 01'
+				 or visit like 'Cycle 01'
+				 ),		
 				 
-				 ),			
     tu_data AS (
         SELECT distinct
 		tu.comprehendid,
@@ -42,17 +44,17 @@ WITH included_subjects AS (
         case when tu.tudtc::date <= ex.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
         tu.tublfl,
         tu.tueval,
-        tu.tuevalid,
-        --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tuevalid,
+        --tu.tuevalid,
+        concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tuevalid,
         tu.tuacptfl,
         --ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) 
-        sv.visitnum,
+        COALESCE(sv.visitnum,0) as visitnum,
         tu.visit,
         tu.visitdy,
         tu.taetord,
         dm.arm epoch,
         tu.tudtc,
-        (tu.tudtc::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+        (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 FROM (	
 
 SELECT  	distinct	null::text AS comprehendid,
@@ -237,8 +239,8 @@ left join ex_data ex
 on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
 left join dm
 on tu.studyid=dm.studyid and tu.siteid=dm.siteid and tu.usubjid=dm.usubjid
-left join ex_visit exv
-on tu.studyid=exv.studyid and tu.siteid=exv.siteid and tu.usubjid=exv.usubjid
+left join sv_visit svv
+on tu.studyid=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
 left join sv on tu.studyid = sv.studyid and sv.siteid = tu.siteid and sv.usubjid = tu.usubjid 
 
                 )
