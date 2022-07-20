@@ -5,11 +5,13 @@ Notes: Standard mapping to CCDM TR table
 
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
-	 ex_visit as (
-				 select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
-				 from 	ex
-				 where visit like '%Cycle 01' and exdose is not null
-				),	
+	 sv_visit as (
+				 select studyid,siteid,usubjid,visit,svstdtc
+				 from sv
+				 where visit like '%Day 1 Cycle 01' 
+				 or visit like '%Day 01 Cycle 01'
+				 or visit like 'Cycle 01'
+				 ),	
 	ex_data as (
 				select studyid,siteid,usubjid,min(exstdtc) ex_mindt
 				from ex
@@ -42,8 +44,7 @@ WITH included_subjects AS (
 						case when tr.trdtc::date <= ex.ex_mindt then 'Y' else 'N' end::text AS trlobxfl,
 						trblfl,
 						treval,
-						trevalid,
-						--concat(trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc)) as trevalid,
+						concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as trevalid,
 						tracptfl,
 						--row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc) as 
 						sv.visitnum,
@@ -51,8 +52,8 @@ WITH included_subjects AS (
 						tr.visitdy,
 						tr.taetord,
 						dm.arm::text as epoch,
-						trdtc::date
-						,(tr.trdtc::date - ex.ex_mindt::date)+1::numeric as trdy
+						trdtc::date,
+						(tr.trdtc::date-svv.svstdtc::date)::numeric AS trdy
 
 		from
 				(
@@ -229,8 +230,8 @@ WITH included_subjects AS (
 					
 			left join dm								
 			on tr.studyid = dm."studyid" and tr.siteid=dm.siteid and tr.usubjid = dm."usubjid"
-			left join  ex_visit a
-			on tr.studyid = a."studyid" and tr.siteid = a.siteid and tr.usubjid = a."usubjid"
+			left join sv_visit svv
+			on tr.studyid=svv.studyid and tr.siteid=svv.siteid and tr.usubjid=svv.usubjid
 			left join  ex_data ex
 			on tr.studyid = ex."studyid"  and tr.siteid  = ex.siteid and tr.usubjid = ex."usubjid"
 			left join sv on tr.studyid = sv.studyid and sv.siteid = tr.siteid and sv.usubjid = tr.usubjid 

@@ -11,13 +11,13 @@ WITH included_subjects AS (
 				from ex
 				group by 1,2,3
 				),
-	ex_visit as (
-				 select 	studyid,siteid,usubjid,visit, exstdtc--min(exstdtc) ex_mindt_visit
-				 from 		ex
-				 where 		visit like '%Cycle 1 Day 1' 
-				 and 		exdose is not null	
-				 --group by 	1,2,3,4
-				),
+	sv_visit as (
+				 select studyid,siteid,usubjid,visit,svstdtc
+				 from sv
+				 where visit like '%Day 1 Cycle 01' 
+				 or visit like '%Day 01 Cycle 01'
+				 or visit like 'Cycle 01'
+				 ),	
     tu_data AS (
         SELECT  distinct tu.Study::text AS studyid,
                 tu.SiteNumber::text AS siteid,
@@ -41,8 +41,7 @@ WITH included_subjects AS (
                 case when tu.tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tu.tublfl::text AS tublfl,
                 tueval::text AS tueval,
-                --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber, tu.Subject ORDER BY tu.tudtc))
-                tuevalid::text AS tuevalid,
+                concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber,tu.Subject ORDER BY tudtc))::text as tuevalid,
                 null::text AS tuacptfl,
                 --ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber, tu.Subject ORDER BY tu.tudtc)::numeric AS 
                 sv.visitnum,
@@ -51,7 +50,7 @@ WITH included_subjects AS (
                 null::numeric AS taetord,
                 tu.epoch::text AS epoch,
                 tu.tudtc::text AS tudtc,
-                (DATE_PART('day',tu.tudtc::timestamp - e2.exstdtc::timestamp):: numeric) +1::numeric AS tudy
+                (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 		FROM	(
 					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
@@ -194,8 +193,8 @@ WITH included_subjects AS (
 		)tu	
 		left join 	ex_data e1
 		on			'TAS3681_101_DOSE_ESC'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
-		left join	ex_visit e2
-		on			'TAS3681_101_DOSE_ESC'=e2.studyid and SiteNumber=e2.siteid and tu.Subject= e2.usubjid
+		left join sv_visit svv
+on 'TAS3681_101_DOSE_ESC'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
 				left join sv
 on 'TAS3681_101_DOSE_ESC'=sv.studyid and tu.SiteNumber=sv.siteid and tu.Subject=sv.usubjid
 		)

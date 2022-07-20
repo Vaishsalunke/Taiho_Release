@@ -6,11 +6,13 @@ ex_data as (
 from ex
 group by studyid,siteid,usubjid
 ),
-ex_visit as (
-select studyid,siteid,usubjid,visit,exstdtc ex_mindt_visit
-from ex
-where visit like '%Cycle 1 Day 1' and exdose is not null
-),
+sv_visit as (
+				 select studyid,siteid,usubjid,visit,svstdtc
+				 from sv
+				 where visit like '%Day 1 Cycle 01' 
+				 or visit like '%Day 01 Cycle 01'
+				 or visit like 'Cycle 01'
+				 ),	
     tu_data AS (
         SELECT  distinct
         study::text AS studyid,
@@ -35,8 +37,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                case when tudtc <= ex1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tublfl::text AS tublfl,
                 'INDEPENDENT ASSESSOR'::text AS tueval,
-                --concat(tuevalid,(ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc)))::text AS 
-                'Investigator'::text as tuevalid,
+                concat('Investigator',ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.siteid,tu.usubjid ORDER BY tudtc))::text as tuevalid,
                 null::text AS tuacptfl,
                 --(ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc))::numeric AS 
                 sv.visitnum,
@@ -45,7 +46,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
                 null::numeric AS taetord,
                dm."arm"::text AS epoch,
                tudtc::text AS tudtc,
-             (tudtc::date - ex1.ex_mindt::date)+1::numeric AS tudy
+             (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
                 from (
 
 --NL
@@ -228,8 +229,8 @@ From tas120_204."TL" tl
 )tu
 					left join 	ex_data ex1
 					on			tu."study" = ex1."studyid" and concat(study,'_',split_part(tu.siteid,'_',2))=ex1.siteid and tu.usubjid= ex1."usubjid"
-					left join	ex_visit ex2
-					on			tu."study"=ex2."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = ex2.siteid and tu.usubjid= ex2."usubjid" 
+					left join sv_visit svv
+on tu."study"=svv.studyid and concat(study,'_',split_part(tu.siteid,'_',2))=svv.siteid and tu.usubjid=svv.usubjid
 					left join 	dm
 					on 		tu."study" = dm."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = dm.siteid and tu.usubjid=dm."usubjid"
 					left join 	sv

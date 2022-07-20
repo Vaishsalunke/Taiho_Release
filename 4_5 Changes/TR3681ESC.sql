@@ -8,12 +8,14 @@ WITH included_subjects AS (
 		
 
 
-	ex_data as (
-				 select studyid,siteid,usubjid,visit,exstdtc ex_dt
-				 from ex
-				 where visit like '%Cycle 01' and exdose is not null
-							 			 
-				),
+	
+				sv_visit as (
+				 select studyid,siteid,usubjid,visit,svstdtc
+				 from sv
+				 where visit like '%Day 1 Cycle 01' 
+				 or visit like '%Day 01 Cycle 01'
+				 or visit like 'Cycle 01'
+				 ),	
 				
     tr_data AS (
        select distinct u.comprehendid,
@@ -40,8 +42,7 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						--concat(trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc)) as trevalid,
-						trevalid,
+						concat(u.trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc))::text as trevalid,
 						tracptfl,
 						--row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as 
 						sv.visitnum,
@@ -50,7 +51,7 @@ WITH included_subjects AS (
 						u.taetord,
 						dm.arm::text as epoch,
 						trdtc,
-						(u.trdtc::date - ex.ex_dt::date)+1::numeric as trdy
+						(u.trdtc::date-svv.svstdtc::date)::numeric AS trdy
 
 		from
 				(
@@ -288,8 +289,9 @@ WITH included_subjects AS (
 		left join dm 
 		on u.studyid=dm.studyid and u.siteid=dm.siteid and u.usubjid=dm.usubjid
 		
-		left join ex_data ex 
-		on u.studyid=ex.studyid and u.siteid=ex.siteid and u.usubjid=ex.usubjid
+		
+		left join sv_visit svv
+			on u.studyid=svv.studyid and u.siteid=svv.siteid and u.usubjid=svv.usubjid
 		left join sv on u.studyid = sv.studyid and sv.siteid = u.siteid and sv.usubjid = u.usubjid 
                 )
 

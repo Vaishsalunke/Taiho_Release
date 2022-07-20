@@ -12,12 +12,14 @@ WITH included_subjects AS (
 				group by 1,2,3
 				),
 				
-	ex_visit as (
-				 select 	studyid,siteid,usubjid,visit,exstdtc
-				 from 		ex
-				 where 		visit in ('Cycle 1 Day 1','Day 01 Cycle 01')
-				 and 		exdose is not null	
-				),
+	
+				sv_visit as (
+				 select studyid,siteid,usubjid,visit,svstdtc
+				 from sv
+				 where visit like '%Day 1 Cycle 01' 
+				 or visit like '%Day 01 Cycle 01'
+				 or visit like 'Cycle 01'
+				 ),		
 				
     tu_data AS (
         SELECT  distinct Study::text AS studyid,
@@ -42,8 +44,7 @@ WITH included_subjects AS (
                 case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tublfl::text AS tublfl,
                 tueval::text AS tueval,
-                tuevalid::text AS tuevalid,
-                --concat(tuevalid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)) as tuevalid,
+                concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text as tuevalid,
                 null::text AS tuacptfl,
                 --ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric as 
                 sv.visitnum,
@@ -51,8 +52,8 @@ WITH included_subjects AS (
                 Null::numeric AS visitdy,
                 null::numeric AS taetord,
                 epoch::text AS epoch,
-                tudtc::text AS tudtc,
-                (extract(day from tudtc::timestamp  - e2.exstdtc::timestamp)::numeric) +1::numeric AS tudy
+                tudtc::text as tudtc,
+                (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 		FROM	(
 					Select 		distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
@@ -74,8 +75,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NLDAT":: date as tudtc,
-								null::text as  tudy
+								"NLDAT":: date as tudtc
+								--null::text as  tudy
 					From 		TAS120_203."NL" nl
 					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
@@ -104,8 +105,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NTLBDAT":: date as tudtc,
-								null::text as  tudy
+								"NTLBDAT":: date as tudtc
+								--null::text as  tudy
 					From 		TAS120_203."NTLB" ntlb
 					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
@@ -134,8 +135,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-							    "NTLDAT":: date as tudtc,
-								null::text as  tudy
+							    "NTLDAT":: date as tudtc
+								--null::text as  tudy
 					From 		TAS120_203."NTL" ntl
 					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
@@ -164,8 +165,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"TLBDAT":: date as tudtc,
-								null::text as  tudy
+								"TLBDAT":: date as tudtc
+								--null::text as  tudy
 					From 		TAS120_203."TLB" tlb
 					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
@@ -194,8 +195,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"TLDAT":: date as tudtc,
-								null::text as  tudy
+								"TLDAT":: date as tudtc
+								--null::text as  tudy
 					From 		TAS120_203."TL" tl
 					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
@@ -204,8 +205,9 @@ WITH included_subjects AS (
 		)tu	
 		left join 	ex_data e1
 		on 'TAS120_203'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
-		left join	ex_visit e2
-		on 'TAS120_203'=e2.studyid and SiteNumber=e2.siteid and tu.Subject= e2.usubjid
+		
+		left join sv_visit svv
+on 'TAS120_203'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
 		left join sv on 'TAS120_203' = sv.studyid and sv.siteid = SiteNumber and sv.usubjid = tu.Subject
 		)
 
@@ -240,7 +242,7 @@ SELECT
     tu.visitdy::numeric AS visitdy,
     tu.taetord::numeric AS taetord,
     tu.epoch::text AS epoch,
-    tu.tudtc::text AS tudtc,
+    tu.tudtc::text as tudtc,
     tu.tudy::numeric AS tudy
     /*KEY, (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
