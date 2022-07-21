@@ -56,7 +56,7 @@ WITH included_subjects AS (
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 dm."arm"::text AS epoch,
-                to_char("ORDAT"::date,'YYYY-MM-DD')  AS rsdtc,
+                to_char("ORDAT"::date,'DD-MM-YYYY')  AS rsdtc,
                 ("ORDAT"::date - b.ex_mindt_visit::date)+1::numeric  AS rsdy,
                 null::text AS rstpt,
                 0::numeric::numeric AS rstptnum,
