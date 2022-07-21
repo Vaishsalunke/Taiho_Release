@@ -32,7 +32,7 @@ WITH included_subjects AS (
 						null as rsrefid,
 						null as rsspid,
 						null as rslnkid,
-						null as rslnkgrp,
+						rslnkgrp,
 						rstestcd,
 						rstest,
 						rscat,
@@ -76,6 +76,7 @@ WITH included_subjects AS (
 					select distinct	project::text AS studyid,
 									concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 									"Subject"::text AS usubjid,
+									"InstanceName"::text AS rslnkgrp,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
 									'RECIST 1.1'::text AS rscat,
@@ -107,6 +108,7 @@ WITH included_subjects AS (
 					SELECT distinct project::text AS studyid,
 									concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 									"Subject"::text AS usubjid,
+									"InstanceName"::text AS rslnkgrp,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
 									'RECIST 1.1'::text AS rscat,
@@ -185,7 +187,7 @@ SELECT
     rs.rssttpt::text AS rssttpt,
     rs.rsenrtpt::text AS rsenrtpt,
     rs.rsentpt::text AS rsentpt
-    /*KEY , (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref )::text  AS objectuniquekey KEY*/
+    /*KEY, (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref || '~' || rs.rslnkgrp )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
 

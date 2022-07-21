@@ -74,7 +74,7 @@ WITH included_subjects AS (
 					'New Lesion'::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	null ::text AS trlnkid,
+                	nl."NLNUM" ::text AS trlnkid,
                 	nl."RecordPosition" ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
@@ -108,7 +108,7 @@ WITH included_subjects AS (
 					'Non-Target Lesion'::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	null ::text AS trlnkid,
+                	ntlb."NTLSNUM" ::text AS trlnkid,
                 	ntlb."RecordPosition" ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
@@ -142,7 +142,7 @@ WITH included_subjects AS (
 					'Non-Target Lesion'::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	null ::text AS trlnkid,
+                	ntl."NTLSNUM" ::text AS trlnkid,
                 	ntl."RecordPosition" ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
@@ -176,7 +176,7 @@ WITH included_subjects AS (
 					'Target Lesion'::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	null ::text AS trlnkid,
+                	tl."LSNUM" ::text AS trlnkid,
                 	tl."RecordPosition" ::text AS trlnkgrp,
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
@@ -210,7 +210,7 @@ WITH included_subjects AS (
 					'Target Lesion'::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	null ::text AS trlnkid,
+                	tlb."LSNUM" ::text AS trlnkid,
                 	tlb."RecordPosition" ::text AS trlnkgrp,
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
@@ -279,7 +279,7 @@ SELECT
     tr.epoch::text AS epoch,
     tr.trdtc::text AS trdtc,
     tr.trdy::numeric AS trdy
-    /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum)::text  AS objectuniquekey KEY*/ 
+    /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum || '~' || tr.trlnkid || '~' || tr.trlnkgrp)::text  AS objectuniquekey  KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid)
 ;
