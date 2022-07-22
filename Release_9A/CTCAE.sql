@@ -1160,9 +1160,9 @@ left join ae on
 	and a.lbdtc = ae.aestdtc
 	where lbcat not in ('Thyroid Function Test','Physical Examination','Hemoglobin A1C','ECG','PSA Blood Sampling','Urinalysis',
 'Vital Signs','ECG - Triplicate Assessments','EXPOSURE')
-and lbtestcd not in ('BICARB', 'CL', 'URATE', 'UREA', 'GFRE', 'NEUTLE','CA', 'NEUT', 'CAPHOSPD', 'BILDIR','BASOLE', 'TROPONT', 
-'RETIRBC', 'TESTOS', 'MONO', 'UACID', 'BUN', 'NEUTB', 'CK', 'BASO', 'CREATCLR', 'PLAT','EOSLE','FIBRINO','ANC','LYMLE','INR',
-'MONOLE','HCT','TRIG','PT','BILUNCON','CHOL','TROPONI','BILCON','BILIND','RBC')
+and lbtestcd not in ('BICARB', 'CL', 'URATE', 'UREA', 'GFRE', 'NEUTLE','CA', 'CAPHOSPD', 'BILDIR','BASOLE', 'TROPONT', 
+'RETIRBC', 'TESTOS', 'MONO', 'UACID', 'BUN', 'NEUTB', 'BASO', 'CREATCLR','EOSLE','ANC','LYMLE',
+'MONOLE','HCT','PT','BILUNCON','TROPONI','BILCON','BILIND','RBC')
 )a
 where rnk =1
 
