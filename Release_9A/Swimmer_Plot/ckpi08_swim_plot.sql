@@ -33,6 +33,7 @@ select
 	, cohort
 	, cancer_diag
 	, eot_reason
+	, eot_reason_raw
 	, weeks_from_c1d1
     , ((date_of_or::date - c1d1_date_of_visit::date) + 1) / 7 as pr_weeks_from_c1d1
 	, case
@@ -50,7 +51,7 @@ select
 from
 	ckpi.ckpi07_swimp 
 )
-select
+select DISTINCT
 	nextval('ckpi.ckpi08_swim_plot_id_seq'::regclass)
 	, study
 	, sitenumber
@@ -62,7 +63,7 @@ select
 	, weeks_from_c1d1 + COALESCE(weeks_from_c1d1_surv_con, 0) as cum_wks_frm_c1d1_surv_con 
 	, weeks_from_c1d1_surv_uncon as wks_frm_c1d1_surv_uncon
 	, weeks_from_c1d1 + COALESCE(weeks_from_c1d1_surv_con, 0) + COALESCE(weeks_from_c1d1_surv_uncon, 0) as cum_wks_frm_c1d1_surv_uncon
-	, eot_reason
+	, eot_reason_raw as eot_reason
 	, case when eot_reason not in ('Ongoing', 'Radiological Progression', 'Clinical Disease Progression', 'Death') then 'Discontinuation (Other)' else eot_reason end as eot_reason_updtd
 	, eot_frm_c1d1_wks
 	, case when overall_respnse = 'PR' then string_agg(pr_weeks_from_c1d1::text,',') else null end as pr_wks_from_c1d1
@@ -73,9 +74,11 @@ select
 from swmr1
 group by study
 , sitenumber, subject, cohort, cancer_diag
-, eot_reason
+, eot_reason_raw
 ,case when eot_reason not in ('Ongoing', 'Radiological Progression', 'Clinical Disease Progression', 'Death') then 'Discontinuation (Other)' else eot_reason end
 ,weeks_from_c1d1, eot_frm_c1d1_wks, death_frm_c1d1_wks, weeks_from_c1d1_surv_con, weeks_from_c1d1_surv_uncon, last_date_of_surv, date_of_death, overall_respnse
 ORDER BY study, sitenumber, subject
 )
 ;
+
+--ALTER TABLE ckpi.ckpi08_swim_plot OWNER TO "taiho-stage-app-clinical-master-write";
