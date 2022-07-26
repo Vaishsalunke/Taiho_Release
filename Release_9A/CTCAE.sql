@@ -48,7 +48,7 @@ select
 	ae.aesev,
 	ae.aestdtc,
 	ae.aeendtc,
-	row_number() over (partition by a.studyid,a.usubjid, a.lbtest, a.visit, a.lbdtc order by ae.aeterm ) as rnk
+	row_number() over (partition by a.studyid,a.usubjid, a.lbtest, a.visit, a.lbdtc,a.result,a.bl_lbstresn  order by ae.aeterm ) as rnk
 from
 	(
 	
@@ -109,9 +109,10 @@ group by 1,2,3,4)k
 	from
 		cqs.rpt_lab_information lb
 	left join bl_val on
-		bl_val.studyid = lb.studyid
+		lb.studyid = bl_val.studyid
 		and lb.usubjid = bl_val.usubjid
 		and lb.lbtestcd = bl_val.lbtestcd
+		and lb.lbstresn = bl_val.bl_lbstresn
 ),
 	aeterm as
 (
@@ -1140,10 +1141,11 @@ baseline.studyid,
 			when lbstresn is null or lbstnrhi is null or lbstnrlo is null then null
 			else null
 		end as lbtox,
-		case
+		/*case
 			when lbstresn is null then null
 			else baseline.result
-		end as "result",
+		end as "result",*/
+		baseline.result as "result",
 		baseline.bl_lbstresn,
 		baseline.visit,
 		aeterm.aeterm
