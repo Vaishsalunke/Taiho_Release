@@ -101,7 +101,7 @@ create table ctable_listing.ctcae_listing as select * from
 				select
 					lb.*,
 					a.result
-					--,k.bl_lbstresn
+					,a.bl_lbstresn as bl_lbstresn_1
 
 					from cqs.rpt_lab_information lb
 				left join (
@@ -109,22 +109,27 @@ create table ctable_listing.ctcae_listing as select * from
 						usubjid,
 						lbtestcd,
 						result
+						,bl_lbstresn
 					from
-						bl_val) a on
+						bl_val
+					where result is not null
+						) a on
 					lb.studyid = a.studyid
 					and lb.usubjid = a.usubjid
-					and lb.lbtestcd = a.lbtestcd ) ,
-				baseline as (
+					and lb.lbtestcd = a.lbtestcd ) 
+				,baseline as (
 				select
-					distinct lb.*,
-					bl_val.bl_lbstresn
+					distinct lb.*
+					--,bl_val.bl_lbstresn
 				from
 					result_abromal_normal lb
 				left join bl_val on
 					lb.studyid = bl_val.studyid
 					and lb.usubjid = bl_val.usubjid
 					and lb.lbtestcd = bl_val.lbtestcd
-					and lb.lbstresn = bl_val.bl_lbstresn ),
+					--and lb.lbstresn = bl_val.bl_lbstresn
+					),
+					
 				aeterm as ( (
 				select
 					distinct studyid,
@@ -317,19 +322,19 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn > 20 * lbstnrhi) then 'G4'
 						when lbtestcd = 'ALP'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 2 * baseline.bl_lbstresn
-						and lbstresn <= 2.5 * baseline.bl_lbstresn) then 'G1'
+						and (lbstresn >= 2 * baseline.bl_lbstresn_1
+						and lbstresn <= 2.5 * baseline.bl_lbstresn_1) then 'G1'
 						when lbtestcd = 'ALP'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 2.5 * baseline.bl_lbstresn
-						and lbstresn <= 5 * baseline.bl_lbstresn) then 'G2'
+						and (lbstresn >= 2.5 * baseline.bl_lbstresn_1
+						and lbstresn <= 5 * baseline.bl_lbstresn_1) then 'G2'
 						when lbtestcd = 'ALP'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 5 * baseline.bl_lbstresn
-						and lbstresn <= 20 * baseline.bl_lbstresn) then 'G3'
+						and (lbstresn >= 5 * baseline.bl_lbstresn_1
+						and lbstresn <= 20 * baseline.bl_lbstresn_1) then 'G3'
 						when lbtestcd = 'ALP'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 20 * baseline.bl_lbstresn) then 'G4'
+						and (lbstresn > 20 * baseline.bl_lbstresn_1) then 'G4'
 						when lbtestcd = 'ALT'
 						and baseline.result = 'normal'
 						and (lbstresn > lbstnrhi
@@ -347,19 +352,19 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn > 20 * lbstnrhi) then 'G4'
 						when lbtestcd = 'ALT'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 1.5 * baseline.bl_lbstresn
-						and lbstresn <= 3 * baseline.bl_lbstresn) then 'G1'
+						and (lbstresn >= 1.5 * baseline.bl_lbstresn_1
+						and lbstresn <= 3 * baseline.bl_lbstresn_1) then 'G1'
 						when lbtestcd = 'ALT'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 3 * baseline.bl_lbstresn
-						and lbstresn <= 5 * baseline.bl_lbstresn) then 'G2'
+						and (lbstresn >= 3 * baseline.bl_lbstresn_1
+						and lbstresn <= 5 * baseline.bl_lbstresn_1) then 'G2'
 						when lbtestcd = 'ALT'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 5 * baseline.bl_lbstresn
-						and lbstresn <= 20 * baseline.bl_lbstresn) then 'G3'
+						and (lbstresn >= 5 * baseline.bl_lbstresn_1
+						and lbstresn <= 20 * baseline.bl_lbstresn_1) then 'G3'
 						when lbtestcd = 'ALT'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 20 * baseline.bl_lbstresn) then 'G4'
+						and (lbstresn > 20 * baseline.bl_lbstresn_1) then 'G4'
 						when lbtestcd = 'BILI'
 						and baseline.result = 'normal'
 						and (lbstresn > lbstnrhi
@@ -377,19 +382,19 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn > 10 * lbstnrhi) then 'G4'
 						when lbtestcd = 'BILI'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 1 * baseline.bl_lbstresn
-						and lbstresn <= 1.5 * baseline.bl_lbstresn) then 'G1'
+						and (lbstresn >= 1 * baseline.bl_lbstresn_1
+						and lbstresn <= 1.5 * baseline.bl_lbstresn_1) then 'G1'
 						when lbtestcd = 'BILI'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 1.5 * baseline.bl_lbstresn
-						and lbstresn <= 3 * baseline.bl_lbstresn) then 'G2'
+						and (lbstresn >= 1.5 * baseline.bl_lbstresn_1
+						and lbstresn <= 3 * baseline.bl_lbstresn_1) then 'G2'
 						when lbtestcd = 'BILI'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 3 * baseline.bl_lbstresn
-						and lbstresn <= 10 * baseline.bl_lbstresn) then 'G3'
+						and (lbstresn >= 3 * baseline.bl_lbstresn_1
+						and lbstresn <= 10 * baseline.bl_lbstresn_1) then 'G3'
 						when lbtestcd = 'BILI'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 10 * baseline.bl_lbstresn) then 'G4'
+						and (lbstresn > 10 * baseline.bl_lbstresn_1) then 'G4'
 						when lbtestcd = 'AST'
 						and baseline.result = 'normal'
 						and (lbstresn > lbstnrhi
@@ -407,19 +412,19 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn > 20 * lbstnrhi) then 'G4'
 						when lbtestcd = 'AST'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 1.5 * baseline.bl_lbstresn
-						and lbstresn <= 3 * baseline.bl_lbstresn) then 'G1'
+						and (lbstresn >= 1.5 * baseline.bl_lbstresn_1
+						and lbstresn <= 3 * baseline.bl_lbstresn_1) then 'G1'
 						when lbtestcd = 'AST'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 3 * baseline.bl_lbstresn
-						and lbstresn <= 5 * baseline.bl_lbstresn) then 'G2'
+						and (lbstresn >= 3 * baseline.bl_lbstresn_1
+						and lbstresn <= 5 * baseline.bl_lbstresn_1) then 'G2'
 						when lbtestcd = 'AST'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 5 * baseline.bl_lbstresn
-						and lbstresn <= 20 * baseline.bl_lbstresn) then 'G3'
+						and (lbstresn >= 5 * baseline.bl_lbstresn_1
+						and lbstresn <= 20 * baseline.bl_lbstresn_1) then 'G3'
 						when lbtestcd = 'AST'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 20 * baseline.bl_lbstresn) then 'G4'
+						and (lbstresn > 20 * baseline.bl_lbstresn_1) then 'G4'
 						when lbtestcd = 'AMYLASE'
 						and (lbstresn > lbstnrhi
 						and lbstresn <= 1.5 * lbstnrhi) then 'G1'
@@ -444,7 +449,7 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn > lbstnrhi) then 'G1'
 						when lbtestcd = 'EOS'
 						and baseline.result = 'abnormal'
-						and (lbstresn > baseline.bl_lbstresn) then 'G1'
+						and (lbstresn > baseline.bl_lbstresn_1) then 'G1'
 						when lbtestcd = 'INR'
 						and (lbstresn >= 1.2
 						and lbstresn <= 1.5) then 'G1'
@@ -627,11 +632,11 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn > 6 * lbstnrhi) then 'G4'
 						when lbtestcd = 'CREAT'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 1.5 * baseline.bl_lbstresn
-						and lbstresn <= 3 * baseline.bl_lbstresn) then 'G2'
+						and (lbstresn > 1.5 * baseline.bl_lbstresn_1
+						and lbstresn <= 3 * baseline.bl_lbstresn_1) then 'G2'
 						when lbtestcd = 'CREAT'
 						and baseline.result = 'abnormal'
-						and (lbstresn >= 3 * baseline.bl_lbstresn) then 'G3'
+						and (lbstresn >= 3 * baseline.bl_lbstresn_1) then 'G3'
 						when lbtestcd = 'FIBRINO'
 						and baseline.result = 'normal'
 						and (lbstresn < 1 * lbstnrlo
@@ -649,19 +654,19 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn < 0.25 * lbstnrlo) then 'G4'
 						when lbtestcd = 'FIBRINO'
 						and baseline.result = 'abnormal'
-						and (lbstresn < 1 * baseline.bl_lbstresn
-						and lbstresn >= 0.75 * baseline.bl_lbstresn) then 'G1'
+						and (lbstresn < 1 * baseline.bl_lbstresn_1
+						and lbstresn >= 0.75 * baseline.bl_lbstresn_1) then 'G1'
 						when lbtestcd = 'FIBRINO'
 						and baseline.result = 'abnormal'
-						and (lbstresn < 0.75 * baseline.bl_lbstresn
-						and lbstresn >= 0.5 * baseline.bl_lbstresn) then 'G2'
+						and (lbstresn < 0.75 * baseline.bl_lbstresn_1
+						and lbstresn >= 0.5 * baseline.bl_lbstresn_1) then 'G2'
 						when lbtestcd = 'FIBRINO'
 						and baseline.result = 'abnormal'
-						and (lbstresn < 0.5 * baseline.bl_lbstresn
-						and lbstresn >= 0.25 * baseline.bl_lbstresn) then 'G3'
+						and (lbstresn < 0.5 * baseline.bl_lbstresn_1
+						and lbstresn >= 0.25 * baseline.bl_lbstresn_1) then 'G3'
 						when lbtestcd = 'FIBRINO'
 						and baseline.result = 'abnormal'
-						and (lbstresn < 0.25 * baseline.bl_lbstresn) then 'G4'
+						and (lbstresn < 0.25 * baseline.bl_lbstresn_1) then 'G4'
 						when lbtestcd = 'GGT'
 						and baseline.result = 'normal'
 						and (lbstresn > lbstnrhi
@@ -679,19 +684,19 @@ create table ctable_listing.ctcae_listing as select * from
 						and (lbstresn > 20 * lbstnrhi) then 'G4'
 						when lbtestcd = 'GGT'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 2 * baseline.bl_lbstresn
-						and lbstresn <= 2.5 * baseline.bl_lbstresn) then 'G1'
+						and (lbstresn > 2 * baseline.bl_lbstresn_1
+						and lbstresn <= 2.5 * baseline.bl_lbstresn_1) then 'G1'
 						when lbtestcd = 'GGT'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 2.5 * baseline.bl_lbstresn
-						and lbstresn <= 5 * baseline.bl_lbstresn) then 'G2'
+						and (lbstresn > 2.5 * baseline.bl_lbstresn_1
+						and lbstresn <= 5 * baseline.bl_lbstresn_1) then 'G2'
 						when lbtestcd = 'GGT'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 5 * baseline.bl_lbstresn
-						and lbstresn <= 20 * baseline.bl_lbstresn) then 'G3'
+						and (lbstresn > 5 * baseline.bl_lbstresn_1
+						and lbstresn <= 20 * baseline.bl_lbstresn_1) then 'G3'
 						when lbtestcd = 'GGT'
 						and baseline.result = 'abnormal'
-						and (lbstresn > 20 * baseline.bl_lbstresn) then 'G4'
+						and (lbstresn > 20 * baseline.bl_lbstresn_1) then 'G4'
 						when lbtestcd = 'GLUC'
 						and lbstresu in ('mmol/L',
 						'mmol/l')
@@ -1005,11 +1010,11 @@ create table ctable_listing.ctcae_listing as select * from
 			else baseline.result
 		end as "result",*/
 					baseline.result as "result",
-					baseline.bl_lbstresn,
+					baseline.bl_lbstresn_1,
 					baseline.visit,
 					aeterm.aeterm
 				from
-					baseline
+					baseline 
 				left join aeterm on
 					baseline.studyid = aeterm.studyid
 					and aeterm.test = baseline.lbtestcd) a
