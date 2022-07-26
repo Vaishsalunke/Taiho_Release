@@ -5,7 +5,7 @@ Notes: Standard mapping to CCDM LB table
 
 WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
-        included_site AS (SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),   
+        included_sites AS (SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),   
 
         ds_en as ( SELECT distinct studyid,siteid,usubjid,dsstdtc FROM ds WHERE dsterm = 'Enrolled' ),
 
@@ -449,21 +449,23 @@ and lb.visit = c.visit
 and lb.lbdtc = c.lbdtc
 and lb.lbstresn = c.lbstresn
             WHERE       lb.lbdtc IS NOT NULL
-    ),
-  baseline as(
-select ex.studyid,ex.siteid,ex.usubjid,blfl,labtest,count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid,labtest ) as blfl_count
+    )
+  , baseline as(
+select ex.studyid,ex.siteid,ex.usubjid,visit,blfl,labtest,seq,count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid,labtest ) as blfl_count
 from(
-select studyid,siteid,usubjid,labtest,max(min_lbdtc) as blfl
+select studyid,siteid,usubjid,labtest,visit,max(min_lbdtc) as blfl,seq
 from(
-select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lbdtc as min_lbdtc--case when min(exstdtc) >= lbdtc then lbdtc end as min_lbdtc
+select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lbdtc as min_lbdtc,max(lbseq) as seq,
+rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc ,max(lbseq) desc) as rnk
 from ex
 left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
-group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc
+where lb.lbstresn is not null 
+group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit
 having lb.lbdtc <= min(exstdtc)
 )ex_max
-group by ex_max.studyid,ex_max.siteid,ex_max.usubjid,labtest
+where rnk = 1
+group by ex_max.studyid,ex_max.siteid,ex_max.usubjid,labtest,visit,Seq
 )ex
---group by ex.studyid,ex.siteid,ex.usubjid
 ),
    
 final_lb as
@@ -506,110 +508,10 @@ final_lb as
                     lbtm
         FROM        lb_data lb
         left join   baseline on baseline.studyid = lb.studyid and lb.siteid = baseline.siteid and lb.usubjid = baseline.usubjid  
-        			and baseline.labtest = lb.lbtest and blfl_count = 1
+        			and baseline.labtest = lb.lbtest and lb.visit = baseline.visit and lb.lbseq= baseline.seq and blfl_count = 1
         )
        
-,min_baseline as
-(
-    select
-        studyid,
-        siteid,
-        usubjid,
-        lbtestcd,
-        lbblfl,
-        visit,
-        min(lbdtc) min_lbdtc
-    from
-        final_lb lb
-    where
-        lbblfl = 'Yes'
-    group by
-        studyid,
-        siteid,
-        usubjid,
-        lbtestcd,
-        lbblfl,
-        visit
-        ),
-       
-       
-    bl_val as (
-    select
-        lb.studyid,
-        lb.siteid,
-        lb.usubjid,
-        lb.lbtestcd,
-        lb.visit,
-        lb.lbstresn bl_lbstresn,
-        case
-            when (lb.lbstresn > lb.lbstnrhi
-                or lb.lbstresn < lb.lbstnrlo) then 'abnormal'
-            when lb.lbstresn is null then null
-            else 'normal'
-        end as "result"
-    from
-        min_baseline
-    left join final_lb lb on
-        min_baseline.studyid = lb.studyid
-        and min_baseline.siteid = lb.siteid
-        and lb.usubjid = min_baseline.usubjid
-        and lb.lbtestcd = min_baseline.lbtestcd
-        and lb.lbdtc = min_baseline.min_lbdtc
-        and lb.visit = min_baseline.visit
-        AND lb.lbblfl = min_baseline.lbblfl
-    ),
 
-new_baseline as
-(
-    select distinct
-        lb.studyid,
-                    lb.siteid,
-                    lb.usubjid,
-                    lb.visit,
-                    lb.lbdtc,
-                    lb.lbdy,
-                    lb.lbseq,
-                    lb.lbtestcd,
-                    lb.lbtest,
-                    lb.lbcat,
-                    lb.lbscat,
---                    lbspec,
-                    lb.lbmethod,
-                    lb.lborres,
-                    lb.lbstat,
-                    lb.lbreasnd,
-                    lb.lbstnrlo,
-                    lb.lbstnrhi,
-                    lb.lborresu,
-                    lb.lbstresn,
-                    lb.lbstresu,
-                    lb.lbblfl,
-                    lb.lbnrind,
-                    lb.lbornrhi,
-                    lb.lbornrlo,
-                    lb.lbstresc,
-                    lb.lbenint,
-                    lb.lbevlint,
-                    lb.lblat,
-                    lb.lblloq,
-                    --lbloc,
-                    lb.lbpos,
-                    lb.lbstint,
-                    lb.lbuloq,
-                    lb.lbclsig,
-                    lb.lbtm,
-        bl_val.bl_lbstresn as lbloc,
-       bl_val.result as lbspec
-    from
-        final_lb lb
-    left join bl_val on
-        bl_val.studyid = lb.studyid
-        and bl_val.siteid = lb.siteid
-        and lb.usubjid = bl_val.usubjid
-        and lb.lbtestcd = bl_val.lbtestcd
-        and lb.visit = bl_val.visit
-        AND lb.lbstresn = bl_val.bl_lbstresn
-        )
 SELECT 
         /*KEY (lb.studyid || '~' || lb.siteid || '~' || lb.usubjid)::text AS comprehendid, KEY*/
         lb.studyid::text AS studyid,
@@ -656,9 +558,9 @@ SELECT
         null::text AS  timpnt
         /*KEY, (lb.studyid || '~' || lb.siteid || '~' || lb.usubjid || '~' || lb.lbseq)::text  AS objectuniquekey KEY*/
         /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM new_baseline lb
+FROM final_lb lb
 JOIN included_subjects s ON (lb.studyid = s.studyid AND lb.siteid = s.siteid AND lb.usubjid = s.usubjid)
-LEFT JOIN included_site si ON (lb.studyid = si.studyid AND lb.siteid = si.siteid);
+LEFT JOIN included_sites si ON (lb.studyid = si.studyid AND lb.siteid = si.siteid);
     
     
 
