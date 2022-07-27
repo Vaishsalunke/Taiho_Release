@@ -25,6 +25,7 @@ WITH    included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subj
                 lb.lbdtc,
                 extract (days from (lb.lbdtc-dsstdtc)::interval)::numeric as lbdy,
                 (row_number() over (partition by lb.studyid, lb.siteid, lb.usubjid order by lb.lbtestcd, lb.lbdtc))::int as lbseq,
+                folderseq,
                 lb.lbtestcd as lbtestcd,
                 lb.lbtest as lbtest,
                 lb.lbcat,
@@ -75,6 +76,7 @@ from (
                         END::timestamp without time zone AS lbdtc,
                         null::integer AS lbdy,
                         lb1."DataPointId"::integer AS lbseq,
+                        lb1."FolderSeq"::integer AS folderseq,
                         lb1."AnalyteName"::text AS lbtestcd,
                         lb1."AnalyteName"::text AS lbtest,
                         lb1."DataPageName"::text AS lbcat,
@@ -121,6 +123,7 @@ from (
                         vs.vsdtc::timestamp without time zone AS lbdtc,
                         null::integer AS lbdy,
                         vs.vsseq::int AS lbseq, 
+                        null::integer as folderseq,
                         vs.vstestcd::text AS lbtestcd,
                         vs.vstest::text AS lbtest,
                         vs.vscat::text AS lbcat,
@@ -163,6 +166,7 @@ from (
                                 ex.exstdtc::timestamp without time zone AS lbdtc,
                                 null::integer AS lbdy,
                                 ex.exseq::int AS lbseq,
+                                null::integer as folderseq,
                                 'EXPOSURE'::text AS lbtestcd,
                                 'EXPOSURE'::text AS lbtest,
                                 'EXPOSURE'::text AS lbcat,
@@ -205,6 +209,7 @@ from (
                                 eg.egdtc::timestamp without time zone              AS lbdtc,
                                 null::integer AS lbdy,
                                 eg.egseq::int          AS lbseq, 
+                                null::integer as folderseq,
                                 eg.egtestcd::text      AS lbtestcd, 
                                 eg.egtest::text        AS lbtest, 
                                 eg.egcat::text         AS lbcat, 
@@ -246,6 +251,7 @@ from (
                         pe.pedtc::timestamp without time zone AS lbdtc,
                         null::integer AS lbdy,
                         pe.peseq::int AS lbseq,
+                        null::integer as folderseq,
                         pe.petestcd::text AS lbtestcd,
                         pe.petest::text AS lbtest,
                         pe.pecat::text AS lbcat,
@@ -291,17 +297,21 @@ and lb.lbdtc = c.lbdtc
 and lb.lbstresn = c.lbstresn
             where lb.lbdtc is not null
                         
-    ), baseline as(
+    )
+    
+ , baseline as (       
 select ex.studyid,ex.siteid,ex.usubjid,visit,blfl,labtest,seq,count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid,labtest ) as blfl_count
 from(
 select studyid,siteid,usubjid,labtest,visit,max(min_lbdtc) as blfl,seq
 from(
-select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lbdtc as min_lbdtc,max(lbseq) as seq,
-rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc ,max(lbseq) desc) as rnk
+    select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lb.lbdtc as min_lbdtc,folderseq as seq1,max(lb.lbseq) as seq,
+rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc, folderseq Desc --,max(lbseq) desc
+) as rnk
 from ex
 left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
-where lb.lbstresn is not null
-group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit
+--left join normlab nl on nl.studyid=ex.studyid and nl.siteid = ex.siteid and nl.usubjid=ex.usubjid and lb.lbseq = nl.lbseq
+where lb.lbstresn is not null --and   lb.usubjid = '305-001' and lb.lbtest='ALB'
+group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit,folderseq
 having lb.lbdtc <= min(exstdtc)
 )ex_max
 where rnk = 1
