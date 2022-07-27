@@ -26,6 +26,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
             lb.lbcat,
             lbscat,
             lbspec,
+			folderseq,
             lbmethod,
             lborres,
             lbstat,
@@ -77,6 +78,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
                     END::TIMESTAMP without TIME zone                AS lbdtc,
                     null::numeric as lbdy,
                     lb1."DataPointId"::INTEGER                      AS lbseq,
+					lb1."FolderSeq":: INTEGER						AS folderseq,
                     lb1."AnalyteName"::text                         AS lbtestcd,
                     lb1."AnalyteName"::text                         AS lbtest,
                     lb1."DataPageName"::text                        AS lbcat,
@@ -156,6 +158,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
                     vs.vsdtc::TIMESTAMP without TIME zone AS lbdtc,
                     NULL::INTEGER                         AS lbdy,
                     concat(vs.vsseq,0)::INT                       AS lbseq,
+					NULL:: INTEGER						AS folderseq,
                     vs.vstestcd::text                     AS lbtestcd,
                     vs.vstest::text                       AS lbtest,
                     vs.vscat::text                        AS lbcat,
@@ -198,6 +201,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
                     ex.exstdtc::TIMESTAMP without TIME zone AS lbdtc,
                     NULL::INTEGER                           AS lbdy,
                     ex.exseq::numeric         AS lbseq,
+					NULL:: INTEGER						AS folderseq,
                     'EXPOSURE'::text                        AS lbtestcd,
                     'EXPOSURE'::text                        AS lbtest,
                     'EXPOSURE'::text                        AS lbcat,
@@ -241,6 +245,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
                     eg.egdtc::TIMESTAMP without TIME zone AS lbdtc,
                     NULL::INTEGER                         AS lbdy,
                     eg.egseq::INT                         AS lbseq,
+					NULL:: INTEGER						AS folderseq,
                     eg.egtestcd::text                     AS lbtestcd,
                     eg.egtest::text                       AS lbtest,
                     eg.egcat::text                        AS lbcat,
@@ -283,6 +288,7 @@ WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject
                     pe.pedtc::TIMESTAMP without TIME zone AS lbdtc,
                     NULL::INTEGER                         AS lbdy,
                     pe.peseq::INT                         AS lbseq,
+					NULL:: INTEGER						AS folderseq,
                     pe.petestcd::text                     AS lbtestcd,
                     pe.petest::text                       AS lbtest,
                     pe.pecat::text                        AS lbcat,
@@ -330,17 +336,19 @@ and lb.lbstresn = c.lbstresn
             lb.lbdtc IS NOT NULL
     )
 	
-  , baseline as(
-select ex.studyid,ex.siteid,ex.usubjid,visit,blfl,labtest,seq,count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid,labtest ) as blfl_count
+, baseline as (       
+select ex.studyid,ex.siteid,ex.usubjid,visit,blfl,labtest,seq,
+count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid,labtest ) as blfl_count
 from(
 select studyid,siteid,usubjid,labtest,visit,max(min_lbdtc) as blfl,seq
 from(
-select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lbdtc as min_lbdtc,max(lbseq) as seq,
-rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc ,max(lbseq) desc) as rnk
+    select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lb.lbdtc as min_lbdtc,folderseq as seq1,max(lb.lbseq) as seq,
+rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc, folderseq Desc --,max(lbseq) desc
+) as rnk
 from ex
 left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
-where lb.lbstresn is not null
-group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit
+where lb.lbstresn is not null 
+group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit,folderseq
 having lb.lbdtc <= min(exstdtc)
 )ex_max
 where rnk = 1

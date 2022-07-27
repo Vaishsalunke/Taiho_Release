@@ -3,6 +3,7 @@ CCDM LB mapping
 Notes: Standard mapping to CCDM LB table
 */
 
+
 WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
         included_sites AS (SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),   
@@ -31,6 +32,7 @@ WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM sub
                             Null::integer AS lbdy,
                             --Null::integer AS lbseq,
                             lb1."DataPointId" ::integer AS lbseq,
+							lb1."FolderSeq" :: INTEGER as folderseq,
                             lb1."AnalyteName"::text AS lbtestcd,
                             lb1."AnalyteName"::text AS lbtest,
                             lb1."DataPageName"::text AS lbcat,
@@ -338,17 +340,21 @@ and lb.lbdtc = c.lbdtc
 and lb.lbstresn = c.lbstresn
                 where       lb.lbdtc is not Null
 
-                    ), baseline as(
+                    )
+
+, baseline as (       
 select ex.studyid,ex.siteid,ex.usubjid,visit,blfl,labtest,seq,count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid,labtest ) as blfl_count
 from(
 select studyid,siteid,usubjid,labtest,visit,max(min_lbdtc) as blfl,seq
 from(
-select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lbdtc as min_lbdtc,max(lbseq) as seq,
-rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc ,max(lbseq) desc) as rnk
+    select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lb.lbdtc as min_lbdtc,folderseq as seq1,max(lb.lbseq) as seq,
+rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc, folderseq Desc --,max(lbseq) desc
+) as rnk
 from ex
 left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
-where lb.lbstresn is not null
-group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit
+left join normlab nl on nl.studyid=ex.studyid and nl.siteid = ex.siteid and nl.usubjid=ex.usubjid and lb.lbseq = nl.lbseq
+where lb.lbstresn is not null 
+group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit,folderseq
 having lb.lbdtc <= min(exstdtc)
 )ex_max
 where rnk = 1
