@@ -3,6 +3,7 @@ CCDM LB mapping
 Notes: Standard mapping to CCDM LB table
 */
 
+
 WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
         included_sites AS (SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),  
@@ -51,6 +52,7 @@ WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM sub
                     END::TIMESTAMP without TIME zone                AS lbdtc,
                     NULL::INTEGER                                   AS lbdy,
                     lb1."DataPointId":: int   AS lbseq,
+                    lb1."FolderSeq" :: int as folderseq,
                     lb1."AnalyteName"::text                         AS lbtestcd,
                     lb1."AnalyteName"::text                         AS lbtest,
                     lb1."DataPageName"::text                        AS lbcat,
@@ -130,7 +132,8 @@ WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM sub
                                                     ) ::text                        AS visit,
                                             "LBDAT"::TIMESTAMP without TIME zone AS lbdtc,
                                             NULL::INTEGER                         AS lbdy,
-                                            lbseq::INT                         AS lbseq,
+                                            lbseq::int                         AS lbseq,
+                                            null :: int folderseq,
                                             lbtestcd::text                     AS lbtestcd,
                                             lbtest::text                       AS lbtest,
                                             "DataPageName"::text                        AS lbcat,
@@ -283,7 +286,7 @@ VALUES  ('PROT','Urinary Protein',case when UPPER("PROT") = 'OTHER' then "PROTSP
                             vs.visit::text                        AS visit,
                             vs.vsdtc::TIMESTAMP without TIME zone AS lbdtc,
                             NULL::INTEGER                         AS lbdy,
-                            concat(vs.vsseq,0)::INT                         AS lbseq,
+                            concat(vs.vsseq,0)::int                         AS lbseq,
                             vs.vstestcd::text                     AS lbtestcd,
                             vs.vstest::text                       AS lbtest,
                             vs.vscat::text                        AS lbcat,
@@ -324,7 +327,7 @@ VALUES  ('PROT','Urinary Protein',case when UPPER("PROT") = 'OTHER' then "PROTSP
                             ex.visit::text                          AS visit,
                             ex.exstdtc::TIMESTAMP without TIME zone AS lbdtc,
                             NULL::INTEGER                           AS lbdy,
-                            concat(ex.exseq,09)::INT                           AS lbseq,
+                            concat(ex.exseq,09)::int                           AS lbseq,
                             'EXPOSURE'::text                        AS lbtestcd,
                             'EXPOSURE'::text                        AS lbtest,
                             'EXPOSURE'::text                        AS lbcat,
@@ -364,7 +367,7 @@ VALUES  ('PROT','Urinary Protein',case when UPPER("PROT") = 'OTHER' then "PROTSP
                             eg.visit::text                        AS visit,
                             eg.egdtc::TIMESTAMP without TIME zone AS lbdtc,
                             NULL::INTEGER                         AS lbdy,
-                            eg.egseq::INT                         AS lbseq,
+                            eg.egseq::int                         AS lbseq,
                             eg.egtestcd::text                     AS lbtestcd,
                             eg.egtest::text                       AS lbtest,
                             eg.egcat::text                        AS lbcat,
@@ -404,7 +407,7 @@ VALUES  ('PROT','Urinary Protein',case when UPPER("PROT") = 'OTHER' then "PROTSP
                             pe.visit::text                        AS visit,
                             pe.pedtc::TIMESTAMP without TIME zone AS lbdtc,
                             NULL::INTEGER                         AS lbdy,
-                            pe.peseq::INT                         AS lbseq,
+                            pe.peseq::int                         AS lbseq,
                             pe.petestcd::text                     AS lbtestcd,
                             pe.petest::text                       AS lbtest,
                             pe.pecat::text                        AS lbcat,
@@ -448,17 +451,19 @@ and lb.lbdtc = c.lbdtc
 and lb.lbstresn = c.lbstresn
             WHERE       lb.lbdtc IS NOT NULL
     )
- , baseline as(
+, baseline as (       
 select ex.studyid,ex.siteid,ex.usubjid,visit,blfl,labtest,seq,count(blfl) over(partition by ex.studyid,ex.siteid,ex.usubjid,labtest ) as blfl_count
 from(
 select studyid,siteid,usubjid,labtest,visit,max(min_lbdtc) as blfl,seq
 from(
-select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lbdtc as min_lbdtc,max(lbseq) as seq,
-rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc ,max(lbseq) desc) as rnk
+    select lb.studyid,lb.siteid,lb.usubjid,lb.lbtest as labtest,lb.visit,lb.lbdtc as min_lbdtc,folderseq as seq1,max(lb.lbseq) as seq,
+rank() over (partition by lb.studyid,lb.usubjid,lb.lbtest order by lb.lbdtc desc, folderseq Desc --,max(lbseq) desc
+) as rnk
 from ex
 left join lb_data lb on lb.studyid=ex.studyid and lb.siteid = ex.siteid and lb.usubjid=ex.usubjid
-where lb.lbstresn is not null 
-group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit
+left join normlab nl on nl.studyid=ex.studyid and nl.siteid = ex.siteid and nl.usubjid=ex.usubjid and lb.lbseq = nl.lbseq
+where lb.lbstresn is not null --and   lb.usubjid = '305-001' and lb.lbtest='ALB'
+group by lb.studyid,lb.siteid,lb.usubjid,lb.lbtest,lb.lbdtc,lb.visit,folderseq
 having lb.lbdtc <= min(exstdtc)
 )ex_max
 where rnk = 1

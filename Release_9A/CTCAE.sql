@@ -37,21 +37,14 @@ create table ctable_listing.ctcae_listing as select * from
 				a.lbstnrlo,
 				a.lbtox,
 				a.result,
-				a.bl_lbstresn,
+				a.bl_lbstresn_1 as bl_lbstresn,
 				ae.aeterm,
 				trim(ae.aeverbatim) as aeverbatim,
 				ae.preferredterm,
 				ae.aesev,
 				ae.aestdtc,
 				ae.aeendtc,
-				row_number() over (partition by a.studyid,
-				a.usubjid,
-				a.lbtest,
-				a.visit,
-				a.lbdtc,
-				a.result,
-				a.bl_lbstresn
-			order by
+				row_number() over (partition by a.studyid, a.usubjid,a.lbtest,a.visit,a.lbdtc ,a.result,a.lbstresn order by
 				ae.aeterm ) as rnk
 			from
 				( with min_baseline as (
@@ -60,21 +53,25 @@ create table ctable_listing.ctcae_listing as select * from
 					usubjid,
 					lbtestcd,
 					lbblfl,
-					lbdtc as min_lbdtc
+					lbdtc as min_lbdtc,
+					lbseq
 				from
 					cqs.rpt_lab_information lb
 				where
-					lbblfl = 'Yes' ) ,
+					lbblfl = 'Yes' ) 
 					
-				bl_val as (
+				,bl_val as (
 				select
 					k.*,
-					case
-						when (k.bl_lbstresn > lb.lbstnrhi
-						or k.bl_lbstresn < lb.lbstnrlo) then 'abnormal'
-						when k.bl_lbstresn is null then null
+					Case when lb.lbstnrhi is not null and lb.lbstnrlo is not NULL
+					then
+						case
+							when (k.bl_lbstresn > lb.lbstnrhi or k.bl_lbstresn < lb.lbstnrlo) 
+								then 'abnormal'
+							when k.bl_lbstresn is null then null
 						else 'normal'
-					end as "result"
+						end
+		end as "result"
 				from
 					(
 					select
@@ -82,22 +79,27 @@ create table ctable_listing.ctcae_listing as select * from
 						lb.usubjid,
 						lb.lbtestcd,
 						min_lbdtc,
-						lb.lbstresn as bl_lbstresn
+						lb.lbstresn as bl_lbstresn,
+						min_baseline.lbseq
 					from
 						min_baseline
 					left join cqs.rpt_lab_information lb on
 						lb.studyid = min_baseline.studyid
 						and lb.usubjid = min_baseline.usubjid
 						and lb.lbtestcd = min_baseline.lbtestcd
-						and lb.lbdtc = min_baseline.min_lbdtc )k
+						and lb.lbdtc = min_baseline.min_lbdtc 
+						and lb.lbseq = min_baseline.lbseq
+						)k
 				left join cqs.rpt_lab_information lb on
 					lb.studyid = k.studyid
 					and lb.usubjid = k.usubjid
 					and lb.lbtestcd = k.lbtestcd
 					and lb.lbdtc = k.min_lbdtc
-					and lb.lbstresn = k.bl_lbstresn ) ,
-					
-				result_abromal_normal as (
+					and lb.lbstresn = k.bl_lbstresn
+					and lb.lbseq = k.lbseq
+										) 
+										
+			,result_abromal_normal as (
 				select
 					lb.*,
 					a.result
@@ -112,7 +114,7 @@ create table ctable_listing.ctcae_listing as select * from
 						,bl_lbstresn
 					from
 						bl_val
-					where result is not null
+					--where result is not null
 						) a on
 					lb.studyid = a.studyid
 					and lb.usubjid = a.usubjid
@@ -1064,8 +1066,7 @@ create table ctable_listing.ctcae_listing as select * from
 				'BILCON',
 				'BILIND',
 				'RBC') )a
-		where
-			rnk = 1
+where rnk =1 
 			--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-dev-app-clinical-master-write";
 			--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-stage-app-clinical-master-write";
 			--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-app-clinical-master-write";
