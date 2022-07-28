@@ -22,7 +22,8 @@ create table ctable_listing.ctcae_listing as select * from
 				ae.studyid = aetx.studyid
 				and aetx.usubjid = ae.usubjid
 				and ae.aeterm = aetx.aeterm
-				and ae.aestdtc = aetx.fastdtc )
+				--and ae.aestdtc = aetx.fastdtc 
+				)
 			select
 				distinct a.studyid,
 				a.usubjid,
@@ -1065,7 +1066,12 @@ create table ctable_listing.ctcae_listing as select * from
 				'TROPONI',
 				'BILCON',
 				'BILIND',
-				'RBC') )a
+				'RBC') 
+				order by a.studyid,
+				a.usubjid,
+				a.lbcat,
+				a.lbtest,a.lbdtc
+				)a
 where rnk =1 
 			--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-dev-app-clinical-master-write";
 			--ALTER TABLE ctable_listing.ctcae_listing OWNER TO "taiho-stage-app-clinical-master-write";
