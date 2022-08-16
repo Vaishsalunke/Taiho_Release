@@ -28,7 +28,8 @@ WITH included_subjects AS (
                         coalesce(nullif("DMRACE",''),nullif("DMOTH",'')) ::text AS race,
                         nullif("DMETHNIC",'') ::text AS ethnicity,
                         null::text AS armcd,
-                        nullif(concat("ENRPHAS","ENRCOHO"),'')::text AS arm,
+                        --nullif(concat("ENRPHAS","ENRCOHO"),'')::text AS arm,
+                        "ENRPHAS"::text AS arm,
                         null::text AS brthdtc_iso
                      from TAS2940_101."DM" dm
                    	left join tas2940_101."EOT" eot on dm.project = eot.project and dm."SiteNumber"=eot."SiteNumber" and dm."Subject"=eot."Subject"

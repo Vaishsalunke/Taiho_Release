@@ -34,10 +34,11 @@ dm_dm2 as(select	dm."project"::text as studyid,
 					dm."DMSEX"::text as sex,
 					coalesce(dm."DMRACE", dm."DMOTH")::text as race,
 					dm."DMETHNIC"::text as ethnicity,
-					null:: text as armcd,
-					null:: text as arm
+					tr."TAPHASE" :: text as armcd,
+					tr."TAPHASE" :: text as arm
 		 from		tas0612_101."DM" dm
 		 left join ex_data e3 on dm."project" = e3.project and dm."SiteNumber"= e3."SiteNumber"and dm."Subject" =e3."Subject"
+		 left join tas0612_101."TREAT" tr on dm."project" = tr.project and dm."SiteNumber" = tr."SiteNumber" and dm."Subject" = tr."Subject" 
 		 ) 
 SELECT 
         /*KEY (dm.studyid || '~' || dm.siteid || '~' || dm.usubjid)::text AS comprehendid, KEY*/
