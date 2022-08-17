@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
      ie_data AS(
 		
-                SELECT distinct "project"::text AS studyid,
+                SELECT distinct 'TAS-120-204'::text AS studyid,
                         'TAS120_204_' || split_part("SiteNumber",'_',2)::text AS siteid,
                         "Subject"::text AS usubjid,
                          row_number() OVER (PARTITION BY ie.studyid, ie.siteid, ie."Subject" ORDER BY ie."serial_id")::int as ieseq,

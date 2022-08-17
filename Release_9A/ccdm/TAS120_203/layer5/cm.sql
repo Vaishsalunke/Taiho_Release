@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
      cm_data AS (
-                SELECT  project::text AS studyid,
+                SELECT  'TAS-120-203'::text AS studyid,
                         'TAS120_203'::text AS studyname,
                         project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
                         null::text AS sitename,

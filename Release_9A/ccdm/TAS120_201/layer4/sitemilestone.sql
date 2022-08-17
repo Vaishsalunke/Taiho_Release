@@ -28,7 +28,7 @@ WITH included_sites AS (
 	 
 	 from
 	 (
-	 SELECT  		distinct	'TAS120_201'::text AS studyid,
+	 SELECT  		distinct	'TAS-120-201'::text AS studyid,
 						'TAS120_201'::text AS studyname,
                         concat('TAS120_201_',sm."site_number")::text AS siteid,
                         tms.milestoneseq::int AS milestoneseq,
@@ -49,7 +49,7 @@ WITH included_sites AS (
 					left join internal_config.taiho_ms_standards tms on upper(start_original_label) = upper(event_desc)
 					where tms.milestonelevel = 'Site'
 	UNION ALL
-	 select distinct	'TAS120_201'::text AS studyid,
+	 select distinct	'TAS-120-201'::text AS studyid,
 						'TAS120_201'::text AS studyname,
                         concat('TAS120_201_',sm."site_number")::text AS siteid,
                         tms.milestoneseq::int AS milestoneseq,

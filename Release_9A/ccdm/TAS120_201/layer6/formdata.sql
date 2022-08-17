@@ -29,7 +29,7 @@ WITH form_data AS (
     JOIN subject s ON (fd.studyid = s.studyid AND fd.usubjid = s.usubjid AND fd.siteid = s.siteid)
     JOIN fielddef fdef ON (fd.studyid = fdef.studyid AND fd.formid = fdef.formid)
 	where (fd.datacollecteddate between '2020-01-08'
-      and current_date) and fd.studyid='TAS120_201'
+      and current_date) and fd.studyid='TAS-120-201'
 GROUP BY
   fd.studyid,
   s.siteid,

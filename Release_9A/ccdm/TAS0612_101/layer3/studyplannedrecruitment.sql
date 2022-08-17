@@ -62,7 +62,7 @@ From tas0612_101."DM"
 
 
      studyplannedrecruitment_data AS (
-				SELECT  'TAS0612_101'::text AS studyid,
+				SELECT  'TAS0612-101'::text AS studyid,
                         'Enrollment'::text AS category,
                         'Monthly'::text AS frequency,
                        msub.completed_date::date AS enddate,
@@ -73,7 +73,7 @@ From tas0612_101."DM"
 				and sc.year = msub.year 
 	 
             union all
-                SELECT  'TAS0612_101'::text AS studyid,
+                SELECT  'TAS0612-101'::text AS studyid,
                         'Site Activation'::text AS category,
                         'Monthly'::text AS frequency,                        
                          msite.planned_visit_date::date AS enddate,
@@ -85,7 +85,7 @@ From tas0612_101."DM"
 				
 			   
             union all
-			SELECT  'TAS0612_101'::text AS studyid,
+			SELECT  'TAS0612-101'::text AS studyid,
                         'Screening'::text AS category,
                         'Monthly'::text AS frequency,
                         mscr.screening_date::date AS enddate,

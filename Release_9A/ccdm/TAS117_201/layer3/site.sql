@@ -14,7 +14,7 @@ sitecountrycode_data AS (
                 select distinct b.*, sr.siteregion::text AS siteregion from (
                 select a.*,
                 cc.countrycode3_iso::text AS sitecountrycode from (
-                SELECT  'TAS117_201'::text AS studyid,
+                SELECT  'TAS117-201'::text AS studyid,
                         null::text AS studyname,
                         'TAS117_201_' || split_part("name",'_',1) ::text AS siteid,
                         --substring("name",position('_' in "name")+1,length(trim("name"))-8) ::text AS sitename,

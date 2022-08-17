@@ -7,7 +7,7 @@ WITH included_sites AS (
                 SELECT DISTINCT studyid, siteid from  site ),
     
     subject_data AS (
-                SELECT  distinct 'TAS120_204'::text AS studyid,
+                SELECT  distinct 'TAS-120-204'::text AS studyid,
                         'TAS120_204'::text AS studyname,
                         'TAS120_204_' || split_part("site_key",'_',2)::text AS siteid,
                         "subject_key"::text AS usubjid,

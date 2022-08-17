@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
      mh_data AS (
                 
-				SELECT  "project"::text AS studyid,
+				SELECT  'TAS0612-101'::text AS studyid,
                         concat(concat("project",'_'),split_part("SiteNumber",'_',2))::text AS siteid,
                         "Subject"::text AS usubjid,
                         concat("RecordPosition","InstanceRepeatNumber","PageRepeatNumber")::int AS mhseq, /*(row_number() over (partition by [studyid],[siteid],[usubjid] order [mhstdtc,mhsttm]))::int AS mhseq,*/

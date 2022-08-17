@@ -10,12 +10,12 @@ WITH included_studies AS (
 tv_scheduled AS (
 
 	SELECT visit_number     as      visitnum, visit, visitdy , window_before_visit_day as "visitwindowbefore", window_after_visit_day as "visitwindowafter"
-            FROM tv_internal.tv_tracker_list where studyid='TAS120-201'
+            FROM tv_internal.tv_tracker_list where studyid='TAS120_201'
 	
 ),
 
 tv_data as(
-	 select studyid,
+	 select replace(studyid ,'TAS120_201','TAS-120-201') as studyid,
 		   	visitnum,
 			visit,
 			visitdy,
@@ -27,7 +27,7 @@ OR lower(visit) like '% day 01 %' OR lower(visit) like '% day 01<%') or (lower(v
 			from
 	(
 	SELECT
-		'TAS120_201'::text AS studyid,
+		'TAS-120-201'::text AS studyid,
 		coalesce(visitnum,'99')::numeric AS visitnum,
 		visit::text AS visit,
 		visitdy::int AS visitdy,

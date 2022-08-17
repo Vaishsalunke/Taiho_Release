@@ -26,7 +26,7 @@ WITH included_sites AS (
 	 endmilestonecycletime
 	 from
 	 (
-	 SELECT  		distinct	'TAS0612_101'::text AS studyid,
+	 SELECT  		distinct	'TAS0612-101'::text AS studyid,
 						'TAS0612_101'::text AS studyname,
                         concat('TAS0612_101_',sm."site_number")::text AS siteid,
                         tms.milestoneseq::int AS milestoneseq,
@@ -47,7 +47,7 @@ WITH included_sites AS (
 					left join internal_config.taiho_ms_standards tms on upper(start_original_label) = upper(event_desc)
 					where tms.milestonelevel = 'Site'
 	UNION ALL
-	 select distinct	'TAS0612_101'::text AS studyid,
+	 select distinct	'TAS0612-101'::text AS studyid,
 						'TAS0612_101'::text AS studyname,
                         concat('TAS0612_101_',sm."site_number")::text AS siteid,
                         tms.milestoneseq::int AS milestoneseq,

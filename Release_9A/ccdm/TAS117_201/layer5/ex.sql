@@ -8,7 +8,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      ex_data AS (
-                SELECT  project ::text AS studyid,
+                SELECT  'TAS117-201' ::text AS studyid,
                         null::text AS studyname,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber")))::text AS siteid,
                         null::text AS sitename,

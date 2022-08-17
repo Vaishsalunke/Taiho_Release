@@ -4,7 +4,7 @@ Notes: Standard mapping to CCDM Study table
 */
 
 WITH study_data AS (
-                    SELECT  'TAS117_201'::text AS studyid,
+                    SELECT  'TAS117-201'::text AS studyid,
                             'TAS117_201'::text AS studyname,
                             'A Phase 2 Study of TAS-117 in Patients with Advanced Solid Tumors
 Harboring Germline PTEN Inactivating Mutations'::text AS studydescription,

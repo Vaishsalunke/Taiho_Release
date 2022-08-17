@@ -6,7 +6,7 @@ Notes: Standard mapping to CCDM AE table
 WITH included_subjects AS (
     SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
-    ae_data AS ( SELECT "project"::text AS studyid,
+    ae_data AS ( SELECT 'TAS-120-202'::text AS studyid,
                        "SiteNumber"::text AS siteid,
                        "Subject"::text AS usubjid,
                        nullif("AETERM_PT",'')::text AS aeterm,

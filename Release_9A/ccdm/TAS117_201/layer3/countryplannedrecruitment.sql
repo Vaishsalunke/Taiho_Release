@@ -56,7 +56,7 @@ select distinct
 	   rc.count::NUMERIC AS recruitmentcount
 	   
 from                          (	   
-                					SELECT  'TAS117_201'::text AS studyid,
+                					SELECT  'TAS117-201'::text AS studyid,
                         					'TAS117_201'::text AS studyname,
                         					country_name::text AS sitecountry,
                         					country_code::text AS sitecountrycode,

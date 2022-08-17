@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
      ie_data AS (
 	 
-                SELECT "project"::text AS studyid,
+                SELECT 'TAS-120-202'::text AS studyid,
 					   "SiteNumber"::text AS siteid,
 					   "Subject"::text  AS usubjid,
 					   "FolderSeq"::numeric  AS visitnum,

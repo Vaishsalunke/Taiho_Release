@@ -10,7 +10,7 @@ WITH included_subjects AS (
                 select *,
                 row_number() over (partition by e.studyid, e.siteid, e.usubjid ORDER BY e.exstdtc)::int AS exseq
                 from(     
-                SELECT distinct project ::text AS studyid,
+                SELECT distinct 'TAS2940-101' ::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
                         null::text AS sitename,
@@ -51,7 +51,7 @@ WITH included_subjects AS (
                 
                 UNION ALL
                 
-                SELECT distinct project ::text AS studyid,
+                SELECT distinct 'TAS2940-101' ::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
                         null::text AS sitename,

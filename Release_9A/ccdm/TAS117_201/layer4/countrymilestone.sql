@@ -9,7 +9,7 @@ WITH included_studies AS (
         
  
 countrymilestone_data AS (
-        select 	studyid,
+        select 	replace(studyid ,'TAS117_201','TAS117-201') as studyid,
 			studyname,
 			sitecountry,
 			sitecountrycode,

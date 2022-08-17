@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
      eg_data AS (
                 				 
-				SELECT distinct project ::text AS studyid,
+				SELECT distinct 'TAS2940-101' ::text AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::text AS siteid,
                         "Subject" ::text AS usubjid,
                         concat(concat("instanceId","RecordPosition"),1) ::int AS egseq,

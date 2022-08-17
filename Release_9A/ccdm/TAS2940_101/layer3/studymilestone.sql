@@ -64,7 +64,7 @@ WITH included_studies AS (
             
      
                 SELECT 
-                        'TAS2940_101'::text AS studyid,
+                        'TAS2940-101'::text AS studyid,
                         null::int AS milestoneseq,
 						event_desc::text AS milestonelabel,
                         'Planned'::text AS milestonetype,
@@ -78,7 +78,7 @@ WITH included_studies AS (
                         union all
 
                 select
-                        'TAS2940_101'::text AS studyid,
+                        'TAS2940-101'::text AS studyid,
                          null::int AS milestoneseq,
                          event_desc::text AS milestonelabel,
 						 'Actual'::text AS milestonetype,

@@ -39,7 +39,7 @@ WITH included_studies AS (
   ),        
   
   studymilestone_data AS (
-     select studyid,
+     select replace(studyid ,'TAS117_201','TAS117-201') as studyid,
      studyname,
      sm.milestoneseq,
      case when a.milestonelabel = 'First Subject Enrolled' then 'FIRST SUBJECT IN'

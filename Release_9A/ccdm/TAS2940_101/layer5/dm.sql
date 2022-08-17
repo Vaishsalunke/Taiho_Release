@@ -12,7 +12,7 @@ WITH included_subjects AS (
     ),          
 
      dm_data AS (
-                SELECT  distinct dm.project ::text AS studyid,
+                SELECT  distinct 'TAS2940-101' ::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         'TAS2940_101_' || split_part(dm."SiteNumber",'_',2)::text AS siteid,
                         null::text AS sitename,
@@ -32,8 +32,8 @@ WITH included_subjects AS (
                         "ENRPHAS"::text AS arm,
                         null::text AS brthdtc_iso
                      from TAS2940_101."DM" dm
-                   	left join tas2940_101."EOT" eot on dm.project = eot.project and dm."SiteNumber"=eot."SiteNumber" and dm."Subject"=eot."Subject"
-                    left join exo_data exo on dm.project = exo.project and dm."SiteNumber"=exo."SiteNumber" and dm."Subject"=exo."Subject"  	     
+                   	left join tas2940_101."EOT" eot on 'TAS2940-101' = eot.project and dm."SiteNumber"=eot."SiteNumber" and dm."Subject"=eot."Subject"
+                    left join exo_data exo on 'TAS2940-101' = exo.project and dm."SiteNumber"=exo."SiteNumber" and dm."Subject"=exo."Subject"  	     
 					 ),
 		site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 

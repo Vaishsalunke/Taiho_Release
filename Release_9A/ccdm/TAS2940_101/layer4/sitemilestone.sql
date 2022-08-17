@@ -31,7 +31,7 @@ WITH included_sites AS (
 	 (
       
                 select distinct 
-                'TAS2940_101'::text AS studyid,
+                'TAS2940-101'::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         concat('TAS2940_101_',"site_number")::text AS siteid,
                         tms.milestoneseq ::int AS milestoneseq,
@@ -55,7 +55,7 @@ WITH included_sites AS (
                         
                         union all 
                         SELECT distinct 
-                        'TAS2940_101'::text AS studyid,
+                        'TAS2940-101'::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         concat('TAS2940_101_',"site_number")::text AS siteid,
                         tms.milestoneseq ::int AS milestoneseq,

@@ -89,7 +89,7 @@ max_date_screen as (
 						  )	,
 					
 studyplannedrecruitment_data AS (
-                SELECT  'TAS2940_101'::text AS studyid,
+                SELECT  'TAS2940-101'::text AS studyid,
                         'Enrollment'::text AS category,
                         'Monthly'::text AS frequency,
                         mds.IEDAT::date AS enddate,
@@ -103,7 +103,7 @@ studyplannedrecruitment_data AS (
 
 union all 
 
-				SELECT  'TAS2940_101'::text AS studyid,
+				SELECT  'TAS2940-101'::text AS studyid,
                         'Site Activation'::text AS category,
                         'Monthly'::text AS frequency,
                         mds."siv"::date AS enddate,
@@ -116,7 +116,7 @@ union all
 
 union all 
 
-				SELECT  'TAS2940_101'::text AS studyid,
+				SELECT  'TAS2940-101'::text AS studyid,
                         'Screening'::text AS category,
                         'Monthly'::text AS frequency,
                         mds.DMDAT::date AS enddate,

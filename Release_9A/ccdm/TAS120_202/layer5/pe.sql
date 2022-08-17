@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      pe_data AS (
-                SELECT  pe."project"::text AS studyid,
+                SELECT  'TAS-120-202'::text AS studyid,
                         pe."SiteNumber"::text AS siteid,
                         pe."Subject"::text AS usubjid,
                         --row_number() OVER (PARTITION BY pe."studyid", pe."siteid", pe."Subject" ORDER BY pe."serial_id")::int AS peseq,
@@ -34,7 +34,7 @@ WITH included_subjects AS (
                         null::time without time zone AS petm 
 from "tas120_202"."PE" pe
 left join "tas120_202"."VISIT" vs
-on pe."project"=vs."project" and pe."SiteNumber"=vs."SiteNumber" and pe."Subject"=vs."Subject"	
+on 'TAS-120-202'=vs."project" and pe."SiteNumber"=vs."SiteNumber" and pe."Subject"=vs."Subject"	
 where vs."PEPERF" = 'Yes'		
 )
 

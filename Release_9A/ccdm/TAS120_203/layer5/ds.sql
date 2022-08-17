@@ -8,7 +8,7 @@ WITH included_subjects AS (
      ds_data AS (
 ---Disposition Event: All Subjects										
 					(SELECT  distinct
-						'TAS120_203' ::TEXT AS studyid,
+						'TAS-120-203' ::TEXT AS studyid,
 						concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
 						"patient" ::TEXT AS usubjid,
 						1.0::NUMERIC AS dsseq, 
@@ -39,7 +39,7 @@ WITH included_subjects AS (
 --Disposition Event: Failed Screen										 
  
 
-(SELECT  'TAS120_203' ::TEXT AS studyid,
+(SELECT  'TAS-120-203' ::TEXT AS studyid,
                         concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
                         e."patient" ::TEXT AS usubjid,
                         2.1::NUMERIC AS dsseq, --deprecated
@@ -58,7 +58,7 @@ WITH included_subjects AS (
 --Disposition Event: Enrollment										 
  
  (SELECT  distinct
-						'TAS120_203'::TEXT AS studyid,
+						'TAS-120-203'::TEXT AS studyid,
                         concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
                         "patient" ::TEXT AS usubjid,
                         3.0::NUMERIC AS dsseq, --deprecated
@@ -74,7 +74,7 @@ WITH included_subjects AS (
 
 --Disposition Event: Early EOT 
  
- (SELECT  'TAS120_203' ::TEXT AS studyid,
+ (SELECT  'TAS-120-203' ::TEXT AS studyid,
                         concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
                         "patient" ::TEXT AS usubjid,
                         4.01::NUMERIC AS dsseq, --deprecated
@@ -92,7 +92,7 @@ WITH included_subjects AS (
 
 --Disposition Event: Withdrawn										 
  
- (SELECT  project ::TEXT AS studyid,
+ (SELECT  'TAS-120-203' ::TEXT AS studyid,
                         concat('TAS120_203','_',split_part("SiteNumber",'_',2)) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         4.4::NUMERIC AS dsseq,
@@ -122,7 +122,7 @@ WITH included_subjects AS (
 
 --Disposition Event: Screened										 
  
- (SELECT  'TAS120_203' ::TEXT AS studyid,
+ (SELECT  'TAS-120-203' ::TEXT AS studyid,
                         concat('TAS120_203','_',split_part("study_site",'_',1)) ::TEXT AS siteid,
                         "patient" ::TEXT AS usubjid,
                         1.3::NUMERIC AS dsseq, --deprecated

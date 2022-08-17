@@ -3,7 +3,7 @@ WITH included_subjects AS (
              
 
      ae_sev_toxgr_data AS (
-                SELECT  "project"::text AS studyid,
+                SELECT  'TAS-120-203'::text AS studyid,
                         concat(concat("project",'_'),split_part("SiteNumber",'_',2))::text AS siteid,
                         "Subject"::text AS usubjid,
                         "AETERM_PT"::text AS aeterm,

@@ -7,7 +7,7 @@ WITH included_studies AS (
                 SELECT studyid FROM study ),
 
      studyplannedstatistic_data AS (
-                SELECT  'TAS120_203'::text AS studyid,
+                SELECT  'TAS-120-203'::text AS studyid,
                         'SITE_ACTIVATION'::text AS statcat,
                         'COUNT'::text AS statsubcat,
                         count("actual_activation")::NUMERIC AS statval,

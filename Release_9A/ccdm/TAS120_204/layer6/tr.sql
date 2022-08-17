@@ -13,7 +13,7 @@ WITH included_subjects AS (
 				),	
 	tr_data AS (
 				SELECT DISTINCT
-               	project::text AS studyid,
+               	'TAS-120-204'::text AS studyid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS trseq,
@@ -58,9 +58,9 @@ WITH included_subjects AS (
 									)as t (cd1,trtestcd,trorres,trstresc,trstat)
 			
 			left join dm								
-			on project = dm."studyid" and concat(project,'_',split_part("SiteNumber",'_',2))::text  = dm.siteid and "Subject"= dm."usubjid"
+			on 'TAS-120-204' = dm."studyid" and concat(project,'_',split_part("SiteNumber",'_',2))::text  = dm.siteid and "Subject"= dm."usubjid"
 			left join  ex_visit a
-			on project = a."studyid"  and concat(project,'_',split_part("SiteNumber",'_',2))::text  = a.siteid and "Subject"= a."usubjid"
+			on 'TAS-120-204' = a."studyid"  and concat(project,'_',split_part("SiteNumber",'_',2))::text  = a.siteid and "Subject"= a."usubjid"
 			)
 SELECT
     /*KEY (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid)::text AS comprehendid, KEY*/  

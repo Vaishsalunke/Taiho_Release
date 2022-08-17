@@ -10,7 +10,7 @@ WITH included_subjects AS (
 
      cm_data AS (
                  -- TAS0621-101
-                 select studyid,
+                 select REPLACE (studyid, 'TAS0612_101', 'TAS0612-101') as studyid,
                  siteid,
                  usubjid,
                 -- row_number() over (partition by studyid, siteid, usubjid order by cmstdtc) as cmseq,

@@ -21,7 +21,7 @@ taiho_ms_standards AS (
                        where milestonelevel='Country'
                      ),
     countrymilestone_data AS (
-    select  studyid,
+    select replace(studyid ,'TAS120_201','TAS-120-201') as studyid,
             studyname,
             sitecountry,
             sitecountrycode,

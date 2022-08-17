@@ -40,7 +40,7 @@ and column_name not in ('__dq_flag','__generation_time','__hash','id_','comprehe
 
     sitemilestone_data AS (
        
-	 select studyid,
+	 select replace(studyid ,'TAS120_203','TAS-120-203') as studyid,
 	 studyname,
 	 siteid,
 	-- row_number() over (partition by studyid,siteid order by expecteddate,milestonelabel) as milestoneseq,

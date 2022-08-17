@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
     ex_data AS (             
              SELECT
-                ex."project"::	text AS studyid,
+                'TAS0612-101'::	text AS studyid,
                 'TAS0612_101':: text as studyname,
                 --ex."SiteNumber":: text AS siteid,
 				concat('TAS0612_101_',split_part(ex."SiteNumber",'_',2))::text AS siteid,

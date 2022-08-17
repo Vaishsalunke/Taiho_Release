@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
           eg_data AS (
-     SELECT    eg.studyid,
+     SELECT  replace(studyid ,'TAS120_201','TAS-120-201') as studyid,
                     eg.siteid,
                     eg.usubjid,
                     --(row_number() over (partition by eg.studyid, eg.siteid, eg.usubjid order by eg.egseq, eg.egdtc))::int AS egseq,

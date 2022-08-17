@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
      sv_data AS (
-                SELECT  "project"::text AS studyid,
+                SELECT  'TAS-120-201'::text AS studyid,
                         "SiteNumber"::text AS siteid,
                         "Subject"::text AS usubjid, 
                         "FolderSeq"::numeric AS visitnum,
@@ -41,7 +41,7 @@ WITH included_subjects AS (
                                     coalesce(datacollecteddate,dataentrydate)::date AS svendtc
                             FROM formdata fd
                             LEFT JOIN sv_data sd ON (fd.studyid = sd.studyid and fd.siteid = sd.siteid and fd.usubjid = sd.usubjid and fd.visit = sd.visit)
-                            WHERE sd.studyid IS NULL AND fd.studyid='TAS120_201'
+                            WHERE sd.studyid IS NULL AND fd.studyid='TAS-120-201'
                         ),
 						
 	all_visits AS (

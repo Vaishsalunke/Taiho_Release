@@ -59,7 +59,7 @@ SELECT 	DISTINCT
 from (        
 
 
-				SELECT  'TAS120_204'::text AS studyid,
+				SELECT  'TAS-120-204'::text AS studyid,
                         null::text AS studyname,
                         null::int AS milestoneseq,
                         milestone_name::text AS milestonelabel,
@@ -71,7 +71,7 @@ from (
 
 			union all 
 
-				SELECT  'TAS120_204'::text AS studyid,
+				SELECT  'TAS-120-204'::text AS studyid,
                         null::text AS studyname,
                         null::int AS milestoneseq,
                         milestone_name::text AS milestonelabel,

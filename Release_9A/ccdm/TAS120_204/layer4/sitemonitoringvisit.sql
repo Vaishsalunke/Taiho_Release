@@ -18,7 +18,7 @@ WITH included_sites AS (
 				   smvvtype,
 				   smvmethd
 			from (
-						SELECT  'TAS120_204'::text AS studyid,
+						SELECT  'TAS-120-204'::text AS studyid,
 								concat('TAS120_204_', right(site_number,3)) ::text AS siteid,
 								visit_name ::text AS visitname,
 								coalesce(nullif(sv."visit_completed_date",''),nullif(sv."planned_visit_date",''),nullif(sv."visit_start_date",''))::date AS visitdate,

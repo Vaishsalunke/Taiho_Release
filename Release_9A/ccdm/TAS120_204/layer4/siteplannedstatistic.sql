@@ -11,7 +11,7 @@ WITH included_sites AS (
                 SELECT DISTINCT studyid, siteid FROM site),
 
      siteplannedstatistic_data AS  (
-										SELECT  'TAS120_204'::text AS studyid,
+										SELECT  'TAS-120-204'::text AS studyid,
 												concat('TAS120_204_',split_part(site_number,'_',2))::text AS siteid,
 												'Site Activation'::text AS statcat,
 												'Count'::text AS statsubcat,

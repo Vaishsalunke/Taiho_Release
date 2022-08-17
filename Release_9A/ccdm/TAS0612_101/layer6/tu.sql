@@ -21,7 +21,7 @@ WITH included_subjects AS (
     tu_data AS (
         SELECT distinct
 		tu.comprehendid,
-        tu.studyid,
+        REPLACE (tu.studyid, 'TAS0612_101', 'TAS0612-101') as studyid,
         tu.siteid,
         tu.usubjid,
         ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc)::numeric as tuseq,

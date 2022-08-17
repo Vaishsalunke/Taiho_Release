@@ -8,7 +8,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      pe_data AS (
-                 SELECT "project"::text AS studyid,
+                 SELECT 'TAS0612-101'::text AS studyid,
                         --"SiteNumber"::text AS siteid,
 						concat('TAS0612_101_',split_part("SiteNumber",'_',2))::text AS siteid,
                         "Subject"::text AS usubjid,

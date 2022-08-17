@@ -20,7 +20,7 @@ ds_data AS (
 ----Disposition Event: All Subjects----
 
 SELECT distinct
-'TAS0612_101' ::text AS studyid,
+'TAS0612-101' ::text AS studyid,
 concat('TAS0612_101_',site_id) ::text AS siteid,
 s1.usubjid ::text AS usubjid,
 1.0::NUMERIC AS dsseq,
@@ -57,7 +57,7 @@ union all
 --Disposition Event: Screened
 
 SELECT  distinct
-'TAS0612_101'::text AS studyid,
+'TAS0612-101'::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
 s1.usubjid ::text AS usubjid,
 1.3::NUMERIC AS dsseq,
@@ -77,7 +77,7 @@ union all
 --Disposition Event: Failed Screen
 
 select studyid, siteid, usubjid, dsseq, dscat, dsterm, dsstdtc, string_agg(dsscat,';') as dsscat from (
-SELECT distinct 'TAS0612_101'::text AS studyid,
+SELECT distinct 'TAS0612-101'::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
 s2.usubjid ::text AS usubjid,
 2.1::NUMERIC AS dsseq,
@@ -87,11 +87,11 @@ screen_fail_date ::DATE AS dsstdtc,
 concat(i."IECAT",i."IETESTCD") ::text AS dsscat
 from tas0612_101_irt.subject s1
 left join tas0612_101."IE" i on
-('TAS0612_101'=i.project and
+('TAS0612-101'=i.project and
 concat('TAS0612_101_',s1.site_id) = concat(split_part(i."SiteNumber",'_',1),'_101_',split_part(i."SiteNumber",'_',2)) and
 s1.subject_number = i."Subject")
 left join subject s2 on
-s2.studyid = 'TAS0612_101' and
+s2.studyid = 'TAS0612-101' and
 s2.siteid = concat('TAS0612_101_',s1.site_id) and
 case when s2.usubjid like '%-P1' then split_part(s2.usubjid,'-P1',1) else s2.usubjid end = s1.subject_number
 where subject_status = 'Screen Failed')a
@@ -102,7 +102,7 @@ union all
 --Disposition Event: Enrollment
 
 SELECT  distinct
-'TAS0612_101' ::text AS studyid,
+'TAS0612-101' ::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
 s1.usubjid ::text AS usubjid,
 3.0::NUMERIC AS dsseq,
@@ -122,7 +122,7 @@ union all
 --Disposition Event: Early EOT
 
 SELECT distinct
-'TAS0612_101'::text AS studyid,
+'TAS0612-101'::text AS studyid,
 concat('TAS0612_101_',site_id)::text AS siteid,
 s1.usubjid ::text AS usubjid,
 4.01::NUMERIC AS dsseq,
@@ -142,7 +142,7 @@ union all
 
 --Disposition Event: Withdrawn
 
-SELECT  es."project"::text AS studyid,
+SELECT  'TAS0612-101'::text AS studyid,
 --es."SiteNumber"::text AS siteid,
 concat('TAS0612_101_',split_part(es."SiteNumber",'_',2))::text AS siteid,
 es."Subject"::text AS usubjid,

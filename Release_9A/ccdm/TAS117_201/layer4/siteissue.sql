@@ -7,7 +7,7 @@ WITH included_sites AS (
                 SELECT DISTINCT studyid, siteid FROM site ),
 
      siteissue_data AS (
-                SELECT  'TAS117_201' ::text AS studyid,
+                SELECT  'TAS117-201' ::text AS studyid,
                         concat('TAS117_201_',split_part(site_number,'_',2)) ::text AS siteid,
                         id_ ::int AS issueid,
                         issue_type ::text AS issuetype,

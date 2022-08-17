@@ -29,7 +29,7 @@ countrymilestone_data AS (
 			milestonecat
 			from (
  SELECT		distinct
-                'TAS120_204'::text AS studyid,
+                'TAS-120-204'::text AS studyid,
                 'TAS120_204'::text AS studyname,
                 src.country_name::text AS sitecountry,
                 src.alpha_3_code::text AS sitecountrycode,
@@ -59,7 +59,7 @@ countrymilestone_data AS (
    union 
    
     SELECT		distinct
-                'TAS120_204'::text AS studyid,
+                'TAS-120-204'::text AS studyid,
                 'TAS120_204'::text AS studyname,
                 src.country_name::text AS sitecountry,
                 src.alpha_3_code::text AS sitecountrycode,

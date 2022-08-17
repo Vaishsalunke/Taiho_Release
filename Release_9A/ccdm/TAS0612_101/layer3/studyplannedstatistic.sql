@@ -7,7 +7,7 @@ WITH included_studies AS (
                 SELECT studyid FROM study ),
 
      studyplannedstatistic_data AS (
-                SELECT  'TAS0612_101'::text AS studyid,
+                SELECT  'TAS0612-101'::text AS studyid,
                         'SITE_ACTIVATION'::text AS statcat,
                         'Count'::text AS statsubcat,
                         count(site_status_icon)::int AS statval,

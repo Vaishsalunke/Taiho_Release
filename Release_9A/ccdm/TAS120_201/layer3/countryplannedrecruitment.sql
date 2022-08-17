@@ -43,7 +43,7 @@ type,
 rc.rec_cnt as recruitmentcount
 from (
 SELECT DISTINCT
-										 'TAS120_201'::text AS studyid,
+										 'TAS-120-201'::text AS studyid,
 										 'TAS120_201'::text AS studyname,
 										 case
 										 When trim(ms.country) = 'USA' then 'United States of America'

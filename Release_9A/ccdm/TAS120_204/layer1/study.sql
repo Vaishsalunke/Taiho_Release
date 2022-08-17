@@ -4,7 +4,7 @@ Notes: Standard mapping to CCDM Study table
 */
 
 WITH study_data AS (
-                    SELECT  'TAS120_204'::text AS studyid,
+                    SELECT  'TAS-120-204'::text AS studyid,
                             'TAS120_204'::text AS studyname,
                             'A Phase 1b/2 open-label, nonrandomized study of FGFR inhibitor
 						futibatinib in combination with MEK-inhibitor binimetinib in patients

@@ -13,7 +13,7 @@ WITH included_studies AS (
 
    site_data AS (
 
-                SELECT distinct 'TAS120_202'::text AS studyid,
+                SELECT distinct 'TAS-120-202'::text AS studyid,
                         'TAS120_202_'||"site_#"::text AS siteid,
                         case when tss.sitename_std is null then psc."account_name"
 						else tss.sitename_std end::text AS sitename,

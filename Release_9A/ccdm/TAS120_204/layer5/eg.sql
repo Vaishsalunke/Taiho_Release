@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
      eg_data AS (
-                SELECT  distinct project ::text AS studyid,
+                SELECT  distinct 'TAS-120-204' ::text AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber"))::text AS siteid,
                         "Subject" ::text AS usubjid,
                         concat(concat("instanceId","RecordPosition"),12) ::int AS egseq,
@@ -39,7 +39,7 @@ WITH included_subjects AS (
                         from tas120_204."ECG" e 
                         
 	union all 
-				SELECT distinct project ::text AS studyid,
+				SELECT distinct 'TAS-120-204' ::text AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::text AS siteid,
                         "Subject" ::text AS usubjid,
                         concat(concat("instanceId","RecordPosition"),23) ::int AS egseq,

@@ -4,7 +4,7 @@ Notes: Standard mapping to CCDM Study table
 */
 
 WITH study_data AS (
-							SELECT  'TAS120_201'::text AS studyid,
+							SELECT  'TAS-120-201'::text AS studyid,
                             'TAS120_201'::text AS studyname,
                             'A Phase 2 Study of TAS-120 in Metastatic Breast Cancers Harboring Fibroblast Growth Factor Receptor (FGFR) Amplifications'::text AS studydescription,
                             'Active'::text AS studystatus,

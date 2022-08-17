@@ -4,7 +4,7 @@ Notes: Standard mapping to CCDM Study table
 */
 
 WITH study_data AS (
-                    SELECT  'TAS120_203'::text AS studyid,
+                    SELECT  'TAS-120-203'::text AS studyid,
                             'TAS120_203'::text AS studyname,
                             'A Phase 2 Study Evaluating Futibatinib (TAS-120) Plus
 							Pembrolizumab in the Treatment of Advanced or Metastatic

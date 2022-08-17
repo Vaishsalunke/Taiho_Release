@@ -8,7 +8,7 @@ WITH included_subjects AS (
      ds_data AS (
                 
 --DS Event: All Subjects
-						SELECT  project ::TEXT AS studyid,
+						SELECT  'TAS117-201' ::TEXT AS studyid,
                         concat('TAS117_201','_',split_part("SiteNumber",'_',2)) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         1.0::NUMERIC AS dsseq, 
@@ -54,7 +54,7 @@ WITH included_subjects AS (
 union all                          
 --Disposition Event: Failed Screen
 			SELECT  	
-			project  ::TEXT AS studyid,
+			'TAS117-201'  ::TEXT AS studyid,
 			concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::TEXT AS siteid,
 			"Subject" ::TEXT AS usubjid,
 			2.1::NUMERIC AS dsseq, 
@@ -78,7 +78,7 @@ group by	1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17
 
 union all                          
 --Disposition Event: Enrollment										                        
-						SELECT   project  ::TEXT AS studyid,
+						SELECT   'TAS117-201'  ::TEXT AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         3.0::NUMERIC AS dsseq, --deprecated
@@ -99,7 +99,7 @@ union all
                         from tas117_201."ENR" e where "ENPERF" ='Yes'
 union all                          
 --Disposition Event: Early EOT                        
-						SELECT  project ::TEXT AS studyid,
+						SELECT  'TAS117-201' ::TEXT AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         4.01::NUMERIC AS dsseq, 
@@ -121,7 +121,7 @@ union all
                         
 union all  
 --Disposition Event: Withdrawn										                        
-						SELECT  project ::TEXT AS studyid,
+						SELECT  'TAS117-201' ::TEXT AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         4.4::NUMERIC AS dsseq, --deprecated
@@ -143,7 +143,7 @@ union all
                         
 /*union all  
 --Disposition Event: Study Completion                        
-						SELECT  project ::TEXT AS studyid,
+						SELECT  'TAS117-201' ::TEXT AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         5.0::NUMERIC AS dsseq, 
@@ -164,7 +164,7 @@ union all
                         from tas117_201."EOS" e4 where "EOSREAS"  = ('Study Completion') */
 union all                          
 --Disposition Event: Screened                        
-						SELECT  project ::TEXT AS studyid,
+						SELECT  'TAS117-201' ::TEXT AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         1.3::NUMERIC AS dsseq, --deprecated

@@ -61,7 +61,7 @@ From tas120_202."DM"
 
      studyplannedrecruitment_data AS (
 	
-     	SELECT  'TAS120_202'::text AS studyid,
+     	SELECT  'TAS-120-202'::text AS studyid,
                         'Enrollment'::text AS category,
                         'Monthly'::text AS frequency,
                        max("ENRDAT")::date AS enddate,
@@ -76,7 +76,7 @@ From tas120_202."DM"
 				and sc.year = msub.year */
 	 
             union all
-                SELECT  'TAS120_202'::text AS studyid,
+                SELECT  'TAS-120-202'::text AS studyid,
                         'Site Activation'::text AS category,
                         'Monthly'::text AS frequency,                        
                          msite.planned_visit_date::date AS enddate,
@@ -87,7 +87,7 @@ From tas120_202."DM"
 				and sc.year = msite.year
 			   
             union all
-			SELECT  'TAS120_202'::text AS studyid,
+			SELECT  'TAS-120-202'::text AS studyid,
                         'Screening'::text AS category,
                         'Monthly'::text AS frequency,
                         mscr.screening_date::date AS enddate,

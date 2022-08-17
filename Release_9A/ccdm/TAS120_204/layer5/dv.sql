@@ -21,7 +21,7 @@ WITH included_subjects AS (
 						dvid,
 						dvcls
 				from (  
-		                SELECT  'TAS120_204'::text AS studyid,
+		                SELECT  'TAS-120-204'::text AS studyid,
 		                        concat('TAS120_204_', right(site_number,3)) ::text AS siteid,
 		                        screening_no ::text AS usubjid,
 		                        nullif(visit_reference,'') ::text AS visit,

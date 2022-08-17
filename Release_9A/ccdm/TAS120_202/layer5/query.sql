@@ -7,7 +7,7 @@ WITH included_site AS (
 SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),
 included_subjects AS (
 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
-querydata as(SELECT 'TAS120_202'::text AS studyId,
+querydata as(SELECT 'TAS-120-202'::text AS studyId,
 concat('TAS120_202_',left("sitename"::text, strpos("sitename", '_') - 1))::text AS siteId,
 "subjectname"::text AS usubjId,
 "id_"::text AS queryId,

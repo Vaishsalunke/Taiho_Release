@@ -7,7 +7,7 @@ WITH included_sites AS (
                 SELECT DISTINCT studyid, siteid FROM site),
                 
      sitemilestone_data AS (   
-	 select studyid,
+	 select replace(studyid ,'TAS120_204','TAS-120-204') as studyid,
 	 studyname,
 	 siteid,
 	 --row_number() over (partition by studyid,siteid order by expecteddate,milestonelabel) as milestoneseq,

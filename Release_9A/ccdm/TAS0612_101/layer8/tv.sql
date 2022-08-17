@@ -26,7 +26,7 @@ OR lower(visit) like '% day 1 %' OR lower(visit) like '% day 1<%') or (lower(vis
 OR lower(visit) like '% day 01 %' OR lower(visit) like '% day 01<%') or (lower(visit) like '%day 1-%') or (lower(visit) like '%day 01-%')) then 'True' else null end as isbaselinevisit
 from (
 	SELECT
-		'TAS0612_101'::text AS studyid,
+		'TAS0612-101'::text AS studyid,
 		visitnum::numeric AS visitnum,
 		visit::text AS visit,
 		visitdy::int AS visitdy,

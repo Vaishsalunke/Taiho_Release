@@ -19,7 +19,7 @@ WITH included_studies AS (
 					  from TAS0612_101_ctms."milestone_status_site" ),
 	 
      studycountry_data AS (
-                  SELECT distinct 'TAS0612_101'::text AS studyid,				
+                  SELECT distinct 'TAS0612-101'::text AS studyid,				
 						coalesce(case when sc.country_name = 'United States' then 'United States of America' else sc.country_name end,'')::text AS country_src,
                         ''::text AS countrystatus_src,
                         ''::text AS countrystatus,

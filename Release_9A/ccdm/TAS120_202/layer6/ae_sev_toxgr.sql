@@ -3,7 +3,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      ae_sev_toxgr_data AS (
-                SELECT  "project"::text AS studyid,
+                SELECT  'TAS-120-201'::text AS studyid,
                         "SiteNumber"::text AS siteid,
                         "Subject"::text AS usubjid,
                         "AETERM_PT"::text AS aeterm,

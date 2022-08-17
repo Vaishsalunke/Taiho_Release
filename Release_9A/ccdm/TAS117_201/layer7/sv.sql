@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
      sv_data AS (
                 --screening
-SELECT  project ::text AS studyid,
+SELECT  'TAS117-201'::text AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::text AS siteid,
                         "Subject" ::text AS usubjid, 
                         "FolderSeq" ::numeric AS visitnum,
@@ -28,7 +28,7 @@ SELECT  project ::text AS studyid,
 union all
 ---C1D1
 
-SELECT  project ::text AS studyid,
+SELECT  'TAS117-201'::text AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::text AS siteid,
                         "Subject" ::text AS usubjid, 
                         "FolderSeq" ::numeric AS visitnum,
@@ -48,7 +48,7 @@ SELECT  project ::text AS studyid,
 union all
 ---C1D8
 
-SELECT  project ::text AS studyid,
+SELECT  'TAS117-201'::text AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::text AS siteid,
                         "Subject" ::text AS usubjid, 
                         "FolderSeq" ::numeric AS visitnum,
@@ -68,7 +68,7 @@ SELECT  project ::text AS studyid,
 union all
 ---C1D15
 
-SELECT  project ::text AS studyid,
+SELECT  'TAS117-201'::text AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::text AS siteid,
                         "Subject" ::text AS usubjid, 
                         "FolderSeq" ::numeric AS visitnum,
@@ -88,7 +88,7 @@ SELECT  project ::text AS studyid,
 union all
 ---Cycle 2 Onwards
 
-SELECT  project ::text AS studyid,
+SELECT  'TAS117-201'::text AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::text AS siteid,
                         "Subject" ::text AS usubjid, 
                         "FolderSeq" ::numeric AS visitnum,
@@ -108,7 +108,7 @@ SELECT  project ::text AS studyid,
 union all
 ---Safety Follow Up
 
-SELECT  project ::text AS studyid,
+SELECT  'TAS117-201'::text AS studyid,
                         concat(project,substring("SiteNumber",position('_' in "SiteNumber"))) ::text AS siteid,
                         "Subject" ::text AS usubjid, 
                         "FolderSeq" ::numeric AS visitnum,
@@ -143,7 +143,7 @@ SELECT  project ::text AS studyid,
                                     coalesce(datacollecteddate,dataentrydate)::date AS svendtc
                             FROM formdata fd
                             LEFT JOIN sv_data sd ON (fd.studyid = sd.studyid and fd.siteid = sd.siteid and fd.usubjid = sd.usubjid and trim(fd.visit) = trim(sd.visit))
-                            WHERE sd.studyid IS NULL AND fd.studyid='TAS117_201'),
+                            WHERE sd.studyid IS NULL AND fd.studyid='TAS117-201'),
                                  
                         all_visits AS (
                         SELECT studyid,
@@ -157,7 +157,7 @@ SELECT  project ::text AS studyid,
                                 svendtc 
                         FROM sv_data
                         UNION ALL
-                        SELECT studyid,--'TAS117_201' as studyname,
+                        SELECT studyid,--'TAS117-201' as studyname,
                                 siteid,
                                 usubjid,
                                 visitnum,

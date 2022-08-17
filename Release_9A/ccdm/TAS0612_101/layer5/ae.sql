@@ -10,7 +10,7 @@ included_site AS (
 	SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),	
 
     ae_data AS (
-SELECT "project"::text AS studyid,
+SELECT 'TAS0612-101'::text AS studyid,
                        concat(concat("project",'_'),split_part("SiteNumber",'_',2))::text AS siteid,
                        ae."Subject"::text AS usubjid,
                        nullif(ae."AETERM_PT",'')::text AS aeterm,

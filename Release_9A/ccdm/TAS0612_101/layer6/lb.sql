@@ -79,7 +79,7 @@ WITH    included_subjects AS ( SELECT DISTINCT studyid, siteid, usubjid FROM sub
                     ),
    
         lb_data AS (
-                select      lb.studyid,
+                select      studyid,
                             lb.siteid,
                             lb.usubjid,
                             trim(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE
@@ -364,7 +364,7 @@ group by ex_max.studyid,ex_max.siteid,ex_max.usubjid,labtest,visit,Seq
    
 final_lb as
         (
-        select  distinct  lb.studyid,
+        select  distinct  REPLACE (lb.studyid, 'TAS0612_101', 'TAS0612-101') as studyid,
                     lb.siteid,
                     lb.usubjid,
                     lb.visit,

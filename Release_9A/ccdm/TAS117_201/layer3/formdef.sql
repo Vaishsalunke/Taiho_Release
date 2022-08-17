@@ -22,7 +22,7 @@ left join sdv on rd."FormDefOID" = sdv."FormDefOID")
 
 ,formdef_data as (
 select
-'TAS117_201'::text as studyid,
+'TAS117-201'::text as studyid,
 "OID"::text as formid,
 "Name"::text as formname,
 false ::boolean AS isprimaryendpoint,

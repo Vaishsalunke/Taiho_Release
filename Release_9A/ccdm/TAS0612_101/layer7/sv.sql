@@ -43,11 +43,11 @@ WITH included_subjects AS (
                                     coalesce(datacollecteddate,dataentrydate)::date AS svendtc
                             FROM formdata fd
                             LEFT JOIN sv_data sd ON (fd.studyid = sd.studyid and fd.siteid = sd.siteid and fd.usubjid = sd.usubjid and fd.visit = sd.visit)
-                            WHERE sd.studyid IS NULL AND fd.studyid='TAS0612_101'
+                            WHERE sd.studyid IS NULL AND fd.studyid='TAS0612-101'
                         ),
 						
 	all_visits AS (
-	SELECT  v.studyid,
+	SELECT replace (v.studyid,'TAS0612_101','TAS0612-101') as studyid,
                                 v.siteid,
                                 v.usubjid,
                                 v.visitnum,

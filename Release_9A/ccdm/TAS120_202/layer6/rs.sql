@@ -23,7 +23,7 @@ WITH included_subjects AS (
 				end::text AS rsevlint
     			 from(
         select distinct rs.comprehendid,
-						rs.studyid,
+						replace(rs.studyid ,'TAS120_202','TAS-120-202') as studyid,
 						rs.siteid,
 						rs.usubjid,
 						rsseq,

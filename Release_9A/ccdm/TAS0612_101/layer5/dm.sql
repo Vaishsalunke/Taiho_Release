@@ -16,7 +16,7 @@ with included_subjects as ( select 	distinct studyid, siteid, usubjid from subje
 			  ),
 	
 
-dm_dm2 as(select	dm."project"::text as studyid,
+dm_dm2 as(select	'TAS0612-101'::text as studyid,
 					concat('TAS0612_101_',split_part(dm."SiteNumber",'_',2))::text as siteid,
 					dm."Subject"::text as usubjid,
 					dm."FolderSeq"::numeric as visitnum,
@@ -37,8 +37,8 @@ dm_dm2 as(select	dm."project"::text as studyid,
 					tr."TAPHASE" :: text as armcd,
 					tr."TAPHASE" :: text as arm
 		 from		tas0612_101."DM" dm
-		 left join ex_data e3 on dm."project" = e3.project and dm."SiteNumber"= e3."SiteNumber"and dm."Subject" =e3."Subject"
-		 left join tas0612_101."TREAT" tr on dm."project" = tr.project and dm."SiteNumber" = tr."SiteNumber" and dm."Subject" = tr."Subject" 
+		 left join ex_data e3 on 'TAS0612-101' = e3.project and dm."SiteNumber"= e3."SiteNumber"and dm."Subject" =e3."Subject"
+		 left join tas0612_101."TREAT" tr on 'TAS0612-101' = tr.project and dm."SiteNumber" = tr."SiteNumber" and dm."Subject" = tr."Subject" 
 		 ) 
 SELECT 
         /*KEY (dm.studyid || '~' || dm.siteid || '~' || dm.usubjid)::text AS comprehendid, KEY*/

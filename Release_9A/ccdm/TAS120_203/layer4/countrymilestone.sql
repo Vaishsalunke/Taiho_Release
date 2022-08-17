@@ -32,7 +32,7 @@ with included_studies AS (
 			
             from (
         SELECT  Distinct
-                'TAS120_203'::text AS studyid,
+                'TAS-120-203'::text AS studyid,
                 'TAS120_203'::text AS studyname,
                 src.country_name::text AS sitecountry,
                 "country"::text AS sitecountrycode,
@@ -59,7 +59,7 @@ with included_studies AS (
    where tms.milestonelevel ='Country'
    UNION
    SELECT  Distinct
-                'TAS120_203'::text AS studyid,
+                'TAS-120-203'::text AS studyid,
                 'TAS120_203'::text AS studyname,
                 src.country_name::text AS sitecountry,
                 "country"::text AS sitecountrycode,

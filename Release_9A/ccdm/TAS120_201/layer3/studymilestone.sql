@@ -28,7 +28,7 @@ WITH included_studies AS (
   ),
 	
      studymilestone_data AS (
-                SELECT  'TAS120_201'::text AS studyid,
+                SELECT  'TAS-120-201'::text AS studyid,
                         ms.milestoneseq::int AS milestoneseq,
 						replace(replace (replace (event_desc, 'Last Subject 1st Visit','LAST SUBJECT IN'),'1st Subject 1st Treatment','FIRST SUBJECT IN'),'Planned','')::text AS milestonelabel,
                         'Planned'::text AS milestonetype,
@@ -42,7 +42,7 @@ WITH included_studies AS (
                                                 
                         union all
 
-                          SELECT  'TAS120_201'::text AS studyid,
+                          SELECT  'TAS-120-201'::text AS studyid,
                         ms.milestoneseq::int AS milestoneseq,
                          replace(replace (replace (event_desc, 'Last Subject 1st Visit','LAST SUBJECT IN'),'1st Subject 1st Treatment','FIRST SUBJECT IN'),'Planned','')::text AS milestonelabel,
 						 'Actual'::text AS milestonetype,

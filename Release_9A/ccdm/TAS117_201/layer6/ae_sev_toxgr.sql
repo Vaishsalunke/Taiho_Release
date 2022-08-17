@@ -5,7 +5,7 @@ WITH included_subjects AS (
 SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregion FROM site),  
 
      ae_sev_toxgr_data AS (
-                SELECT  "project"::text AS studyid,
+                SELECT  'TAS117-201'::text AS studyid,
                         concat(concat("project",'_'),split_part("SiteNumber",'_',2))::text AS siteid,
                         "Subject"::text AS usubjid,
                         "AETERM_PT"::text AS aeterm,

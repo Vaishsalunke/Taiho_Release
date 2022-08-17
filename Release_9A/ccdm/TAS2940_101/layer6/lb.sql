@@ -345,7 +345,7 @@ group by ex_max.studyid,ex_max.siteid,ex_max.usubjid,labtest,visit,Seq
    
 final_lb as
         (
-        select  distinct  lb.studyid,
+        select  distinct  REPLACE (lb.studyid,'TAS2940_101','TAS2940-101') AS studyid,
                     lb.siteid,
                     lb.usubjid,
                     lb.visit,

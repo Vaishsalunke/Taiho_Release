@@ -48,10 +48,10 @@ sv.svendtc from(
                                     coalesce(datacollecteddate,dataentrydate)::date AS svendtc
                             FROM formdata fd
                             LEFT JOIN sv_data sd ON (fd.studyid = sd.studyid and fd.siteid = sd.siteid and fd.usubjid = sd.usubjid and trim(fd.visit) = trim(sd.visit))
-                            WHERE sd.studyid IS NULL AND fd.studyid='TAS120_203'),
+                            WHERE sd.studyid IS NULL AND fd.studyid='TAS-120-203'),
                                  
                         all_visits AS (
-                        SELECT studyid,
+                        SELECT replace (studyid,'TAS120_203','TAS-120-203') as studyid,
                         	   studyname,
                                 siteid,
                                 usubjid,

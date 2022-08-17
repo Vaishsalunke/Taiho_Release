@@ -9,7 +9,7 @@ WITH included_studies AS (
                 
      studymilestone_data AS (
      		select * from(
-		     			SELECT  'TAS120_203'::text AS studyid,
+		     			SELECT  'TAS-120-203'::text AS studyid,
 								 null::text AS studyname,
 								 case
 							     when evt_desc = '1st Site Selected' then 1
@@ -30,7 +30,7 @@ WITH included_studies AS (
 		                        from tas120_203_ctms.study_milestones
 		                        
 		                        union all
-		                SELECT  'TAS120_203'::text AS studyid,
+		                SELECT  'TAS-120-203'::text AS studyid,
 		                        null::text AS studyname,
 		                         case
 							     when evt_desc = '1st Site Selected' then 1

@@ -86,7 +86,7 @@ max_date_screen as 		(
 							 )	,					 
 
 studyplannedrecruitment_data AS (
-				 SELECT  'TAS120_204'::text AS studyid,
+				 SELECT  'TAS-120-204'::text AS studyid,
                         'Enrollment'::text AS category,
                         'Monthly'::text AS frequency,
                         mds.completed_date::date AS enddate,
@@ -100,7 +100,7 @@ studyplannedrecruitment_data AS (
 
 union all 
 
-				SELECT  'TAS120_204'::text AS studyid,
+				SELECT  'TAS-120-204'::text AS studyid,
                         'Site Activation'::text AS category,
                         'Monthly'::text AS frequency,
                         mds.planned_visit_date::date AS enddate,
@@ -113,7 +113,7 @@ union all
 
 union all 
 
-				SELECT  'TAS120_204'::text AS studyid,
+				SELECT  'TAS-120-204'::text AS studyid,
                         'Screening'::text AS category,
                         'Monthly'::text AS frequency,
                         mds.screening_date::date AS enddate,

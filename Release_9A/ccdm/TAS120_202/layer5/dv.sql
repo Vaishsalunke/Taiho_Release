@@ -18,7 +18,7 @@ WITH included_subjects AS (
 						dvscat,
 						dvid
 				from (
-					  SELECT  distinct 'TAS120_202'::text AS studyid,
+					  SELECT  distinct 'TAS-120-202'::text AS studyid,
 									   'TAS120_202_'||"site_#"::text AS siteid,
 									   "subject_#"::text AS usubjid,
 									   null::text AS visit,

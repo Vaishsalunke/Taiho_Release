@@ -43,7 +43,7 @@ taiho_ms_standards AS (
 			
             from (
         SELECT  Distinct
-                'TAS2940_101'::text AS studyid,
+                'TAS2940-101'::text AS studyid,
                 'TAS2940_101'::text AS studyname,
                 src.country_name::text AS sitecountry,
                 country::text AS sitecountrycode,                
@@ -66,7 +66,7 @@ taiho_ms_standards AS (
    left join taiho_ms_standards tms on trim(upper(event_desc)) = trim(upper(start_original_label))
    UNION
    SELECT  Distinct
-                'TAS2940_101'::text AS studyid,
+                'TAS2940-101'::text AS studyid,
                 'TAS2940_101'::text AS studyname,
                 src.country_name::text AS sitecountry,
                 country::text AS sitecountrycode,

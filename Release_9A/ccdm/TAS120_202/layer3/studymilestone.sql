@@ -27,7 +27,7 @@ WITH included_studies AS (
      iscriticalpath
      from
      (
-                SELECT  'TAS120_202'::text AS studyid,
+                SELECT  'TAS-120-202'::text AS studyid,
                         ms.milestoneseq::int AS milestoneseq,
                         sm."type"::text AS milestonelabel,
                         'Planned'::text AS milestonetype,
@@ -40,7 +40,7 @@ WITH included_studies AS (
                         
                         union all
                         
-                SELECT  'TAS120_202'::text AS studyid,
+                SELECT  'TAS-120-202'::text AS studyid,
                         ms.milestoneseq::int AS milestoneseq,
                         sm."type"::text AS milestonelabel,
                         'Actual'::text AS milestonetype,

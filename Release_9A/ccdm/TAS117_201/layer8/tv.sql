@@ -17,7 +17,7 @@ tv_scheduled AS (
 				
 
 tv_data AS (
-select studyid,
+select replace(studyid ,'TAS117_201','TAS117-201') as studyid,
 visitnum,
 visit,
 visitdy,
@@ -29,7 +29,7 @@ OR lower(visit) like '% day 01 %' OR lower(visit) like '% day 01<%') or (lower(v
 from (
 
 	SELECT
-		'TAS117_201'::text AS studyid,
+		'TAS117-201'::text AS studyid,
 		visitnum::numeric AS visitnum,
 		visit::text AS visit,
 		visitdy::int AS visitdy,

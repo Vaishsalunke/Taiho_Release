@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
           cm_data AS (
                 SELECT 
-				"project"	::text	AS	studyid	,
+				'TAS-120-201'	::text	AS	studyid	,
 				"SiteNumber"	::text	AS	siteid	,
 				"Subject"	::text	AS	usubjid	,
 				concat("RecordPosition","InstanceRepeatNumber","PageRepeatNumber")::integer AS cmseq,

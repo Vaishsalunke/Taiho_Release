@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
      ie_data AS (
-				SELECT  "project"::text AS studyid,
+				SELECT  'TAS0612-101'::text AS studyid,
                         concat(concat("project",'_'),split_part("SiteNumber",'_',2))::text AS siteid,
                         "Subject"::text AS usubjid,
                         "FolderSeq"::numeric AS visitnum,

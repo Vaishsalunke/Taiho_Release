@@ -8,7 +8,7 @@ WITH included_subjects AS (
                 
                 vs_data AS (
                 select 
-                     studyid,
+                     REPLACE (studyid,'TAS0612_101','TAS0612-101') as studyid,
                      siteid, 
                      usubjid,
                      case when vstest='Diastolic Blood Pressure' then concat(vsseq,12)

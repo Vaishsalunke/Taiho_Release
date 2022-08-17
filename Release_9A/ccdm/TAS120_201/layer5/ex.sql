@@ -7,7 +7,7 @@ WITH included_subjects AS (
 
      ex_data AS (
 SELECT
-     studyid,
+     replace(studyid ,'TAS120_201','TAS-120-201') as studyid,
      siteid,
      usubjid,
      row_number() over (partition by ex."studyid", ex."siteid", ex."usubjid" ORDER BY ex."exstdtc")::int AS exseq,

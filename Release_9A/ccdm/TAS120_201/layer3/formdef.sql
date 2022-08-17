@@ -21,7 +21,7 @@ left join sdv on rd."FormDefOID" = sdv."FormDefOID")
 
 ,formdef_data as (
 select
-'TAS120_201'::text as studyid,
+'TAS-120-201'::text as studyid,
 "OID"::text as formid,
 "Name"::text as formname,
 case when UPPER(nullif("OID",''))= 'COA' then True else False end::boolean AS isprimaryendpoint,

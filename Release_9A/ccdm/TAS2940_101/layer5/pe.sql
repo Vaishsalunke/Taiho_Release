@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      pe_data AS (
-                SELECT  project ::text AS studyid,
+                SELECT  'TAS2940-101' ::text AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::text AS siteid,
                         "Subject" ::text AS usubjid,
                         concat("RecordPosition","instanceId","PageRepeatNumber")::int AS peseq,

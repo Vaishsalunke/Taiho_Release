@@ -5,7 +5,7 @@ Notes: Standard mapping to CCDM Study table
 
 
 WITH study_data AS (
-                     SELECT  'TAS120_202'::text AS studyid,
+                     SELECT  'TAS-120-202'::text AS studyid,
                             'TAS120_202'::text AS studyname,
                             'A PHASE 2 STUDY OF FUTIBATINIB IN PATIENTS WITH SPECIFIC FGFR ABERRATIONS'::text AS studydescription,
                             'Active'::text AS studystatus,

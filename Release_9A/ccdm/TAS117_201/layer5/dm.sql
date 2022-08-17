@@ -11,7 +11,7 @@ WITH included_subjects AS (
      group by 1,2,3),
 
      dm_data AS (
-                SELECT  d.project ::text AS studyid,
+                SELECT  'TAS117-201' ::text AS studyid,
                         null::text AS studyname,
                         concat(d.project,substring(d."SiteNumber",position('_' in d."SiteNumber"))) ::text AS siteid,
                         null::text AS sitename,
@@ -37,11 +37,11 @@ WITH included_subjects AS (
                         null::text AS brthdtc_iso
                         from tas117_201."DM" d 
                         left join tas117_201."ENR" e 
-                        on d.project = e.project and d."SiteNumber"= e."SiteNumber" and d."Subject" =e."Subject"
+                        on 'TAS117-201' = e.project and d."SiteNumber"= e."SiteNumber" and d."Subject" =e."Subject"
                         left join tas117_201."EOT" e2 
-                        on d.project = e2.project and d."SiteNumber"= e2."SiteNumber" and d."Subject" =e2."Subject"
+                        on 'TAS117-201' = e2.project and d."SiteNumber"= e2."SiteNumber" and d."Subject" =e2."Subject"
                         left join ex_data e3 
-                        on d.project = e3.project and d."SiteNumber"= e3."SiteNumber"and d."Subject" =e3."Subject"
+                        on 'TAS117-201' = e3.project and d."SiteNumber"= e3."SiteNumber"and d."Subject" =e3."Subject"
                          ),
 	
      site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)

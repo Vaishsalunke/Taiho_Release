@@ -24,7 +24,7 @@ WITH included_subjects AS (
 	 visitnum,
 	 pcdtc
 	 from (
-                SELECT  pc."project"::text AS studyid,
+                SELECT  'TAS-120-201'::text AS studyid,
                         pc."SiteNumber"::text AS siteid,
                         pc."Subject"::text AS usubjid,
                         null::int AS pcseq,

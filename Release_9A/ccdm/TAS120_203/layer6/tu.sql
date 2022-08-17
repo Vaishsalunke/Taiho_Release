@@ -20,7 +20,7 @@ WITH included_subjects AS (
 				),
 				
     tu_data AS (
-        SELECT  distinct Study::text AS studyid,
+        SELECT  distinct replace(Study ,'TAS120_203','TAS-120-203')::text AS studyid,
                 SiteNumber::text AS siteid,
                 Subject::text AS usubjid,
                 ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric as tuseq,

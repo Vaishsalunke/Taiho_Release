@@ -5,7 +5,7 @@ Notes: Standard mapping to CCDM Study table
 
 
 WITH study_data AS (
-                     SELECT  'TAS0612_101'::text AS studyid,
+                     SELECT  'TAS0612-101'::text AS studyid,
                             'TAS0612_101'::text AS studyname,
                             'A Phase 1 Study of TAS0612 in Patients with Locally Advanced or Metastatic Solid Tumors'::text AS studydescription,
                             'Active'::text AS studystatus,

@@ -12,7 +12,7 @@ ex_data as (select		project, "SiteNumber" , "Subject" , max("EXOENDAT") as exdat
 			from		tas120_202."EXO"  
 			group by 	project, "SiteNumber", "Subject"),
 
-dm_dm2 as(select distinct dm."project"::text as studyid,
+dm_dm2 as(select distinct 'TAS-120-202'::text as studyid,
 dm."SiteNumber"::text as siteid,
 dm."Subject"::text as usubjid,
 dm."FolderSeq"::numeric as visitnum,
@@ -32,8 +32,8 @@ dm."DMETHNIC"::text as ethnicity,
 null:: text as armcd,
 dm."DMCOH":: text as arm
 from tas120_202."DM" dm
-left join ex_data e1 on (dm.project = e1.project and dm."SiteNumber" = e1."SiteNumber" and dm."Subject" = e1."Subject")
-left join tas120_202."EOT" e on (dm.project = e.project and dm."SiteNumber" = e."SiteNumber" and dm."Subject" = e."Subject")
+left join ex_data e1 on ('TAS-120-202' = e1.project and dm."SiteNumber" = e1."SiteNumber" and dm."Subject" = e1."Subject")
+left join tas120_202."EOT" e on ('TAS-120-202' = e.project and dm."SiteNumber" = e."SiteNumber" and dm."Subject" = e."Subject")
 )
 
 SELECT

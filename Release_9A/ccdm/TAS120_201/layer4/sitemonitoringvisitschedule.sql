@@ -7,7 +7,7 @@ WITH included_sites AS (
                 SELECT DISTINCT studyid, siteid FROM site ),
 
      sitemonitoringvisitschedule_data AS (
-               SELECT  'TAS120_201'::text AS studyid,
+               SELECT  'TAS-120-201'::text AS studyid,
                         concat('TAS120_201_',site_id)::text AS siteid,
 						 "site_status"::text  as visitname,
 						 --case when "siv_plannned_date"='NULL' then Null else "siv_plannned_date" end ::date AS plannedvisitdate,

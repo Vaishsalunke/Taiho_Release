@@ -7,7 +7,7 @@ WITH included_sites AS (
                 SELECT DISTINCT studyid, siteid FROM site ),
 
      sitemonitoringvisitschedule_data AS (
-               SELECT  'TAS0612_101'::text AS studyid,
+               SELECT  'TAS0612-101'::text AS studyid,
                         concat('TAS0612_101_',"site_id")::text AS siteid,
 						 "site_status"::text  as visitname,
 						 "siv_plannned_date"::date AS plannedvisitdate,

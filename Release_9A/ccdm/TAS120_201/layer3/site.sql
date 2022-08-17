@@ -9,7 +9,7 @@ WITH included_studies AS (
                 
     site_data AS (
   
-    SELECT  distinct 'TAS120_201'::text AS studyid,
+    SELECT  distinct 'TAS-120-201'::text AS studyid,
 			NULL::text AS studyname,
                         "oid"::text AS siteid,
                         case when tss.sitename_std is null then split_part(s."name",'_',2)

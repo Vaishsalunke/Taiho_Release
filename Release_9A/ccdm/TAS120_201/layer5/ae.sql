@@ -6,7 +6,7 @@ Notes: Standard mapping to CCDM AE table
 WITH included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      ae_data AS (
-SELECT studyid,
+SELECT replace(studyid ,'TAS120_201','TAS-120-201') as studyid,
                        siteid,
                        usubjid,
                        aeterm,

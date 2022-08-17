@@ -17,7 +17,7 @@ WITH included_subjects AS (
 				
     tr_data AS (
         select distinct u.comprehendid,
-						u.studyid,
+						REPLACE (u.studyid, 'TAS0612_101', 'TAS0612-101') as studyid,
 						u.siteid,
 						u.usubjid,
 						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as trseq,

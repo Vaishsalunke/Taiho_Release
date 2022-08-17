@@ -23,7 +23,7 @@ WITH included_subjects AS (
 				case when rsdtc1::date-prev_visit_date::date is not null then concat((rsdtc1::date-prev_visit_date::date)::numeric,' Days')
 				end::text AS rsevlint
     			 from(
-        select distinct u.studyid,
+        select distinct replace(u.studyid ,'TAS120_201','TAS-120-201') as studyid,
                         u.siteid,
 						u.usubjid,						
 						rsseq,

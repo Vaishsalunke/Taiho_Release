@@ -13,7 +13,7 @@ where visit like '%Cycle 1 Day 1' and exdose is not null
 ),
     tu_data AS (
         SELECT  distinct
-        study::text AS studyid,
+        REPLACE (study,'TAS120_204','TAS-120-204') as studyid,
                 concat(study,'_',split_part(tu.siteid,'_',2))::text AS siteid,
                 tu.usubjid::text AS usubjid,
                 (ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc))::numeric AS tuseq,

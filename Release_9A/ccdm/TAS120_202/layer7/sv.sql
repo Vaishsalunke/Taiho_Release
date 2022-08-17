@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 sv_data AS (
 Select
-sv.studyid,
+studyid,
 sv.siteid,
 sv.usubjid,
 sv.visitnum,
@@ -113,11 +113,11 @@ group by 1,2,3,4,5,6) sv
                                     coalesce(datacollecteddate,dataentrydate)::date AS svendtc
                             FROM formdata fd
                             LEFT JOIN sv_data sd ON (fd.studyid = sd.studyid and fd.siteid = sd.siteid and fd.usubjid = sd.usubjid and trim(fd.visit) = trim(sd.visit))
-                            WHERE sd.studyid IS NULL AND fd.studyid='TAS120_202'
+                            WHERE sd.studyid IS NULL AND fd.studyid='TAS-120-202'
                         ),
 
 all_visits AS (
-                        SELECT studyid,
+                        SELECT replace (studyid, 'TAS120_202','TAS-120-202') AS studyid,
                                 siteid,
                                 usubjid,
                                 visitnum,

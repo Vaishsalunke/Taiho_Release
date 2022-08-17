@@ -20,7 +20,7 @@ WITH included_subjects AS (
 				),
     tu_data AS (
     
-        SELECT  distinct Study::text AS studyid,
+        SELECT  distinct REPLACE(Study,'TAS2940_101','TAS2940-101')::text AS studyid,
         		SiteNumber::text AS siteid,
         		Subject::text AS usubjid,
                 ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric AS tuseq,
@@ -177,9 +177,9 @@ WITH included_subjects AS (
 					
 		)tu	
 		left join 	ex_data e1
-		on			'TAS2940_101'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
+		on			'TAS2940-101'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		left join	ex_visit e2
-		on			'TAS2940_101'=e2.studyid and SiteNumber=e2.siteid and tu.Subject= e2.usubjid
+		on			'TAS2940-101'=e2.studyid and SiteNumber=e2.siteid and tu.Subject= e2.usubjid
 		
 		)
 

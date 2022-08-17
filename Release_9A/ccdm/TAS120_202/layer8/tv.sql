@@ -27,7 +27,7 @@ OR lower(visit) like '% day 01 %' OR lower(visit) like '% day 01<%') or (lower(v
 			from
 			(
 	SELECT
-		'TAS120_202'::text AS studyid,
+		'TAS-120-202'::text AS studyid,
 		visitnum::numeric AS visitnum,
 		visit::text AS visit,
 		visitdy::int AS visitdy,

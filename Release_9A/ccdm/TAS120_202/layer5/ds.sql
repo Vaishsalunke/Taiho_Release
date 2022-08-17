@@ -12,7 +12,7 @@ WITH included_subjects AS (
 
      ds_data AS (
            select distinct
-                'TAS120_202'::TEXT AS studyid,
+                'TAS-120-202'::TEXT AS studyid,
                         concat('TAS120_202_',study_site) ::TEXT AS siteid,
                         patient ::TEXT AS usubjid,
                         1.0::NUMERIC AS dsseq, --deprecated
@@ -54,7 +54,7 @@ union all */
 --Disposition Event : Screened
 
 select
-                      'TAS120_202'::TEXT AS studyid,
+                      'TAS-120-202'::TEXT AS studyid,
                         concat('TAS120_202_',study_site) ::TEXT AS siteid,
                         patient ::TEXT AS usubjid,
                         1.3::NUMERIC AS dsseq, --deprecated
@@ -69,7 +69,7 @@ union all
 --Disposition Event: Failed Screen
 
 select studyid,siteid,usubjid,dsseq,dscat,dsterm,dsstdtc, string_agg(dsscat,';') from (
-select 'TAS120_202' ::TEXT AS studyid,
+select 'TAS-120-202' ::TEXT AS studyid,
                         concat('TAS120_202_',study_site) ::TEXT AS siteid,
                       patient ::TEXT AS usubjid,
                         2.1::NUMERIC AS dsseq, --deprecated
@@ -78,7 +78,7 @@ select 'TAS120_202' ::TEXT AS studyid,
                         actual_date ::DATE AS dsstdtc,
                         concat(concat("IECAT",' '), "IETESTCD")  ::TEXT AS dsscat
                         from tas120_202_irt.patient_visit_summary pvs2
-                        left join tas120_202."IE" i on ('TAS120_202'=i."project" and concat('TAS120_202_',pvs2.study_site) = i."SiteNumber" and pvs2.patient = i."Subject")
+                        left join tas120_202."IE" i on ('TAS-120-202'=i."project" and concat('TAS120_202_',pvs2.study_site) = i."SiteNumber" and pvs2.patient = i."Subject")
                         where visit_description = 'Screen Failure' and nullif (tas_120_required, '') is null) fs
                         group by 1,2,3,4,5,6,7
 union all
@@ -86,7 +86,7 @@ union all
 --Disposition Event: Enrollment
 
 select distinct
-                      'TAS120_202'::TEXT AS studyid,
+                      'TAS-120-202'::TEXT AS studyid,
                         concat('TAS120_202_',study_site) ::TEXT AS siteid,
                         patient ::TEXT AS usubjid,
                         3.0::NUMERIC AS dsseq, --deprecated
@@ -101,7 +101,7 @@ union all
 --Disposition Event: Early EOT
 
 select
-                      'TAS120_202'::TEXT AS studyid,
+                      'TAS-120-202'::TEXT AS studyid,
                         concat('TAS120_202_',study_site) ::TEXT AS siteid,
                         patient ::TEXT AS usubjid,
                         4.01::NUMERIC AS dsseq, --deprecated
@@ -110,7 +110,7 @@ select
                         actual_date ::DATE AS dsstdtc,
                         eot."EOTREAS" ::TEXT AS dsscat
                         from tas120_202_irt.patient_visit_summary pvs4
-                        left join "tas120_202"."EOT" eot on ('TAS120_202' = eot.project and concat('TAS120_202_',pvs4.study_site) = eot."SiteNumber" and pvs4.patient = eot."Subject")
+                        left join "tas120_202"."EOT" eot on ('TAS-120-202' = eot.project and concat('TAS120_202_',pvs4.study_site) = eot."SiteNumber" and pvs4.patient = eot."Subject")
 where visit_description like '%Discont%'
 union all
 

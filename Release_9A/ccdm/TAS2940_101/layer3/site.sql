@@ -25,7 +25,7 @@ site_data AS (
                 select a.*,
                 cc.countrycode3_iso::text AS sitecountrycode from (  
                    
-                SELECT  distinct 'TAS2940_101'::text AS studyid,
+                SELECT  distinct 'TAS2940-101'::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         'TAS2940_101_' || split_part("name",'_',1)::text AS siteid,
                         --split_part("name",'_',2)::text AS sitename,

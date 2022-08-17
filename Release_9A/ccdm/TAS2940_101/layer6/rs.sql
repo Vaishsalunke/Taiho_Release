@@ -21,7 +21,7 @@ WITH included_subjects AS (
 	rs_data AS ( select *,case when rsdtc1::date-prev_visit_date::date is not null then concat((rsdtc1::date-prev_visit_date::date)::numeric,' Days') end::text AS rsevlint
     			 from(
 				SELECT  DISTINCT
-                project::text AS studyid,
+                'TAS2940-101'::text AS studyid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS rsseq,
@@ -79,11 +79,11 @@ WITH included_subjects AS (
 			
 				
 		left join dm
-		on project = dm.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = dm.siteid and "Subject" = dm.usubjid
+		on 'TAS2940-101' = dm.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = dm.siteid and "Subject" = dm.usubjid
 		left join ex_date a
-		on project = a.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = a.siteid and "Subject" = a.usubjid
+		on 'TAS2940-101' = a.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = a.siteid and "Subject" = a.usubjid
 		left join ex_visit b 
-		on project = b.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = b.siteid and "Subject" = b.usubjid
+		on 'TAS2940-101' = b.studyid and concat(project,'_',split_part("SiteNumber",'_',2))::text = b.siteid and "Subject" = b.usubjid
 )rs)
 
 SELECT

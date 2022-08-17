@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
      query_data AS (
-                SELECT  trim(substring(study,1,position ('-' in study)-1))::text AS studyId,
+                SELECT  'TAS117-201'::text AS studyId,
                         null::text AS studyname,
                         concat(trim(substring(study,1,position ('-' in study)-1)),'_',substring(sitename,1,position('_' in sitename)-1)) ::text AS siteId,
                         null::text AS sitename,

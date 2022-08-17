@@ -9,7 +9,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject ),
 
      eg_data AS (
-  SELECT   eg.studyid, 
+  SELECT   replace(eg.studyid ,'TAS120_202','TAS-120-202') as studyid,
                  eg.siteid AS siteid,
           eg.usubjid  AS usubjid,
                    eg.egseq,

@@ -9,7 +9,7 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
 included_subjects AS (
 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
-querydata as(SELECT 'TAS0612_101'::text AS studyId,
+querydata as(SELECT 'TAS0612-101'::text AS studyId,
 concat('TAS0612_101_',left("sitename"::text, strpos("sitename", '_') - 1))::text AS siteId,
 "subjectname"::text AS usubjId,
 "id_"::text AS queryId,

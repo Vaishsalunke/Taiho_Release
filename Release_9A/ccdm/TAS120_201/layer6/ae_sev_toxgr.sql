@@ -6,7 +6,7 @@ WITH included_subjects AS (
 SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregion FROM site),  
 
      ae_sev_toxgr_data AS (
-                SELECT  "project"::text AS studyid,
+                SELECT  'TAS-120-201'::text AS studyid,
                         "SiteNumber"::text AS siteid,
                         "Subject"::text AS usubjid,
                         "AETERM_PT"::text AS aeterm,
@@ -22,7 +22,7 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
                  WHERE NULLIF("AETERM_PT", '') IS NOT NULL
                  
                  UNION ALL
-                 SELECT "project"::text AS studyid,
+                 SELECT 'TAS-120-201'::text AS studyid,
                         "SiteNumber"::text AS siteid,
                         "Subject"::text AS usubjid,
                         "AETERM_PT"::text AS aeterm,

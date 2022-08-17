@@ -56,7 +56,7 @@ select distinct
 from 							(	   
 
 
-                					SELECT  'TAS2940_101'::text AS studyid,
+                					SELECT  'TAS2940-101'::text AS studyid,
                         					'TAS2940_101'::text AS studyname,
                         					case
 											When trim(ms.country) = 'USA' then 'United States of America'

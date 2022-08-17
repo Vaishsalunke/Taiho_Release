@@ -9,7 +9,7 @@ WITH included_subjects AS (
      ds_data AS (
                 ---Disposition Event: All Subjects
 
-(SELECT distinct 'TAS2940_101' ::TEXT AS studyid,
+(SELECT distinct 'TAS2940-101' ::TEXT AS studyid,
                         'TAS2940_101_'||site_id ::TEXT AS siteid,
                         subject_number ::TEXT AS usubjid,
                         1.0::NUMERIC AS dsseq, --deprecated
@@ -38,7 +38,7 @@ WITH included_subjects AS (
    */                    
  union all
  
- (SELECT distinct 'TAS2940_101' ::TEXT AS studyid,
+ (SELECT distinct 'TAS2940-101' ::TEXT AS studyid,
                         'TAS2940_101_'||site_id ::TEXT AS siteid,
                         subject_number ::TEXT AS usubjid,
                         2.1::NUMERIC AS dsseq, --deprecated
@@ -47,7 +47,7 @@ WITH included_subjects AS (
                         'Failed Screen'::TEXT AS dsterm,
                         screen_fail_date ::DATE AS dsstdtc
                         from tas2940_101_irt.subject s1
-                        left join tas2940_101."IE" ie on ('TAS2940_101' = ie.project and 'TAS2940_101_'||s1.site_id = concat('TAS2940_101_',split_part(ie."SiteNumber",'_',2)) and s1.subject_number = ie."Subject")
+                        left join tas2940_101."IE" ie on ('TAS2940-101' = ie.project and 'TAS2940_101_'||s1.site_id = concat('TAS2940_101_',split_part(ie."SiteNumber",'_',2)) and s1.subject_number = ie."Subject")
                         where subject_status = 'Screen Failed' and screen_fail_date <> ''
                         )
                        
@@ -55,7 +55,7 @@ WITH included_subjects AS (
 
 --Disposition Event: Enrollment
  
- (SELECT distinct 'TAS2940_101' ::TEXT AS studyid,
+ (SELECT distinct 'TAS2940-101' ::TEXT AS studyid,
                         'TAS2940_101_'||site_id ::TEXT AS siteid,
                         subject_number ::TEXT AS usubjid,
                         3.0::NUMERIC AS dsseq, --deprecated
@@ -71,7 +71,7 @@ WITH included_subjects AS (
 
 --Disposition Event: Early EOT
  
- (SELECT distinct 'TAS2940_101' ::TEXT AS studyid,
+ (SELECT distinct 'TAS2940-101' ::TEXT AS studyid,
                         'TAS2940_101_'||site_id ::TEXT AS siteid,
                         subject_number ::TEXT AS usubjid,
                         4.01::NUMERIC AS dsseq, --deprecated
@@ -80,7 +80,7 @@ WITH included_subjects AS (
                         'Early EOT'::TEXT AS dsterm,
                         end_of_treatment_date ::DATE AS dsstdtc
                         from tas2940_101_irt.subject s3
-                        left join tas2940_101."EOT" eot on ('TAS2940_101' = eot.project and 'TAS2940_101_'||s3.site_id = concat('TAS2940_101_',split_part(eot."SiteNumber",'_',2)) and s3.subject_number = eot."Subject")
+                        left join tas2940_101."EOT" eot on ('TAS2940-101' = eot.project and 'TAS2940_101_'||s3.site_id = concat('TAS2940_101_',split_part(eot."SiteNumber",'_',2)) and s3.subject_number = eot."Subject")
                         where subject_status = 'Treatment Ended'
                         )
                        
@@ -88,7 +88,7 @@ WITH included_subjects AS (
 
 --Disposition Event: Withdrawn
  
- (SELECT distinct project ::TEXT AS studyid,
+ (SELECT distinct 'TAS2940-101' ::TEXT AS studyid,
                         project||substring("SiteNumber",position ('_' in "SiteNumber")) ::TEXT AS siteid,
                         "Subject" ::TEXT AS usubjid,
                         4.4::NUMERIC AS dsseq, --deprecated
@@ -105,7 +105,7 @@ WITH included_subjects AS (
 
 --Disposition Event: Screened
  
- (SELECT distinct 'TAS2940_101' ::TEXT AS studyid,
+ (SELECT distinct 'TAS2940-101' ::TEXT AS studyid,
                        'TAS2940_101_'||site_id ::TEXT AS siteid,
                         subject_number  ::TEXT AS usubjid,
                         1.3::NUMERIC AS dsseq, --deprecated

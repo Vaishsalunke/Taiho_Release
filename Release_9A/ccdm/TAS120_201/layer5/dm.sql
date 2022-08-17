@@ -8,7 +8,7 @@ with included_subjects as ( select 	distinct studyid, siteid, usubjid from subje
 ex_data AS(select "project", "SiteNumber", "Subject",max("EXOCYCEDT") as max_exendtc
     from tas120_201."EXO" group by 1,2,3),
 
-dm_data as(select 	distinct	dm."project"::text as studyid,
+dm_data as(select 	distinct	'TAS-120-201'::text as studyid,
 					dm."SiteNumber"::text as siteid,
 					dm."Subject"::text as usubjid,
 					dm."FolderSeq"::numeric as visitnum,
@@ -33,9 +33,9 @@ dm_data as(select 	distinct	dm."project"::text as studyid,
 					--,null::text AS sitecountry
 					,null::text AS brthdtc_iso
 		 from		tas120_201."DM" dm
-		 left join 	tas120_201."ENR" e  on dm.project=e.project  and dm."SiteNumber" =e."SiteNumber"  and dm."Subject" =e."Subject"
-		 left join 	tas120_201."DS" DS on  dm.project=DS.project  and dm."SiteNumber" =DS."SiteNumber"  and dm."Subject" =DS."Subject"
-		 left join 	ex_data e2  on dm.project=e2.project  and dm."SiteNumber" =e2."SiteNumber"  and dm."Subject" =e2."Subject"
+		 left join 	tas120_201."ENR" e  on 'TAS-120-201'=e.project  and dm."SiteNumber" =e."SiteNumber"  and dm."Subject" =e."Subject"
+		 left join 	tas120_201."DS" DS on  'TAS-120-201'=DS.project  and dm."SiteNumber" =DS."SiteNumber"  and dm."Subject" =DS."Subject"
+		 left join 	ex_data e2  on 'TAS-120-201'=e2.project  and dm."SiteNumber" =e2."SiteNumber"  and dm."Subject" =e2."Subject"
 		 	 )
 		,included_sites AS (
                 SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregion FROM site )

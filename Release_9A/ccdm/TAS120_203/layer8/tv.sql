@@ -18,7 +18,7 @@ tv_scheduled AS (
 
 tv_data AS (
 
-select studyid,
+select replace (studyid,'TAS120_203','TAS-120-203') AS studyid,
 visitnum,
 visit,
 visitdy,
@@ -29,7 +29,7 @@ OR lower(visit) like '% day 1 %' OR lower(visit) like '% day 1<%') or (lower(vis
 OR lower(visit) like '% day 01 %' OR lower(visit) like '% day 01<%') or (lower(visit) like '%day 1-%') or (lower(visit) like '%day 01-%')) then 'True' else null end as isbaselinevisit
 from (				
 	SELECT
-		'TAS120_203'::text AS studyid,
+		'TAS-120-203'::text AS studyid,
 		visitnum::numeric AS visitnum,
 		visit::text AS visit,
 		visitdy::int AS visitdy,

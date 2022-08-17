@@ -8,7 +8,7 @@ WITH included_subjects AS (
 
 ie_data AS 
 (
-	SELECT  "project"::text AS studyid,
+	SELECT  'TAS-120-201'::text AS studyid,
     "SiteNumber"::text AS siteid,
     "Subject"::text AS usubjid,
     "FolderSeq"::numeric AS visitnum,
@@ -21,7 +21,7 @@ ie_data AS
 						   ,' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]','')
 						   ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''))::text AS visit,
     coalesce("RecordDate","MinCreated")::date AS iedtc,
-    row_number() OVER (PARTITION BY 'TAS120_201',"SiteNumber","Subject" ORDER BY serial_id)::integer AS ieseq,
+    row_number() OVER (PARTITION BY 'TAS-120-201',"SiteNumber","Subject" ORDER BY serial_id)::integer AS ieseq,
     "IETESTCD"::text AS ietestcd,
     "IETESTCD"::text AS ietest,
     nullif("IECAT",'')::text AS iecat,

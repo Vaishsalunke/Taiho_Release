@@ -16,7 +16,7 @@ WITH included_sites AS (
                         resourceenddtc,
                         resourceemail
                         from (
-                SELECT  'TAS120_202'::text AS studyid,
+                SELECT  'TAS-120-202'::text AS studyid,
                         'TAS120_202_' || "site_#"::text AS siteid,
                         'Primary Investigator'::text AS resourcetype,
                         "pi_name"::text AS resourcename,

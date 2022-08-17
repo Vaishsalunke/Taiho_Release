@@ -7,7 +7,7 @@ WITH included_sites AS (
                 SELECT DISTINCT studyid, siteid FROM site ),
  
      sitemonitoringvisit_data AS (
-                SELECT  'TAS117_201'::text AS studyid,
+                SELECT  'TAS117-201'::text AS studyid,
                         concat('TAS117_201_', right(site_number,3)) ::text AS siteid,
                         visit_name ::text AS visitname,
                         coalesce(nullif(sv."visit_completed_date",''),nullif(sv."planned_visit_date",''),nullif(sv."visit_start_date",''))::date AS visitdate,

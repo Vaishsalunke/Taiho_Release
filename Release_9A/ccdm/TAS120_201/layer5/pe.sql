@@ -7,7 +7,7 @@ WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 
      pe_data AS (
-                 SELECT "project"::text AS studyid,
+                 SELECT 'TAS-120-201'::text AS studyid,
                         "SiteNumber"::text AS siteid,
                         "Subject"::text AS usubjid,
                        -- row_number() OVER (PARTITION BY "studyid", "siteid", "Subject" ORDER BY "serial_id")::int AS peseq,

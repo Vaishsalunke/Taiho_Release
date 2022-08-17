@@ -8,7 +8,7 @@ WITH included_studies AS (
 				
 
      studycountry_data AS (
-                 SELECT distinct 'TAS2940_101'::text AS studyid,				 
+                 SELECT distinct 'TAS2940-101'::text AS studyid,				 
 						 case 
 							when length(trim(SUBSTRING( "name",1, POSITION('_' in "name")-1)))=3
 								THEN CASE when left(SUBSTRING( "name",1, POSITION('_' in "name")-1),1)='0' then 'US'

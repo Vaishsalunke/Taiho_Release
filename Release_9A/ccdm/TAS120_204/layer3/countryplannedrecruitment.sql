@@ -43,7 +43,7 @@ type,
 rc.rec_cnt as recruitmentcount
 from (
 SELECT DISTINCT
-										 'TAS120_204'::text AS studyid,
+										 'TAS-120-204'::text AS studyid,
 										 'TAS120_204'::text AS studyname,
 										 country_name::text AS sitecountry,
 										 country_code::text AS sitecountrycode,

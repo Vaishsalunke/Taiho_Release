@@ -13,7 +13,7 @@ WITH included_subjects AS (
     tr_data AS (
         
 		SELECT  DISTINCT
-                project::text AS studyid,
+                'TAS2940-101'::text AS studyid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 row_number()over (partition by project,concat(project,'_',split_part("SiteNumber",'_',2)),"Subject" order by "ORDAT")::numeric AS trseq,
@@ -57,9 +57,9 @@ WITH included_subjects AS (
 												("ORRES"::text,'Overall RECIST Response'::text,"ORRES","ORRES_STD",case when "ORRES"!='' then 'Completed' else 'Not Completed'end)
 												)as t (cd1,trtestcd,trorres,trstresc,trstat)
 			left join dm								
-			on project = dm."studyid" and concat(project,'_',split_part("SiteNumber",'_',2))=dm.siteid and "Subject"= dm."usubjid"
+			on 'TAS2940-101' = dm."studyid" and concat(project,'_',split_part("SiteNumber",'_',2))=dm.siteid and "Subject"= dm."usubjid"
 			left join  ex_visit a
-			on project = a."studyid" and concat(project,'_',split_part("SiteNumber",'_',2)) = a.siteid and "Subject"= a."usubjid"
+			on 'TAS2940-101' = a."studyid" and concat(project,'_',split_part("SiteNumber",'_',2)) = a.siteid and "Subject"= a."usubjid"
 	)
 	
 	

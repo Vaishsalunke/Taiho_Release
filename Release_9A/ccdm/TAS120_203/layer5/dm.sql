@@ -10,7 +10,7 @@ WITH included_subjects AS (
    
 
      dm_data AS (
-                select distinct  dm.project ::text AS studyid,
+                select distinct  'TAS-120-203' ::text AS studyid,
                         'TAS120_203'::text AS studyname,
                         dm.project||substring(dm."SiteNumber",position ('_' in dm."SiteNumber"))::text AS siteid,
                         null::text AS sitename,
@@ -36,11 +36,11 @@ WITH included_subjects AS (
                         null::text AS brthdtc_iso
                       from tas120_203."DM" dm
                             left join tas120_203."ENR" enr
-                            on dm.project =enr.project
+                            on 'TAS-120-203' =enr.project
 and dm."SiteNumber" =enr."SiteNumber"
 and dm."Subject" =enr."Subject"
-left join ex_data e on dm.project = e.project and dm."SiteNumber" = e."SiteNumber" and dm."Subject" = e."Subject"
-left join tas120_203."EOT" e1 on dm.project = e1.project and dm."SiteNumber" = e1."SiteNumber" and dm."Subject" = e1."Subject" ),
+left join ex_data e on 'TAS-120-203' = e.project and dm."SiteNumber" = e."SiteNumber" and dm."Subject" = e."Subject"
+left join tas120_203."EOT" e1 on 'TAS-120-203' = e1.project and dm."SiteNumber" = e1."SiteNumber" and dm."Subject" = e1."Subject" ),
                        
      site_data as (select distinct studyid,siteid,sitename,sitecountry,sitecountrycode,siteregion from site)
 

@@ -31,7 +31,7 @@ WITH included_subjects AS (
 					v.vsstnrhi::numeric AS vsstnrhi,
 					v.vstimpnt::text AS vstimpnt
 					FROM (
-							SELECT  vs."project"::text AS studyid,
+							SELECT  'TAS-120-202'::text AS studyid,
 								vs."SiteNumber"::text AS siteid,
 								vs."Subject"::text AS usubjid,
 								vsseq::int as vsseq,

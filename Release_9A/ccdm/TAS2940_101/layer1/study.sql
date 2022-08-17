@@ -4,7 +4,7 @@ Notes: Standard mapping to CCDM Study table
 */
 
 WITH study_data AS (
-                    SELECT  'TAS2940_101'::text AS studyid,
+                    SELECT  'TAS2940-101'::text AS studyid,
                             'TAS2940_101'::text AS studyname,
                             'A Phase 1 Study of TAS2940 in Patients with Locally
 							Advanced or Metastatic Solid Tumors with EGFR

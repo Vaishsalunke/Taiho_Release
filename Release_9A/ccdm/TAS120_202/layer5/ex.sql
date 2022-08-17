@@ -10,7 +10,7 @@ WITH included_subjects AS (
 	SELECT DISTINCT studyid, siteid, sitename, sitecountry, sitecountrycode, siteregion FROM site),	
 
      ex_data AS (
-                SELECT  "project"::text AS studyid,
+                SELECT  'TAS-120-202'::text AS studyid,
                         "SiteNumber"::text AS siteid,
                         "Subject"::text AS usubjid,
                        -- (row_number() over (partition by "project","SiteNumber","Subject" order by  "EXOSTDAT","EXOENDAT"))::int AS exseq,
