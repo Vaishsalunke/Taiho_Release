@@ -14,7 +14,7 @@ v."Subject" as subject,
 v."VISITDAT" as c1d1_date_of_visit,
 row_number() over(partition by v."project" ,v."SiteNumber" ,v."Subject" order by v."VISITDAT" )::integer AS seq,
 d."DMCOH" as cohort,
-COALESCE (CASE WHEN c."CDTYPE" = 'Other' THEN c."CDTYOTH" ELSE c."CDTYPE" end, c1."CDCANTYP")  AS cancer_diag,
+INITCAP(COALESCE (CASE WHEN c."CDTYPE" = 'Other' THEN c."CDTYOTH" ELSE c."CDTYPE" end, c1."CDCANTYP"))  AS cancer_diag,
 coalesce(e."EOTLDDAT",current_date) as date_of_last_dose,
 e."EOTDAT" date_of_trt_disc_met,
 coalesce(nullif(e."EOTREAS",''),'Ongoing') as eot_reason,
@@ -67,4 +67,3 @@ alter table if exists ckpi.ckpi07_swimp_new rename to ckpi07_swimp;
 --ALTER TABLE ckpi.ckpi07_swimp OWNER TO "taiho-dev-app-clinical-master-write";
 
 --ALTER TABLE ckpi.ckpi07_swimp_orig OWNER TO "taiho-dev-app-clinical-master-write";
-
