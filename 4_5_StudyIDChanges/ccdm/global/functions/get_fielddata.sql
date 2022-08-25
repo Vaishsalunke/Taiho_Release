@@ -39,7 +39,7 @@ FOR rec IN
                 table_name,
                 column_name                   
                 FROM information_schema.columns
-                WHERE replace (replace(table_schema,'-',''),'_','') = LOWER(REPLACE(REPLACE(SUBSTRING('TAS-120-204',1),'-',''), '_', ''))
+                WHERE replace (replace(table_schema,'-',''),'_','') = LOWER(REPLACE(REPLACE(SUBSTRING(pStudyID,1),'-',''), '_', ''))
 		)
                  
 	SELECT
