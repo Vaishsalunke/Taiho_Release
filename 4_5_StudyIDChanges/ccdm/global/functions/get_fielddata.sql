@@ -23,7 +23,10 @@ FOR rec IN
       ( 
 			   SELECT DISTINCT i.formid::TEXT AS table_name,
                i.fieldid::TEXT AS column_name,
-               LOWER(REPLACE(REPLACE(SUBSTRING(i.studyid::TEXT, 1),'-','_'), ' ', '_')) AS table_schema, 
+               case when i.studyid like '%3681_101%' then 'tas3681_101'
+               		when i.studyid like '%TAS-%' then lower(REPLACE(concat(split_part(i.studyid::TEXT,'-',1), SUBSTRING(i.studyid::TEXT, (position ('-' in i.studyid::TEXT)+1))),'-','_'))
+               		else LOWER(REPLACE(REPLACE(SUBSTRING(i.studyid::TEXT, 1),'-','_'), ' ', '_')) 
+               end AS table_schema, 
                i.studyid::TEXT AS studyid
                FROM fielddef i
                WHERE i.studyid = upper(pStudyID)
@@ -36,7 +39,7 @@ FOR rec IN
                 table_name,
                 column_name                   
                 FROM information_schema.columns
-                WHERE table_schema = LOWER(REPLACE(REPLACE(SUBSTRING(pStudyID,1),'-','_'), ' ', '_'))
+                WHERE replace (replace(table_schema,'-',''),'_','') = LOWER(REPLACE(REPLACE(SUBSTRING('TAS-120-204',1),'-',''), '_', ''))
 		)
                  
 	SELECT
