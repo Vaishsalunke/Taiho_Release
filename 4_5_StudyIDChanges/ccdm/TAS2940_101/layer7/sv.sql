@@ -17,7 +17,7 @@ sv.visit,
 sv.visitseq,
 sv.svstdtc,
 sv.svendtc from(
-                SELECT  "project"::text AS studyid,
+                SELECT  'TAS2940-101'::text AS studyid,
                         'TAS2940_101'::text AS studyname,
                         'TAS2940_101_' || split_part("SiteNumber",'_',2)::text AS siteid,
                         "Subject"::text AS usubjid, 
