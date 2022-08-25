@@ -7,7 +7,7 @@ WITH included_studies AS (
                 SELECT studyid FROM study ),
 
     fielddef_data AS (
-                select distinct  "StudyOID" ::text AS studyid,
+                select distinct  'TAS117-201' ::text AS studyid,
                         nullif("FormOID",'') ::text AS formid,
                         split_part(nullif("ItemOID",''),'.',2)::text AS fieldId,
                         COALESCE("SASLabel",'Missing')::text AS fieldname,
