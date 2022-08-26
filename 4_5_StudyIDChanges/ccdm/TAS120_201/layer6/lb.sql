@@ -24,7 +24,8 @@ WITH    included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subj
                                    ,' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''))::text as visit,
                 lb.lbdtc,
                 extract (days from (lb.lbdtc-dsstdtc)::interval)::numeric as lbdy,
-                (row_number() over (partition by lb.studyid, lb.siteid, lb.usubjid order by lb.lbtestcd, lb.lbdtc))::int as lbseq,
+                --(row_number() over (partition by lb.studyid, lb.siteid, lb.usubjid order by lb.lbtestcd, lb.lbdtc))::int as 
+                lb.lbseq,
                 folderseq,
                 lb.lbtestcd as lbtestcd,
                 lb.lbtest as lbtest,
@@ -58,7 +59,7 @@ WITH    included_subjects AS (SELECT DISTINCT studyid, siteid, usubjid FROM subj
                 ,null::text as timpnt
 from (
                SELECT  distinct 
-                        'TAS-120-201'::text AS studyid,
+                        lb1."project"::text AS studyid,
                         lb1."SiteNumber"::text AS siteid, 
                         lb1."Subject"::text    AS usubjid,
                         trim(REGEXP_REPLACE
@@ -122,7 +123,7 @@ from (
                         vs.visit::text AS visit,
                         vs.vsdtc::timestamp without time zone AS lbdtc,
                         null::integer AS lbdy,
-                        vs.vsseq::int AS lbseq, 
+                        concat(vs.vsseq,0)::int AS lbseq, 
                         null::integer as folderseq,
                         vs.vstestcd::text AS lbtestcd,
                         vs.vstest::text AS lbtest,
@@ -321,8 +322,7 @@ group by ex_max.studyid,ex_max.siteid,ex_max.usubjid,labtest,visit,Seq
    
 final_lb as
         (
-        select  distinct  
-                    replace(lb.studyid,'TAS120_201','TAS-120-201') as studyid,
+        select  distinct  replace(lb.studyid,'TAS120_201','TAS-120-201') as studyid,
                     lb.siteid,
                     lb.usubjid,
                     lb.visit,
@@ -413,4 +413,3 @@ SELECT
 FROM final_lb lb
 JOIN included_subjects s ON (lb.studyid = s.studyid AND lb.siteid = s.siteid AND lb.usubjid = s.usubjid)
 LEFT JOIN included_sites si ON (lb.studyid = si.studyid AND lb.siteid = si.siteid);
-
