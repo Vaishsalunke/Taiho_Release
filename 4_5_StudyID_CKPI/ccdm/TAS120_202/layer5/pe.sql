@@ -34,7 +34,7 @@ WITH included_subjects AS (
                         null::time without time zone AS petm 
 from "tas120_202"."PE" pe
 left join "tas120_202"."VISIT" vs
-on 'TAS-120-202'=vs."project" and pe."SiteNumber"=vs."SiteNumber" and pe."Subject"=vs."Subject"	
+on pe."project"=vs."project" and pe."SiteNumber"=vs."SiteNumber" and pe."Subject"=vs."Subject"	
 where vs."PEPERF" = 'Yes'		
 )
 
