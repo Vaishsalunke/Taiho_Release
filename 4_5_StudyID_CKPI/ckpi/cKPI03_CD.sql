@@ -20,7 +20,7 @@ from
 ),
 
 data_201 as 
-(select 'TAS-120-202' as studyid, "SiteNumber" as siteid,"Subject" as usubjid,
+(select 'TAS-120-201' as studyid, "SiteNumber" as siteid,"Subject" as usubjid,
 	"CDTYPE" as cdtype,
 	"FGFRTYPE" as fgfrtype,
 	null as cdhisto

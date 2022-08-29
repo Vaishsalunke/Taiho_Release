@@ -9,7 +9,6 @@ drop table if exists ckpi."cKPI101_TA_new";
 create table ckpi."cKPI101_TA_new" as
 
 
-
 with NL_3681 as
   (
     Select 'TAS3681_101_DOSE_EXP' as Study, "SiteNumber", "Subject","NLSITE","InstanceName",
@@ -408,7 +407,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+min("TLDAT") OVER (PARTITION BY 'TAS0612-101', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From TAS0612_101."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 group by 1, 2, 3, 4, 5, 6, 7,9,10,11,12,13,14
@@ -446,7 +445,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition"--,
-,min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+,min("TLDAT") OVER (PARTITION BY 'TAS-120-201', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From tas120_201."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 group by 1, 2, 3, 4, 5, 6, 7,9,10,11,12,13, 14
@@ -484,7 +483,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+min("TLDAT") OVER (PARTITION BY 'TAS-120-202', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From tas120_202."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 group by 1, 2, 3, 4, 5, 6, 7,9,10,11,12,13,14
@@ -522,7 +521,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+min("TLDAT") OVER (PARTITION BY 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From TAS3681_101."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 and "Subject" in (Select usubjid From cqs.subject where studyid='TAS3681_101_DOSE_ESC')
@@ -544,7 +543,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+min("TLDAT") OVER (PARTITION BY 'TAS3681_101_DOSE_EXP', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From TAS3681_101."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 and "Subject" in (Select usubjid From cqs.subject where studyid='TAS3681_101_DOSE_EXP')
@@ -588,7 +587,7 @@ end:: text as tldim,*/
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+min("TLDAT") OVER (PARTITION BY 'TAS-120-203', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From tas120_203."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 --group by 1, 2, 3, 4, 5, 6, 7,9,10,11,13,14,15
@@ -633,7 +632,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+min("TLDAT") OVER (PARTITION BY 'TAS-120-204', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From tas120_204."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 --group by 1, 2, 3, 4, 5, 6, 7,9,10,11,13,14,15
@@ -678,7 +677,7 @@ max(nullif("TLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TLMETH":: text as tlmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
+min("TLDAT") OVER (PARTITION BY 'TAS2940-101', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TLSUM") ) AS order_date
 From tas2940_101."TL"
 WHERE   "TLDIM" IS NOT null --or "TLDAT" IS NOT NULL
 --group by 1, 2, 3, 4, 5, 6, 7,9,10,11,12,14,15,16
@@ -722,7 +721,7 @@ max(nullif("TUTLSUM"::text,'')) :: numeric as SumTLMeasure,
 "TUMETH4":: text as tlbmeth,
 "PageRepeatNumber",
 "RecordPosition",
-min("TUSTDT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TUTLSUM") ) AS order_date
+min("TUSTDT") OVER (PARTITION BY 'TAS117-201', "SiteNumber", "Subject", "InstanceName", "InstanceRepeatNumber", "FolderSeq", "PageRepeatNumber", max("TUTLSUM") ) AS order_date
 From tas117_201."TLPB"
 WHERE "MEASURMT" IS NOT null or "TUSTDT" IS NOT NULL
 group by 1,2,3,4,5,6,7,8,10,11,12,13,14,15
@@ -748,7 +747,7 @@ Select 'TAS0612-101' :: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS0612-101', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From TAS0612_101."NTL"
 WHERE "NTLDAT" IS NOT NULL and concat("project","Subject") NOT IN (Select DISTINCT concat(Study,Subject) From ALLTL)
@@ -775,7 +774,7 @@ Select 'TAS-120-201' :: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq ,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS-120-201', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From TAS120_201."NTL"
 WHERE "NTLDAT" IS NOT NULL and concat("project","Subject") NOT IN (Select DISTINCT concat(Study,Subject) From ALLTL)
@@ -802,7 +801,7 @@ Select 'TAS-120-202' :: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq ,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS-120-202', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
   From TAS120_202."NTL"
 WHERE "NTLDAT" IS NOT NULL  and concat("project","Subject") NOT IN (Select DISTINCT concat(Study,Subject) From ALLTL)
@@ -829,7 +828,7 @@ Select 'TAS3681_101_DOSE_ESC' :: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From TAS3681_101."NTL"
 WHERE "NTLDAT" IS NOT null
@@ -846,7 +845,7 @@ Select 'TAS3681_101_DOSE_EXP' :: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS3681_101_DOSE_EXP', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From TAS3681_101."NTL"
 WHERE "NTLDAT" IS NOT null
@@ -875,7 +874,7 @@ Select 'TAS-120-203':: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq ,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS-120-203', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From TAS120_203."NTL"
 WHERE "NTLDAT" IS NOT NULL  and concat("project","Subject") NOT IN (Select DISTINCT concat(Study,Subject) From ALLTL)
@@ -902,7 +901,7 @@ Select 'TAS-120-204' :: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq ,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS-120-204', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From TAS120_204."NTL"
 WHERE "NTLDAT" IS NOT NULL  and concat("project","Subject") NOT IN (Select DISTINCT concat(Study,Subject) From ALLTL)
@@ -929,7 +928,7 @@ Select 'TAS2940-101' :: text as Study,
 "NTLDAT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq ,
 "PageRepeatNumber"
-,min("NTLDAT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("NTLDAT") OVER (PARTITION BY 'TAS2940-101', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From TAS2940_101."NTL"
 WHERE "NTLDAT" IS NOT NULL  and concat("project","Subject") NOT IN (Select DISTINCT concat(Study,Subject) From ALLTL)
@@ -956,7 +955,7 @@ Select 'TAS117-201' :: text as Study,
 "TUSTDT" :: timestamp as DateofImage,
 "FolderSeq" :: numeric as FolderSeq,
 "PageRepeatNumber"
-,min("TUSTDT") OVER (PARTITION BY "project", "SiteNumber", "Subject", "InstanceName",
+,min("TUSTDT") OVER (PARTITION BY 'TAS117-201', "SiteNumber", "Subject", "InstanceName",
 "InstanceRepeatNumber", "FolderSeq","PageRepeatNumber")::text AS order_date
 From   tas117_201."NTLPB"
 WHERE "TUSTDT" IS NOT null and concat("project","Subject") NOT IN (Select DISTINCT concat(Study,Subject) From ALLTL)
@@ -1704,8 +1703,7 @@ when (t.Study like'%TAS3681_101%' or t.Study = 'TAS120_201' or  t.Study = 'TAS12
 then t.SiteNumber
 else t.study||'_'||split_part(t.SiteNumber,'_',2)
 end) = s.siteid and
-t.Subject = s.usubjid
-);
+t.Subject = s.usubjid);
 
 
 
