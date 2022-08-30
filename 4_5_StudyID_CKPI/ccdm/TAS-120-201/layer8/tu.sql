@@ -17,6 +17,8 @@ WITH included_subjects AS (
 				 from sv
 				 where visit like '%Day 1 Cycle 01' 
 				 or visit like '%Day 01 Cycle 01'
+                 or visit like '%Cycle 01 Day 01'
+				 or visit like '%Cycle 1 Day 1'
 				 or visit like 'Cycle 01'
 				 ),		
     tu_data AS (
@@ -25,7 +27,7 @@ WITH included_subjects AS (
         replace (tu.studyid,'TAS120_201','TAS-120-201') as studyid,
         tu.siteid,
         tu.usubjid,
-        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid, tu.tuseq  ORDER BY tu.tuseq)::numeric as tuseq,
+        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid)::numeric as tuseq,
         tu.tugrpid,
         tu.turefid,
         tu.tuspid,
@@ -46,7 +48,8 @@ WITH included_subjects AS (
         tulobxfl,
         tu.tublfl,
         tu.tueval,
-        concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as tuevalid,
+        --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as 
+        tuevalid,
         tu.tuacptfl,
         --ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as visitnum,
         coalesce (sv.visitnum,0) as visitnum,
@@ -62,7 +65,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 project::text AS studyid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
-                "RecordPosition" ::numeric AS tuseq,
+                null ::numeric AS tuseq,
                null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -100,7 +103,7 @@ SELECT  distinct		null::text AS comprehendid,
                 project::text AS studyid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
-                "RecordPosition" ::numeric AS tuseq,
+                null ::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -138,7 +141,7 @@ SELECT  distinct		null::text AS comprehendid,
                 project::text AS studyid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
-                "RecordPosition" ::numeric AS tuseq,
+                null ::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -176,7 +179,7 @@ SELECT  distinct		null::text AS comprehendid,
                 project::text AS studyid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
-                "RecordPosition" ::numeric AS tuseq,
+                null ::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -214,7 +217,7 @@ select   distinct		null::text AS comprehendid,
                 project::text AS studyid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
-                "RecordPosition" ::numeric AS tuseq,
+                null ::numeric AS tuseq,
                 null::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -252,8 +255,8 @@ left join dm
 on tu.studyid=dm.studyid and tu.siteid=dm.siteid and tu.usubjid=dm.usubjid
 left join sv_visit svv
 on tu.studyid=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
-left join sv on tu.visit = sv.visit and tu.tudtc :: date = sv.svstdtc  
-
+left join sv on tu.visit = sv.visit
+where tu.tudtc is not null
                 )
 
 SELECT

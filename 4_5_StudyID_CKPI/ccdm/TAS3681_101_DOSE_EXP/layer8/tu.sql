@@ -23,7 +23,7 @@ WITH included_subjects AS (
         SELECT  distinct Study::text AS studyid,
                 SiteNumber::text AS siteid,
                 Subject::text AS usubjid,
-                ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject,tu.tuseq ORDER BY tu.tuseq)::numeric AS tuseq,
+                ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject)::numeric AS tuseq,
                 tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -43,7 +43,8 @@ WITH included_subjects AS (
                 case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tublfl::text AS tublfl,
                 tueval::text AS tueval,
-                concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber,tu.Subject ORDER BY tudtc))::text as tuevalid,
+                --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber,tu.Subject ORDER BY tudtc))::text as 
+				tuevalid,
                 null::text AS tuacptfl,
                 --ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric AS 
                 coalesce (sv.visitnum,0) as visitnum,
@@ -57,7 +58,7 @@ WITH included_subjects AS (
 					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'NL' || "RecordPosition"::numeric as tuseq,
+								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'NL' || "RecordPosition":: text as tulnkid,
 								(row_number() over (partition by 'TAS3681_101_DOSE_EXP', "SiteNumber", "Subject" order by "NLIMGDAT")::numeric+1):: text as tulnkgrp,
@@ -85,7 +86,7 @@ WITH included_subjects AS (
 					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'NTL' || "RecordPosition"::numeric as tuseq,
+								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'NTL' || "RecordPosition":: text as tulnkid,
 								'1':: text as tulnkgrp,
@@ -113,7 +114,7 @@ WITH included_subjects AS (
 					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'NTL' || "RecordPosition"::numeric as tuseq,
+								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'NTL' || "RecordPosition":: text as tulnkid,
 								(row_number() over (partition by 'TAS3681_101_DOSE_EXP', "SiteNumber", "Subject" order by "NTLDAT")::numeric+1):: text as tulnkgrp,
@@ -141,7 +142,7 @@ WITH included_subjects AS (
 					Select distinct		'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'TL' || "RecordPosition"::numeric as tuseq,
+								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'TL' || "RecordPosition":: text as tulnkid,
 								'1':: text as tulnkgrp,
@@ -169,7 +170,7 @@ WITH included_subjects AS (
 					Select 	distinct	'TAS3681_101_DOSE_EXP':: text as Study, 
 								"SiteNumber" :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'TL' || "RecordPosition"::numeric as tuseq,
+								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'TL' || "RecordPosition":: text as tulnkid,
 								(row_number() over (partition by 'TAS3681_101_DOSE_EXP', "SiteNumber", "Subject" order by "TLDAT")::numeric+1):: text as tulnkgrp,
@@ -198,7 +199,8 @@ WITH included_subjects AS (
 		left join sv_visit svv
 on 'TAS3681_101_DOSE_EXP'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
 		left join sv
-on tu.visit = sv.visit and tu.tudtc ::date  = sv.svstdtc 
+on tu.visit = sv.visit
+where tu.tudtc is not null
 		)
 
 SELECT

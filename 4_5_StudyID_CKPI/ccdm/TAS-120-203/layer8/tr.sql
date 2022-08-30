@@ -52,7 +52,8 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as trevalid,
+						--concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as 
+						trevalid,
 						tracptfl,
 						--row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc) as 
 						coalesce (sv.visitnum,0) as visitnum,
@@ -70,10 +71,10 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					null::text AS trgrpid,
+					'NEW LESION' ::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'NL'||nl."NLID" ::text AS trlnkid,
+                	nl."NLID" ::text AS trlnkid,
                 	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)) , "Subject" order by "NLDAT")::numeric+1) ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
@@ -105,10 +106,10 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					null::text AS trgrpid,
+					'NON-TARGET LESION' ::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'NTL'||ntlb."NTLBID" ::text AS trlnkid,
+                	ntlb."NTLBID" ::text AS trlnkid,
                 	'1' ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
@@ -140,10 +141,10 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					null::text AS trgrpid,
+					'NON-TARGET LESION' ::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'NTL'||ntl."NTLID" ::text AS trlnkid,
+                	ntl."NTLID" ::text AS trlnkid,
                 	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)) , "Subject" order by "NTLDAT")::numeric+1) ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
@@ -178,10 +179,10 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					null::text AS trgrpid,
+					'TARGET LESION' ::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'TL'||tl."TLID" ::text AS trlnkid,
+                	tl."TLID" ::text AS trlnkid,
                 	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)) , "Subject" order by "TLDAT")::numeric+1) ::text AS trlnkgrp,
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
@@ -218,10 +219,10 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					null::text AS trgrpid,
+					'TARGET LESION' ::text AS trgrpid,
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'TL'||tlb."TLBID" ::text AS trlnkid,
+                	tlb."TLBID" ::text AS trlnkid,
                 	'1' ::text AS trlnkgrp,
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
@@ -254,7 +255,8 @@ WITH included_subjects AS (
 		on tr.studyid=ex.studyid and tr.siteid=ex.siteid and tr.usubjid=ex.usubjid
 		left join sv_visit svv
 			on tr.studyid=svv.studyid and tr.siteid=svv.siteid and tr.usubjid=svv.usubjid
-		left join sv on tr.visit = sv.visit and tr.trdtc :: date = sv.svstdtc  
+		left join sv on tr.visit = sv.visit
+		where tr.trdtc is not null
                 )
 
 SELECT

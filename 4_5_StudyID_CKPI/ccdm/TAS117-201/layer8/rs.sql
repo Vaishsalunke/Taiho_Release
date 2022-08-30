@@ -28,7 +28,8 @@ WITH included_subjects AS (
 						null as rsrefid,
 						null as rsspid,
 						null as rslnkid,
-						row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as rslnkgrp,
+						--row_number() over(partition by u.studyid, u.siteid,u.usubjid order by rsdtc) as 
+						rslnkgrp,
 						rstestcd,
 						rstest,
 						rscat,
@@ -73,7 +74,7 @@ WITH included_subjects AS (
 					select distinct	project::text AS studyid,
 									concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 									or1."Subject"::text AS usubjid,
-									null ::text AS rslnkgrp,
+									(dense_rank () over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "ORDAT")::numeric+1) ::text AS rslnkgrp,
 									rstestcd::text AS rstestcd,
 									rstest::text AS rstest,
 									'RECIST 1.1'::text AS rscat,
@@ -90,13 +91,13 @@ WITH included_subjects AS (
 									null::numeric as rsseq,
 									coalesce(sv.visitnum,0) as visitnum
 				 from tas117_201."OR" or1
-				 		left join sv on or1.project = sv.studyid and sv.siteid = concat(or1.project,'_',split_part(or1."SiteNumber",'_',2)) and sv.usubjid = or1."Subject"  and to_char(or1."ORDAT"::date,'YYYY-MM-DD') = svstdtc::text
+				 		left join sv on or1."FolderName" = sv.visit and or1."ORDAT"::date = sv.svstdtc
 				 					
 					CROSS JOIN LATERAL(VALUES
 					("ORRES",'OVRLRESP','Overall Response', "ORRES","ORRES_STD" , case when nullif("ORRES",'') is not null then '' else 'Not Done' end ),
 					("ORTLRES",'TRGRESP','Target Response',"ORTLRES","ORTLRES_STD",case when "ORTLYN" = 'Yes' then '' else 'Not Done' end),
-					("ORNTLRES", 'NTRGRESP','Non-Target Response',"ORNTLRES","ORNTLRES_STD", case when "ORNTLYN" = 'Yes' then '' else 'Not Done' end),
-					("ORNLYN", 'NEWLIND','New Lesion Indicator',case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end,case when "ORNLYN" = 'Yes' then '' else 'Not Done' end)
+					("ORNTLRES", 'NTRGRESP','Non-Target Response',"ORNTLRES","ORNTLRES_STD", case when "ORNTLYN" = 'Yes' then '' else 'Not Done' end)
+					--("ORNLYN", 'NEWLIND','New Lesion Indicator',case when "ORNLYN"='Yes' then 'New lesion' else '' end, case when "ORNLYN"='Yes' then 'New lesion' else '' end,case when "ORNLYN" = 'Yes' then '' else 'Not Done' end)
 					
 					
 					
@@ -164,7 +165,7 @@ SELECT
     rs.rsentpt::text AS rsentpt
     /*KEY, (rs.studyid || '~' || rs.siteid || '~' || rs.usubjid || '~' || rs.rstestcd || '~' || rs.rseval || '~' || rs.rsevalid || '~' || rs.visitnum || '~' || rs.rstptnum || '~' || rs.rstptref || '~' || rs.rslnkgrp )::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM rs_data rs JOIN included_subjects s ON (rs.studyid = s.studyid AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
+FROM rs_data rs JOIN included_subjects s ON (rs.studyid = 'TAS117-201' AND rs.siteid = s.siteid AND rs.usubjid = s.usubjid);
 
 
 

@@ -18,7 +18,7 @@ sv_visit as (
         replace(study,'TAS120_204','TAS-120-204') as studyid,
                 concat(study,'_',split_part(tu.siteid,'_',2))::text AS siteid,
                 tu.usubjid::text AS usubjid,
-                (ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid,tu.tuseq  ORDER BY tu.tuseq))::numeric AS tuseq,
+                (ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid))::numeric AS tuseq,
                 tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -28,7 +28,7 @@ sv_visit as (
                 'Lesion ID'::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 tuorres::text AS tuorres,
-                null::text AS tustresc,
+                tustresc::text AS tustresc,
                 null::text AS tunam,
                 tuloc::text AS tuloc,
                 null::text AS tulat,
@@ -39,7 +39,8 @@ sv_visit as (
                tulobxfl,
                 tublfl::text AS tublfl,
                 'Independent Assessor'::text AS tueval,
-                concat('Investigator',ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.siteid,tu.usubjid ORDER BY tudtc))::text as tuevalid,
+                --concat('Investigator',ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.siteid,tu.usubjid ORDER BY tudtc))::text as tuevalid,
+                'Investigator'::text AS tuevalid,
                 null::text AS tuacptfl,
                 --(ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid ORDER BY tu.tudtc))::numeric AS 
                 coalesce (sv.visitnum,0) as visitnum,
@@ -55,7 +56,7 @@ sv_visit as (
 select distinct "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
-'NL'||"RecordPosition"::text as tuseq,
+null::text as tuseq,
 null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
@@ -92,7 +93,7 @@ select distinct
 "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
-'NTL'||"RecordPosition"::text as tuseq,
+null::text as tuseq,
 null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
@@ -128,7 +129,7 @@ select distinct
 "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
-'NTL'||"RecordPosition"::text as tuseq,
+null::text as tuseq,
 null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
@@ -163,7 +164,7 @@ union all
 Select distinct "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
-'TL'||"RecordPosition"::text as tuseq,
+null::text as tuseq,
 null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
@@ -199,7 +200,7 @@ select distinct
 "project"::text as study,
 "Subject" :: text as usubjid,
 "SiteNumber" :: text as siteid,
-'TL'||"RecordPosition"::text as tuseq,
+null::text as tuseq,
 null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
@@ -236,7 +237,8 @@ on tu."study"=svv.studyid and concat(study,'_',split_part(tu.siteid,'_',2))=svv.
 					left join 	dm
 					on 		tu."study" = dm."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = dm.siteid and tu.usubjid=dm."usubjid"
 					left join 	sv
-					on 		tu.visit = sv.visit and tu.tudtc ::date = sv.svstdtc 
+					on 		tu.visit = sv.visit
+                    where tu.tudtc is not null
 )
 
 

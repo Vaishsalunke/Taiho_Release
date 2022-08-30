@@ -25,7 +25,7 @@ WITH included_subjects AS (
         SELECT  distinct replace(Study,'TAS120_203','TAS-120-203')::text AS studyid,
                 SiteNumber::text AS siteid,
                 Subject::text AS usubjid,
-                ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject, tu.tuseq ORDER BY tu.tuseq)::numeric as tuseq,
+                ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject)::numeric as tuseq,
                 tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -34,7 +34,7 @@ WITH included_subjects AS (
                 'Lesion ID'::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 tuorres::text AS tuorres,
-                null::text AS tustresc,
+                tustresc::text AS tustresc,
                 null::text AS tunam,
                 tuloc::text AS tuloc,
                 null::text AS tulat,
@@ -44,7 +44,8 @@ WITH included_subjects AS (
                 case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
                 tublfl::text AS tublfl,
                 tueval::text AS tueval,
-                concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text as tuevalid,
+                --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text as 
+				tuevalid,
                 null::text AS tuacptfl,
                 --ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric as 
                 coalesce (sv.visitnum,0) as visitnum,
@@ -58,9 +59,9 @@ WITH included_subjects AS (
 					Select 		distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'NL'||"NLID"::text as tuseq,
+								null::text as tuseq,
 								null::text as tugrpid,								
-								'NL'||"NLID" :: text as tulnkid,
+								"NLID" :: text as tulnkid,
 								(row_number() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NLDAT")::numeric + 1) :: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
@@ -88,9 +89,9 @@ WITH included_subjects AS (
 					Select 		distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
-                                 'NTL'||"NTLBID"::text as tuseq,	
+                                 null::text as tuseq,	
                                  null::text as tugrpid,								
-                                 'NTL'||"NTLBID":: text as tulnkid,
+                                 "NTLBID":: text as tulnkid,
                                  '1' :: text as tulnkgrp,
 								 null::text AS tutestcd,
 								Null:: text as tutest,
@@ -118,9 +119,9 @@ WITH included_subjects AS (
 					Select 	distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'NTL'||"NTLID"::text as tuseq,	
+								null::text as tuseq,	
 								null::text as tugrpid,								
-								'NTL'||"NTLID":: text as tulnkid,
+								"NTLID":: text as tulnkid,
 								(row_number() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLDAT")::numeric + 1) :: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
@@ -148,9 +149,9 @@ WITH included_subjects AS (
 					Select 	distinct	'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'TL'||"TLBID"::text as tuseq,	
+								null::text as tuseq,	
 								null::text as tugrpid,								
-								'TL'||"TLBID":: text as tulnkid,
+								"TLBID":: text as tulnkid,
 								'1' :: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
@@ -178,9 +179,9 @@ WITH included_subjects AS (
 					Select 	distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
-								'TL'||"TLID"::text as tuseq,	
+								null::text as tuseq,	
 								null::text as tugrpid,								
-								'TL'||"TLID":: text as tulnkid,
+								"TLID":: text as tulnkid,
 								(row_number() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "TLDAT")::numeric + 1) :: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
@@ -208,7 +209,8 @@ WITH included_subjects AS (
 		
 		left join sv_visit svv
 on 'TAS120_203'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
-		left join sv on tu.visit = sv.visit and tu.tudtc :: date = sv.svstdtc 
+		left join sv on tu.visit = sv.visit
+		where tu.tudtc is not null
 		)
 
 SELECT

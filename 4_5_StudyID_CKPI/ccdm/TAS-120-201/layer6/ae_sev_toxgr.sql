@@ -22,8 +22,7 @@ SELECT DISTINCT studyid, siteid, sitename, sitecountry,sitecountrycode, siteregi
                  WHERE NULLIF("AETERM_PT", '') IS NOT NULL
                  
                  UNION ALL
-				 
-                 SELECT 'TAS-120-201'::text AS studyid,
+                 SELECT "project"::text AS studyid,
                         "SiteNumber"::text AS siteid,
                         "Subject"::text AS usubjid,
                         "AETERM_PT"::text AS aeterm,

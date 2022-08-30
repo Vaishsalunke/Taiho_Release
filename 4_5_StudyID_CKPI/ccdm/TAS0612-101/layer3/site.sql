@@ -54,8 +54,8 @@ WITH included_studies AS (
                         on
                          'TAS0612_101_'||"site_number" = tss.siteid
                         and  ms."center_name" = tss.sitename
-                        where --tss.studyid = 'TAS0612_101' and
-							length(ms."site_number") = 3
+                        where tss.studyid = 'TAS0612_101'
+                        and length(ms."site_number") = 3
                         group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
     ),
     site_data AS (
