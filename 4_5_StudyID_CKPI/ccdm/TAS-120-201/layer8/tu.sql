@@ -17,8 +17,8 @@ WITH included_subjects AS (
 				 from sv
 				 where visit like '%Day 1 Cycle 01' 
 				 or visit like '%Day 01 Cycle 01'
-                 or visit like '%Cycle 01 Day 01'
-				 or visit like '%Cycle 1 Day 1'
+                 or visit like '%Cycle 01 Day 01'-- done
+				 or visit like '%Cycle 1 Day 1'-- done
 				 or visit like 'Cycle 01'
 				 ),		
     tu_data AS (
@@ -49,7 +49,7 @@ WITH included_subjects AS (
         tu.tublfl,
         tu.tueval,
         --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as 
-        tuevalid,
+        tuevalid,-- done
         tu.tuacptfl,
         --ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as visitnum,
         coalesce (sv.visitnum,0) as visitnum,
@@ -66,7 +66,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
                 null ::numeric AS tuseq,
-               null::text AS tugrpid,
+               null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'NL' || "RecordPosition"::text AS tulnkid,
@@ -92,7 +92,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                -- dm.arm::text AS epoch,
-                nl."NLDAT"::text AS tudtc
+                min(nl."NLDAT") over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc
                 --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."NL" nl
@@ -104,7 +104,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
                 null ::numeric AS tuseq,
-                null::text AS tugrpid,
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'NTL' || "RecordPosition"::text AS tulnkid,
@@ -130,7 +130,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                ntlb."NTLBDAT"::text AS tudtc
+                min(ntlb."NTLBDAT")over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."NTLB" ntlb
@@ -142,7 +142,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
                 null ::numeric AS tuseq,
-                null::text AS tugrpid,
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'NTL' || "RecordPosition"::text AS tulnkid,
@@ -168,7 +168,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                ntl."NTLDAT"::text AS tudtc
+                min(ntl."NTLDAT")over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."NTL" ntl
@@ -180,7 +180,7 @@ SELECT  distinct		null::text AS comprehendid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
                 null ::numeric AS tuseq,
-                null::text AS tugrpid,
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'TL' || "RecordPosition"::text AS tulnkid,
@@ -206,7 +206,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                TLB."TLBDAT"::text AS tudtc
+                min(TLB."TLBDAT")over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."TLB" TLB
@@ -218,7 +218,7 @@ select   distinct		null::text AS comprehendid,
                 "SiteNumber"::text AS siteid,
                 "Subject"::text AS usubjid,
                 null ::numeric AS tuseq,
-                null::text AS tugrpid,
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'TL' || "RecordPosition"::text AS tulnkid,
@@ -244,7 +244,7 @@ select   distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                TL."TLDAT"::text AS tudtc
+                min(TL."TLDAT")over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 
 from tas120_201."TL" TL
@@ -255,8 +255,8 @@ left join dm
 on tu.studyid=dm.studyid and tu.siteid=dm.siteid and tu.usubjid=dm.usubjid
 left join sv_visit svv
 on tu.studyid=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
-left join sv on tu.visit = sv.visit
-where tu.tudtc is not null
+left join sv on tu.visit = sv.visit--done
+where tu.tudtc is not null --done
                 )
 
 SELECT

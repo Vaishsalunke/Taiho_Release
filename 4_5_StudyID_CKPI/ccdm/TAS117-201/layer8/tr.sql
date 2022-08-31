@@ -57,7 +57,7 @@ WITH included_subjects AS (
 						tr.trblfl,
 						tr.treval,
 						--concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as 
-						trevalid,
+						trevalid,--done
 						tr.tracptfl,
 						--row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						coalesce (tr.visitnum,0) as visitnum,
@@ -76,11 +76,11 @@ WITH included_subjects AS (
 							concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 							"Subject"::text AS usubjid,
 							null::numeric AS trseq,
-							'NEW LESION'::text AS trgrpid,
+							'NEW LESION'::text AS trgrpid,--done
 							null::text AS trrefid,
 							null::text AS trspid,
-							'NL'||nl."TUNUM2":: text :: text AS trlnkid,
-							(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NLDAT")::numeric+1) ::text AS trlnkgrp,
+							'NL'||nl."TUNUM2":: text :: text AS trlnkid,--done
+							(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NLDAT")::numeric+1) ::text AS trlnkgrp,--done
 							'TUMSTATE'::text AS trtestcd,
 							'Tumor State'::text AS trtest,
 							'Present'::text AS trorres,
@@ -112,11 +112,11 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'NON-TARGET LESION'::text AS trgrpid,
+					'NON-TARGET LESION'::text AS trgrpid,--done
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'NTL'||ntlb."TUNUM1"::text AS trlnkid,
-                	'1' ::text AS trlnkgrp,
+                	'NTL'||ntlb."TUNUM1"::text AS trlnkid,--done
+                	'1' ::text AS trlnkgrp,--done
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
                 	'Present'::text AS trorres,
@@ -148,16 +148,16 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'NON-TARGET LESION'::text AS trgrpid,
+					'NON-TARGET LESION'::text AS trgrpid,--done
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'NTL'||ntl."TUNUM1"::text AS trlnkid,
-                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "TUSTDT")::numeric+1) ::text AS trlnkgrp,
+                	'NTL'||ntl."TUNUM1"::text AS trlnkid,--done
+                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "TUSTDT")::numeric+1) ::text AS trlnkgrp,--done
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
-                	ntl."STATUS"::text AS trorres,
+                	ntl."STATUS"::text AS trorres,--done
 	                'mm'::text AS trorresu,
-	                ntl."STATUS"::text AS trstresc,
+	                ntl."STATUS"::text AS trstresc,--done
 	                1::numeric  AS trstresn,
 	                'mm'::text AS trstresu,
 	                case 
@@ -188,11 +188,11 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'TARGET LESION'::text AS trgrpid,
+					'TARGET LESION'::text AS trgrpid,--done
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'TL'||tl."TUNUM"::text AS trlnkid,
-                	'1'::text AS trlnkgrp,
+                	'TL'||tl."TUNUM"::text AS trlnkid,--done
+                	'1'::text AS trlnkgrp,--done
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
                 	tl."MEASURMT" ::text AS trorres,
@@ -227,11 +227,11 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'TARGET LESION'::text AS trgrpid,
+					'TARGET LESION'::text AS trgrpid,--done
                 	null::text AS trrefid,
                 	null::text AS trspid,
-                	'TL'||tlb."TUNUM"::text AS trlnkid,
-                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "TUSTDT")::numeric+1) ::text AS trlnkgrp,
+                	'TL'||tlb."TUNUM"::text AS trlnkid,--done
+                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "TUSTDT")::numeric+1) ::text AS trlnkgrp,--done
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
                 	tlb."MEASURMT" ::text AS trorres,
@@ -269,7 +269,7 @@ WITH included_subjects AS (
 		left join sv_visit svv
 			on tr.studyid=svv.studyid and tr.siteid=svv.siteid and tr.usubjid=svv.usubjid
 		--left join sv on tr.studyid = sv.studyid and sv.siteid = tr.siteid and sv.usubjid = tr.usubjid 
-		where tr.trdtc is not null
+		where tr.trdtc is not null--done
                 )
 
 SELECT
@@ -308,7 +308,7 @@ SELECT
     tr.trdy::numeric AS trdy
     /*KEY , (tr.studyid || '~' || tr.siteid || '~' || tr.usubjid || '~' || tr.trtestcd || '~' || tr.trevalid || '~' || tr.visitnum || '~' || tr.trlnkid || '~' || tr.trlnkgrp)::text  AS objectuniquekey  KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tr_data tr JOIN included_subjects s ON (tr.studyid = 'TAS117-201' AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid);
+FROM tr_data tr JOIN included_subjects s ON (tr.studyid = s.studyid AND tr.siteid = s.siteid AND tr.usubjid = s.usubjid);
 
 
 

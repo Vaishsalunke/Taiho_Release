@@ -76,7 +76,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								min("NLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by 'NL'||"NLID"):: date as tudtc
+								min("NLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NLID"):: date as tudtc
 								--null::text as  tudy
 					From 		TAS120_203."NL" nl
 					left join 	dm

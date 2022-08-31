@@ -79,7 +79,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NLDAT":: date as tudtc,
+								min("NLDAT") over (partition by 'TAS120_202', "SiteNumber", "Subject", "RecordPosition"):: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."NL" nl
 					left join 	dm
@@ -109,7 +109,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NTLBDAT":: date as tudtc,
+								min("NTLBDAT")over (partition by 'TAS120_202', "SiteNumber", "Subject", "RecordPosition"):: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."NTLB" ntlb
 					left join 	dm
@@ -139,7 +139,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-							    "NTLDAT":: date as tudtc,
+							    min("NTLDAT")over (partition by 'TAS120_202', "SiteNumber", "Subject", "RecordPosition"):: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."NTL" ntl
 					left join 	dm
@@ -169,7 +169,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"TLBDAT":: date as tudtc,
+								min("TLBDAT")over (partition by 'TAS120_202', "SiteNumber", "Subject", "RecordPosition"):: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."TLB" tlb
 					left join 	dm
@@ -199,7 +199,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"TLDAT":: date as tudtc,
+								min("TLDAT")over (partition by 'TAS120_202', "SiteNumber", "Subject", "RecordPosition"):: date as tudtc,
 								null::text as  tudy
 					From 		tas120_202."TL" tl
 					left join 	dm

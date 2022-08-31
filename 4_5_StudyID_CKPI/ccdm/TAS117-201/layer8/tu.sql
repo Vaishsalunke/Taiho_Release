@@ -66,8 +66,8 @@ SELECT   distinct null::text AS comprehendid,
                 project::text AS studyid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
-                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM2")::numeric AS tuseq,
-                null::text AS tugrpid,
+                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric AS tuseq, --done
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'NL' || "TUNUM2"::text AS tulnkid,
@@ -93,10 +93,10 @@ SELECT   distinct null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                -- dm.arm::text AS epoch,
-                min(nl."NLDAT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM2")::text AS tudtc
+                min(nl."NLDAT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" , "TUNUM2")::text AS tudtc --done
                 --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas117_201."NL" nl
-left join sv on nl."FolderName" = sv.visit
+left join sv on nl."FolderName" = sv.visit -- done
 
 
 union all
@@ -106,8 +106,8 @@ SELECT  distinct null::text AS comprehendid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 --"TUNUM1"::numeric AS tuseq,
-                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM1")::numeric AS tuseq,
-                null::text AS tugrpid,
+                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric AS tuseq,--done
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'NTL'|| "TUNUM1"::text AS tulnkid,
@@ -133,10 +133,10 @@ SELECT  distinct null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM1")::text AS tudtc
+                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" , "TUNUM1")::text AS tudtc --done
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas117_201."NTLBASE" ntlb
-left join sv on ntlb."FolderName" = sv.visit
+left join sv on ntlb."FolderName" = sv.visit -- done
 
 union all
 
@@ -145,8 +145,8 @@ SELECT  distinct null::text AS comprehendid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 --"TUNUM1"::numeric AS tuseq,
-                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM1")::numeric AS tuseq,
-                null::text AS tugrpid,
+                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric AS tuseq,--done
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'NTL'||"TUNUM1"::text AS tulnkid,
@@ -172,10 +172,10 @@ SELECT  distinct null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM1")::text AS tudtc
+                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" , "TUNUM1")::text AS tudtc --done
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas117_201."NTLPB" ntl
-left join sv on ntl."FolderName" = sv.visit
+left join sv on ntl."FolderName" = sv.visit -- done
 
 
 union all
@@ -185,8 +185,8 @@ SELECT  distinct null::text AS comprehendid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 --"TUNUM"::numeric AS tuseq,
-                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM")::numeric AS tuseq,
-                null::text AS tugrpid,
+                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric AS tuseq,--done
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'TL'|| "TUNUM"::text AS tulnkid,
@@ -212,10 +212,10 @@ SELECT  distinct null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM")::text AS tudtc
+                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" , "TUNUM")::text AS tudtc --done
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas117_201."TLRN2" TL
-left join sv on TL."FolderName" = sv.visit
+left join sv on TL."FolderName" = sv.visit -- done
 
 
 union all
@@ -225,8 +225,8 @@ select   distinct null::text AS comprehendid,
                 concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
                 "Subject"::text AS usubjid,
                 --"TUNUM"::numeric AS tuseq,
-                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM")::numeric AS tuseq,
-                null::text AS tugrpid,
+                ROW_NUMBER() OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric AS tuseq,--done
+                null::text AS tugrpid, --done
                 null::text AS turefid,
                 null::text AS tuspid,
                 'TL'|| "TUNUM"::text AS tulnkid,
@@ -252,10 +252,10 @@ select   distinct null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" ORDER BY "TUNUM")::text AS tudtc
+                min("TUSTDT") OVER (PARTITION BY project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" , "TUNUM")::text AS tudtc --done
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas117_201."TLPB" TLB
-left join sv on TLB."FolderName" = sv.visit
+left join sv on TLB."FolderName" = sv.visit -- done
 )tu
 left join ex_data ex
 on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
@@ -264,7 +264,7 @@ on tu.studyid=dm.studyid and tu.siteid=dm.siteid and tu.usubjid=dm.usubjid
 left join sv_visit svv
 on tu.studyid=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
 --left join sv on tu.studyid = sv.studyid and sv.siteid = tu.siteid and sv.usubjid = tu.usubjid
-where tu.tudtc is not null
+where tu.tudtc is not null --done
                 )
 
 SELECT
@@ -302,7 +302,7 @@ SELECT
     tu.tudy::numeric AS tudy
     /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tu_data tu JOIN included_subjects s ON (tu.studyid = 'TAS117-201' AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
+FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
 ;
 
 

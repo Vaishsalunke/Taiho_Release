@@ -24,8 +24,8 @@ WITH included_subjects AS (
 				 from sv
 				 where visit like '%Day 1 Cycle 01' 
 				 or visit like '%Day 01 Cycle 01'
-				 or visit like '%Cycle 01 Day 01'
-				 or visit like '%Cycle 1 Day 1'
+				 or visit like '%Cycle 01 Day 01'-- done
+				 or visit like '%Cycle 1 Day 1'-- done
 				 or visit like 'Cycle 01'
 				 ),	
 				
@@ -58,7 +58,7 @@ WITH included_subjects AS (
 						trblfl,
 						treval,
 						--concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as 
-						trevalid,
+						trevalid,-- done
 						tracptfl,
 						--row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc) as visitnum,
 						coalesce(sv.visitnum,0) as visitnum, 
@@ -78,7 +78,7 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'NEW LESION' ::text AS trgrpid,
+					'NEW LESION' ::text AS trgrpid, --done
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'NL' || "RecordPosition" ::text AS trlnkid,
@@ -113,7 +113,7 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'NON-TARGET LESION' ::text AS trgrpid,
+					'NON-TARGET LESION' ::text AS trgrpid, --done
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'NTL' || "RecordPosition" ::text AS trlnkid,
@@ -148,7 +148,7 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'NON-TARGET LESION' ::text AS trgrpid,
+					'NON-TARGET LESION' ::text AS trgrpid, --done
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'NTL' || "RecordPosition" ::text AS trlnkid,
@@ -183,7 +183,7 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'TARGET LESION' ::text AS trgrpid,
+					'TARGET LESION' ::text AS trgrpid, --done
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'TL' || "RecordPosition" ::text AS trlnkid,
@@ -218,7 +218,7 @@ WITH included_subjects AS (
 					concat(project,'_',split_part("SiteNumber",'_',2))::text AS siteid,
 					"Subject"::text AS usubjid,
 					null::numeric AS trseq,
-					'TARGET LESION' ::text AS trgrpid,
+					'TARGET LESION' ::text AS trgrpid, --done
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'TL' || "RecordPosition" ::text AS trlnkid,
@@ -254,8 +254,8 @@ WITH included_subjects AS (
 		on tr.studyid=ex.studyid and tr.siteid=ex.siteid and tr.usubjid=ex.usubjid
 		left join sv_visit svv
 			on tr.studyid=svv.studyid and tr.siteid=svv.siteid and tr.usubjid=svv.usubjid
-		left join sv on tr.visit = sv.visit
-		where tr.trdtc is not null
+		left join sv on tr.visit = sv.visit-- done
+		where tr.trdtc is not null -- done
                 )
 
 SELECT
