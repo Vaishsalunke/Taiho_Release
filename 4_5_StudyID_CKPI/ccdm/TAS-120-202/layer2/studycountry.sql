@@ -9,7 +9,7 @@ WITH included_studies AS (
 
      studycountry_data AS (
                  SELECT distinct 'TAS-120-202'::text AS studyid,				 
-						coalesce(case when c.site_country = 'United States' then 'United States of America' else c.site_country end,'')::text AS country_src,
+						coalesce(case when c.site_country = 'United States' then 'United States of America' else s.country_name  end,'')::text AS country_src,
                         ''::text AS countrystatus_src,
                         ''::text AS countrystatus,
                         alpha_3_code::text AS countrycode,

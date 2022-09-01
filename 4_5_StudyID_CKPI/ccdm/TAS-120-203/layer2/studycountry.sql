@@ -8,7 +8,7 @@ WITH included_studies AS (
 
      studycountry_data AS (
                 SELECT distinct 'TAS-120-203'::text AS studyid,				 
-						 case 
+						 /*case 
 							when length(trim(SUBSTRING( "name",1, POSITION('_' in "name")-1)))=3
 								THEN CASE when left(SUBSTRING( "name",1, POSITION('_' in "name")-1),1)='0' then 'US'
 										  when SUBSTRING( "name",1, POSITION('_' in "name")-1) between '100' and '149' then 'United Kingdom'
@@ -18,7 +18,7 @@ WITH included_studies AS (
 										  when SUBSTRING( "name",1, POSITION('_' in "name")-1) between '300' and '349' then 'Italy'
 										  when SUBSTRING( "name",1, POSITION('_' in "name")-1) between '350' and '399' then 'Canada'
 									 end
-						else 'United States of America' end::text AS country_src,
+						else 'United States of America' end*/s.country_name ::text AS country_src,
                         ''::text AS countrystatus_src,
                         ''::text AS countrystatus,
                         alpha_3_code::text AS countrycode,
