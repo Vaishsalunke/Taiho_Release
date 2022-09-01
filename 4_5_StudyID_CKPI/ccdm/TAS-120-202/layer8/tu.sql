@@ -26,7 +26,7 @@ WITH included_subjects AS (
         SELECT  distinct replace(Study,'TAS120_202','TAS-120-202')::text AS studyid,
                 SiteNumber::text AS siteid,
                 Subject::text AS usubjid,
-                ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject)::numeric as tuseq,
+                rank() OVER (PARTITION BY Study, SiteNumber, Subject)::numeric as tuseq,
                 tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -65,7 +65,7 @@ WITH included_subjects AS (
 								null::text as tuseq,
 								null:: text as tugrpid,
 								'NL'||"RecordPosition":: text as tulnkid,
-								(row_number() over (partition by 'TAS120_202', "SiteNumber", "Subject" order by 'NLDAT')::numeric+1):: text as tulnkgrp,
+								(rank() over (partition by 'TAS120_202', "SiteNumber", "Subject" order by 'NLDAT')::numeric+1):: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
 								'New':: text as tuorres,
@@ -125,7 +125,7 @@ WITH included_subjects AS (
 								null ::text as tuseq,
 								null:: text as tugrpid,
 								'NTL'||"RecordPosition":: text as tulnkid,
-								(row_number() over (partition by 'TAS120_202', "SiteNumber", "Subject" order by 'NTLDAT')::numeric+1):: text as tulnkgrp,
+								(rank() over (partition by 'TAS120_202', "SiteNumber", "Subject" order by 'NTLDAT')::numeric+1):: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
 								'NON-TARGET':: text as tuorres,
@@ -185,7 +185,7 @@ WITH included_subjects AS (
 								null ::text as tuseq,
 								null:: text as tugrpid,
 								'TL'||"RecordPosition":: text as tulnkid,
-								(row_number() over (partition by 'TAS120_202', "SiteNumber", "Subject" order by 'TLDAT')::numeric+1):: text as tulnkgrp,
+								(rank() over (partition by 'TAS120_202', "SiteNumber", "Subject" order by 'TLDAT')::numeric+1):: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
 								'TARGET':: text as tuorres,
@@ -212,7 +212,7 @@ WITH included_subjects AS (
 		
 		left join sv_visit svv
 on 'TAS120_202'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
-		left join sv on tu.visit = sv.visit
+		left join sv on tu.visit = sv.visit and 'TAS-120-202' = sv.studyid
 		where tu.tudtc is not null
 		)
 

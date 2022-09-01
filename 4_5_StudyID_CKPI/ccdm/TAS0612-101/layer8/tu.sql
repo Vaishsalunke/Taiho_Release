@@ -33,7 +33,7 @@ WITH included_subjects AS (
         replace(tu.studyid,'TAS0612_101','TAS0612-101') as studyid,
         tu.siteid,
         tu.usubjid,
-        ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid)::numeric as tuseq,
+        rank() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid)::numeric as tuseq,
         tu.tugrpid,
         tu.turefid,
         tu.tuspid,
@@ -75,7 +75,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 null::text AS turefid,
                 null::text AS tuspid,
                 "NLNUM"::text AS tulnkid,
-                (row_number() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "NLDAT")::numeric+1)::text AS tulnkgrp,
+                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "NLDAT")::numeric+1)::text AS tulnkgrp,
                 'Lesion ID'::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 'NEW'::text AS tuorres,
@@ -96,7 +96,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                -- dm.arm::text AS epoch,
-                min(nl."NLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by 'NL-'||"NLNUM")::text AS tudtc
+                min(nl."NLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NLNUM")::text AS tudtc
                 --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas0612_101."NL" nl
 
@@ -133,7 +133,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min(ntlb."NTLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by 'NTL-'||"NTLSNUM")::text AS tudtc
+                min(ntlb."NTLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLSNUM")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas0612_101."NTLB" ntlb
 
@@ -148,7 +148,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::text AS turefid,
                 null::text AS tuspid,
                 "NTLSNUM"::text AS tulnkid,
-                (row_number() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "NTLDAT")::numeric+1)::text AS tulnkgrp,
+                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "NTLDAT")::numeric+1)::text AS tulnkgrp,
                 'Lesion ID'::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 'NON-TARGET'::text AS tuorres,
@@ -170,7 +170,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min(ntl."NTLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by 'NTL-'||"NTLSNUM")::text AS tudtc
+                min(ntl."NTLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLSNUM")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas0612_101."NTL" ntl
 
@@ -206,7 +206,7 @@ SELECT  distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min(tlb."TLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by 'TL-'||"LSNUM")::text AS tudtc
+                min(tlb."TLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "LSNUM")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas0612_101."TLB" TLB
 
@@ -221,7 +221,7 @@ select   distinct		null::text AS comprehendid,
                 null::text AS turefid,
                 null::text AS tuspid,
                 "LSNUM"::text AS tulnkid,
-                (row_number() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "TLDAT")::numeric+1)::text AS tulnkgrp,
+                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "TLDAT")::numeric+1)::text AS tulnkgrp,
                 'Lesion ID'::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
                 'TARGET'::text AS tuorres,
@@ -242,7 +242,7 @@ select   distinct		null::text AS comprehendid,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
                 --dm.arm::text AS epoch,
-                min(tl."TLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by 'TL-'||"LSNUM")::text AS tudtc
+                min(tl."TLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "LSNUM")::text AS tudtc
                 ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
 from tas0612_101."TL" TL
 )tu
@@ -255,7 +255,7 @@ on tu.studyid=exv.studyid and tu.siteid=exv.siteid and tu.usubjid=exv.usubjid
 left join sv_visit svv
 on tu.studyid=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
 left join sv
-on tu.visit = sv.visit
+on tu.visit = sv.visit and 'TAS0612-101' = sv.studyid
 where tu.tudtc is not null
                 )
 

@@ -18,7 +18,7 @@ sv_visit as (
         replace(study,'TAS120_204','TAS-120-204') as studyid,
                 concat(study,'_',split_part(tu.siteid,'_',2))::text AS siteid,
                 tu.usubjid::text AS usubjid,
-                (ROW_NUMBER() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid))::numeric AS tuseq,
+                (rank() OVER (PARTITION BY tu.study, tu.siteid, tu.usubjid))::numeric AS tuseq,
                 tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -61,7 +61,7 @@ null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
 'NL'||"RecordPosition":: text as tulnkid,
-(row_number() over (partition by "project", "Subject", "SiteNumber" order by "NLDAT")::numeric+1)::text as tulnkgrp,
+(rank() over (partition by "project", "Subject", "SiteNumber" order by "NLDAT")::numeric+1)::text as tulnkgrp,
 null :: text as tutestcd,
 null:: text as tutest,
 'NEW':: text as tuorres,
@@ -82,7 +82,7 @@ null:: numeric as visitnum,
 NULL:: text as visitdy,
 NULL:: text as taetord,
 null:: text as epoch,
-"NLDAT":: date as tudtc,
+min("NLDAT")  over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 null::text as  tudy
 From tas120_204."NL" n1
 
@@ -119,7 +119,7 @@ null:: numeric as visitnum,
 NULL:: text as visitdy,
 NULL:: text as taetord,
 null:: text as epoch,
-"NTLBDAT":: date as tudtc,
+min("NTLBDAT") over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 null::text as  tudy
 From tas120_204."NTLB" ntlb
 
@@ -134,7 +134,7 @@ null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
 'NTL'||"RecordPosition":: text as tulnkid,
-(row_number() over (partition by "project", "Subject", "SiteNumber" order by "NTLDAT")::numeric+1)::text as tulnkgrp,
+(rank() over (partition by "project", "Subject", "SiteNumber" order by "NTLDAT")::numeric+1)::text as tulnkgrp,
 null :: text as tutestcd,
 null:: text as tutest,
 'NON-TARGET':: text as tuorres,
@@ -155,7 +155,7 @@ null:: numeric as visitnum,
 NULL:: text as visitdy,
 NULL:: text as taetord,
 null:: text as epoch,
-"NTLDAT":: date as tudtc,
+min("NTLDAT") over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 null::text as  tudy
 From tas120_204."NTL" ntl
 
@@ -190,7 +190,7 @@ null:: numeric as visitnum,
 NULL:: text as visitdy,
 NULL:: text as taetord,
 null:: text as epoch,
-"TLBDAT":: date as tudtc,
+min("TLBDAT") over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 null::text as  tudy
 From tas120_204."TLB" tlb
 
@@ -205,7 +205,7 @@ null::text as tugrpid,
 NULL::text as turefid,
 NULL::text as tuspid,
 'TL'||"RecordPosition":: text as tulnkid,
-(row_number() over (partition by "project", "Subject", "SiteNumber" order by "TLDAT")::numeric+1)::text as tulnkgrp,
+(rank() over (partition by "project", "Subject", "SiteNumber" order by "TLDAT")::numeric+1)::text as tulnkgrp,
 null :: text as tutestcd,
 null:: text as tutest,
 'TARGET':: text as tuorres,
@@ -226,7 +226,7 @@ null:: numeric as visitnum,
 NULL:: text as visitdy,
 NULL:: text as taetord,
 null:: text as epoch,
-"TLDAT":: date as tudtc,
+min("TLDAT") over (partition by project, "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 null::text as  tudy
 From tas120_204."TL" tl
 )tu
@@ -237,7 +237,7 @@ on tu."study"=svv.studyid and concat(study,'_',split_part(tu.siteid,'_',2))=svv.
 					left join 	dm
 					on 		tu."study" = dm."studyid" and concat(study,'_',split_part(tu.siteid,'_',2)) = dm.siteid and tu.usubjid=dm."usubjid"
 					left join 	sv
-					on 		tu.visit = sv.visit
+					on 		tu.visit = sv.visit and 'TAS-120-204' = sv.studyid
                     where tu.tudtc is not null
 )
 

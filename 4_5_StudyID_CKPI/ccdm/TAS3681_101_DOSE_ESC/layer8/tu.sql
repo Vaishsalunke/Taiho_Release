@@ -22,7 +22,7 @@ WITH included_subjects AS (
         SELECT  distinct tu.Study::text AS studyid,
                 tu.SiteNumber::text AS siteid,
                 tu.Subject::text AS usubjid,
-                row_number() over (partition by tu.Study, tu.SiteNumber, tu.Subject)::numeric AS tuseq,
+                rank() over (partition by tu.Study, tu.SiteNumber, tu.Subject)::numeric AS tuseq,
                 tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
@@ -61,7 +61,7 @@ WITH included_subjects AS (
 								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'NL' || "RecordPosition":: text as tulnkid,
-								(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NLIMGDAT")::numeric + 1):: text as tulnkgrp,
+								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NLIMGDAT")::numeric + 1):: text as tulnkgrp,
 								'Lesion ID'::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'NEW':: text as tuorres,
@@ -75,7 +75,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NLIMGDAT":: date as tudtc,
+								min("NLIMGDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 								null::text as  tudy
 					From 		tas3681_101."NL" nl
 					left join 	dm
@@ -89,7 +89,7 @@ WITH included_subjects AS (
 								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'NTL' || "RecordPosition":: text as tulnkid,
-								(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NTLBDAT")::numeric + 1):: text as tulnkgrp,
+								'1':: text as tulnkgrp,
 								'Lesion ID'::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'NON-TARGET':: text as tuorres,
@@ -103,7 +103,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NTLBDAT":: date as tudtc,
+								min("NTLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 								null::text as  tudy
 					From 		tas3681_101."NTLB" ntlb
 					left join 	dm
@@ -117,7 +117,7 @@ WITH included_subjects AS (
 								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'NTL' || "RecordPosition":: text as tulnkid,
-								(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NTLDAT")::numeric + 1):: text as tulnkgrp,
+								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NTLDAT")::numeric + 1):: text as tulnkgrp,
 								'Lesion ID'::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'NON-TARGET':: text as tuorres,
@@ -131,7 +131,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"NTLDAT":: date as tudtc,
+								min("NTLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 								null::text as  tudy
 					From 		tas3681_101."NTL" ntl
 					left join 	dm
@@ -145,7 +145,7 @@ WITH included_subjects AS (
 								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'TL' || "RecordPosition":: text as tulnkid,
-								(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "TLBDAT")::numeric + 1):: text as tulnkgrp,
+								'1':: text as tulnkgrp,
 								'Lesion ID'::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'TARGET':: text as tuorres,
@@ -159,7 +159,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"TLBDAT":: date as tudtc,
+								min("TLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 								null::text as  tudy
 					From 		tas3681_101."TLB" tlb
 					left join 	dm
@@ -173,7 +173,7 @@ WITH included_subjects AS (
 								null::numeric as tuseq,
 								null:: text as tugrpid,
 								'TL' || "RecordPosition":: text as tulnkid,
-								(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "TLDAT")::numeric + 1):: text as tulnkgrp,
+								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "TLDAT")::numeric + 1):: text as tulnkgrp,
 								'Lesion ID'::text AS tutestcd,
 								'Lesion Identification':: text as tutest,
 								'TARGET':: text as tuorres,
@@ -187,7 +187,7 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								"TLDAT":: date as tudtc,
+								min("TLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
 								null::text as  tudy
 					From 		tas3681_101."TL" tl
 					left join 	dm
@@ -199,7 +199,7 @@ WITH included_subjects AS (
 		left join sv_visit svv
 on 'TAS3681_101_DOSE_ESC'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
 				left join sv
-on tu.visit = sv.visit
+on tu.visit = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid
 where tu.tudtc is not null
 		)
 
