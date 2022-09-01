@@ -43,8 +43,7 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						--concat(u.trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc))::text as 
-						trevalid,
+						concat(u.trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc))::text as trevalid,
 						tracptfl,
 						--row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as 
 						coalesce (sv.visitnum,0) as visitnum,
@@ -295,7 +294,7 @@ WITH included_subjects AS (
 		left join sv_visit svv
 			on u.studyid=svv.studyid and u.siteid=svv.siteid and u.usubjid=svv.usubjid
 		left join sv on sv.visit = u.visit
-		where tr.trdtc is not null
+		where u.trdtc is not null
                 )
 
 SELECT

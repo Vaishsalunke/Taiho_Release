@@ -53,8 +53,7 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						--concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as 
-						trevalid,
+						concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as trevalid,
 						tracptfl,
 						--row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc) as visitnum,
 						coalesce (sv.visitnum, 0) as visitnum,
