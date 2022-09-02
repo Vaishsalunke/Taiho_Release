@@ -20,49 +20,18 @@ WITH included_subjects AS (
 				 or visit like '%Day 01 Cycle 01'
 				 or visit like 'Cycle 01'
 				 ),		
-				
-    tu_data AS (
-        SELECT  distinct replace(Study,'TAS120_203','TAS-120-203')::text AS studyid,
-                SiteNumber::text AS siteid,
-                Subject::text AS usubjid,
-                rank() OVER (PARTITION BY Study, SiteNumber, Subject)::numeric as tuseq,
-                tugrpid::text AS tugrpid,
-                null::text AS turefid,
-                null::text AS tuspid,
-                tulnkid::text as tulnkid,
-                tulnkgrp::text AS tulnkgrp,
-                'Lesion ID'::text AS tutestcd,
-                'Lesion Identification'::text AS tutest,
-                tuorres::text AS tuorres,
-                tustresc::text AS tustresc,
-                null::text AS tunam,
-                tuloc::text AS tuloc,
-                null::text AS tulat,
-                null::text AS tudir,
-                null::text AS tuportot,
-                tumethod::text AS tumethod,
-                case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
-                tublfl::text AS tublfl,
-                tueval::text AS tueval,
-                --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text as 
-				tuevalid,
-                null::text AS tuacptfl,
-                --ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric as 
-                coalesce (sv.visitnum,0) as visitnum,
-                tu.visit::text AS visit,
-                Null::numeric AS visitdy,
-                null::numeric AS taetord,
-                epoch::text AS epoch,
-                tudtc::text as tudtc,
-                (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
-		FROM	(
+
+				 tu_raw  as (select *, min(tudtc) OVER (PARTITION BY Study, SiteNumber,Subject, tulnkid)::text AS tudtc_min 
+				 
+				 FROM	(
+					
 					Select 		distinct 'TAS120_203':: text as Study, 
 								concat('TAS120_203_',split_part("SiteNumber",'_',2)) :: text as SiteNumber,
 								"Subject" :: text as Subject,
 								null::text as tuseq,
 								null::text as tugrpid,								
 								"NLID" :: text as tulnkid,
-								(rank() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NLDAT")::numeric + 1) :: text as tulnkgrp,
+								(rank() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject", "NLID" order by "NLDAT")) :: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
 								'NEW':: text as tuorres,
@@ -76,7 +45,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								min("NLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NLID"):: date as tudtc
+								--min("NLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NLID"):: 
+								"NLDAT"::date as tudtc
 								--null::text as  tudy
 					From 		TAS120_203."NL" nl
 					left join 	dm
@@ -106,7 +76,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								min("NTLBDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLBID"):: date as tudtc
+								--min("NTLBDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLBID"):: 
+								"NTLBDAT"::date as tudtc
 								--null::text as  tudy
 					From 		TAS120_203."NTLB" ntlb
 					left join 	dm
@@ -122,7 +93,7 @@ WITH included_subjects AS (
 								null::text as tuseq,	
 								null::text as tugrpid,								
 								"NTLID":: text as tulnkid,
-								(rank() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLDAT")::numeric + 1) :: text as tulnkgrp,
+								(rank() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject","NTLID" order by "NTLDAT")) :: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
 								'NON-TARGET':: text as tuorres,
@@ -136,7 +107,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-							    min("NTLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLID"):: date as tudtc
+							    --min("NTLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLID"):: 
+								"NTLDAT"::date as tudtc
 								--null::text as  tudy
 					From 		TAS120_203."NTL" ntl
 					left join 	dm
@@ -166,7 +138,8 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								min("TLBDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "TLBID"):: date as tudtc
+								--min("TLBDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "TLBID"):: 
+								"TLBDAT"::date as tudtc
 								--null::text as  tudy
 					From 		TAS120_203."TLB" tlb
 					left join 	dm
@@ -182,7 +155,7 @@ WITH included_subjects AS (
 								null::text as tuseq,	
 								null::text as tugrpid,								
 								"TLID":: text as tulnkid,
-								(rank() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "TLDAT")::numeric + 1) :: text as tulnkgrp,
+								(rank() over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject", "TLID" order by "TLDAT")) :: text as tulnkgrp,
 								null::text AS tutestcd,
 								Null:: text as tutest,
 								'TARGET':: text as tuorres,
@@ -196,20 +169,60 @@ WITH included_subjects AS (
 								null:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
-								min("TLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "TLID"):: date as tudtc
+								--min("TLDAT") over (partition by 'TAS120_203', concat('TAS120_203_',split_part("SiteNumber",'_',2)), "Subject" order by "TLID"):: 
+								"TLDAT"::date as tudtc
 								--null::text as  tudy
 					From 		TAS120_203."TL" tl
 					left join 	dm
 					on 			dm.studyid = 'TAS120_203'
 					            and concat('TAS120_203_',split_part("SiteNumber",'_',2)) = dm.siteid
 					            and tl."Subject"=dm.usubjid
-		)tu	
+		)a),
+				
+    tu_data AS (
+        SELECT  distinct replace(tu.Study,'TAS120_203','TAS-120-203')::text AS studyid,
+                tu.SiteNumber::text AS siteid,
+                tu.Subject::text AS usubjid,
+                rank() OVER (PARTITION BY tu.Study, tu.SiteNumber, tu.Subject)::numeric as tuseq,
+                tugrpid::text AS tugrpid,
+                null::text AS turefid,
+                null::text AS tuspid,
+                tulnkid::text as tulnkid,
+                tulnkgrp::text AS tulnkgrp,
+                'Lesion ID'::text AS tutestcd,
+                'Lesion Identification'::text AS tutest,
+                tuorres::text AS tuorres,
+                tustresc::text AS tustresc,
+                null::text AS tunam,
+                tuloc::text AS tuloc,
+                null::text AS tulat,
+                null::text AS tudir,
+                null::text AS tuportot,
+                tumethod::text AS tumethod,
+                case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS tulobxfl,
+                tublfl::text AS tublfl,
+                tueval::text AS tueval,
+                --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text as 
+				tuevalid,
+                null::text AS tuacptfl,
+                --ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric as 
+                coalesce (sv.visitnum,0) as visitnum,
+                tu.visit::text AS visit,
+                Null::numeric AS visitdy,
+                null::numeric AS taetord,
+                epoch::text AS epoch,
+                tudtc::text as tudtc,
+                (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
+				from tu_raw tu
+				inner join (select distinct Study, SiteNumber, Subject, tudtc_min
+			from tu_raw) tu1
+on tu.Study = tu1.Study and tu.SiteNumber=tu1.SiteNumber and tu.Subject =tu1.Subject and tu.tudtc:: date = tu1.tudtc_min:: date  
 		left join 	ex_data e1
-		on 'TAS120_203'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
+		on 'TAS120_203'=e1.studyid and tu.SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		
 		left join sv_visit svv
-on 'TAS120_203'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
-		left join sv on tu.visit = sv.visit and 'TAS-120-203' = sv.studyid
+on 'TAS120_203'=svv.studyid and tu.SiteNumber=svv.siteid and tu.Subject=svv.usubjid
+		left join sv on tu.visit = sv.visit and 'TAS-120-203' = sv.studyid  and tu.SiteNumber = sv.siteid and tu.Subject = sv.usubjid
 		where tu.tudtc is not null
 		)
 

@@ -18,6 +18,155 @@ WITH included_subjects AS (
 				 or visit like '%Day 01 Cycle 01'
 				 or visit like 'Cycle 01'
 				 ),	
+
+tu_raw as (
+	select *, min(tudtc) OVER (PARTITION BY study, SiteNumber,subject, tulnkid)::text AS tudtc_min
+	FROM	(
+					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
+								"SiteNumber" :: text as SiteNumber,
+								"Subject" :: text as Subject,
+								null::numeric as tuseq,
+								null:: text as tugrpid,
+								'NL' || "RecordPosition":: text as tulnkid,
+								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition" order by "NLIMGDAT")):: text as tulnkgrp,
+								'Lesion ID'::text AS tutestcd,
+								'Lesion Identification':: text as tutest,
+								'NEW':: text as tuorres,
+								'NEW':: text as tustresc,
+								"NLSITE":: text as tuloc,
+								case when "NLMETH"='Other' then "NLOTH" else "NLMETH" end:: Text as tumethod,
+								'N'::text as tulobxfl,
+								'N':: text as tublfl,
+								'Independent Assessor':: text as tueval,
+								'Investigator':: text as tuevalid,
+								null:: numeric as visitnum,
+								"FolderName"::text as visit,
+								dm."arm":: text as epoch,
+								--min("NLIMGDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
+								"NLIMGDAT"::text AS tudtc,
+								null::text as  tudy
+					From 		tas3681_101."NL" nl
+					left join 	dm
+					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and nl."Subject"=dm.usubjid
+										
+					union all
+					
+					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
+								"SiteNumber" :: text as SiteNumber,
+								"Subject" :: text as Subject,
+								null::numeric as tuseq,
+								null:: text as tugrpid,
+								'NTL' || "RecordPosition":: text as tulnkid,
+								'1':: text as tulnkgrp,
+								'Lesion ID'::text AS tutestcd,
+								'Lesion Identification':: text as tutest,
+								'NON-TARGET':: text as tuorres,
+								'NON-TARGET':: text as tustresc,
+								"NTLBSITE":: text as tuloc,
+								case when "NTLBMETH"='Other' then "NTLBOTH" else "NTLBMETH" end:: Text as tumethod,
+								'Y'::text as tulobxfl,
+								'Y':: text as tublfl,
+								'Independent Assessor':: text as tueval,
+								'Investigator':: text as tuevalid,
+								null:: numeric as visitnum,
+								"FolderName"::text as visit,
+								dm."arm":: text as epoch,
+								--min("NTLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
+								"NTLBDAT"::text AS tudtc,
+								null::text as  tudy
+					From 		tas3681_101."NTLB" ntlb
+					left join 	dm
+					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntlb."Subject"=dm.usubjid
+										
+					union all
+					
+					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
+								"SiteNumber" :: text as SiteNumber,
+								"Subject" :: text as Subject,
+								null::numeric as tuseq,
+								null:: text as tugrpid,
+								'NTL' || "RecordPosition":: text as tulnkid,
+								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition" order by "NTLDAT")):: text as tulnkgrp,
+								'Lesion ID'::text AS tutestcd,
+								'Lesion Identification':: text as tutest,
+								'NON-TARGET':: text as tuorres,
+								'NON-TARGET':: text as tustresc,
+								"NTLSITE":: text as tuloc,
+								case when "NTLMETH"='Other' then "NTLOTH" else "NTLMETH" end:: Text as tumethod,
+								'N'::text as tulobxfl,
+								'N':: text as tublfl,
+								'Independent Assessor':: text as tueval,
+								'Investigator':: text as tuevalid,
+								null:: numeric as visitnum,
+								"FolderName"::text as visit,
+								dm."arm":: text as epoch,
+								--min("NTLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
+								"NTLDAT"::text AS tudtc,
+								null::text as  tudy
+					From 		tas3681_101."NTL" ntl
+					left join 	dm
+					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntl."Subject"=dm.usubjid
+									
+					union all
+					
+					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
+								"SiteNumber" :: text as SiteNumber,
+								"Subject" :: text as Subject,
+								null::numeric as tuseq,
+								null:: text as tugrpid,
+								'TL' || "RecordPosition":: text as tulnkid,
+								'1':: text as tulnkgrp,
+								'Lesion ID'::text AS tutestcd,
+								'Lesion Identification':: text as tutest,
+								'TARGET':: text as tuorres,
+								'TARGET':: text as tustresc,
+								"TLBSITE":: text as tuloc,
+								case when "TLBMETH"='Other' then "TLBOTH" else "TLBMETH" end:: Text as tumethod,
+								'Y'::text as tulobxfl,
+								'Y':: text as tublfl,
+								'Independent Assessor':: text as tueval,
+								'Investigator':: text as tuevalid,
+								null:: numeric as visitnum,
+								"FolderName"::text as visit,
+								dm."arm":: text as epoch,
+								--min("TLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
+								"TLBDAT"::text AS tudtc,
+								null::text as  tudy
+					From 		tas3681_101."TLB" tlb
+					left join 	dm
+					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tlb."Subject"=dm.usubjid
+									
+					union all
+					
+					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
+								"SiteNumber" :: text as SiteNumber,
+								"Subject" :: text as Subject,
+								null::numeric as tuseq,
+								null:: text as tugrpid,
+								'TL' || "RecordPosition":: text as tulnkid,
+								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition" order by "TLDAT")):: text as tulnkgrp,
+								'Lesion ID'::text AS tutestcd,
+								'Lesion Identification':: text as tutest,
+								'TARGET':: text as tuorres,
+								'TARGET':: text as tustresc,
+								"TLSITE":: text as tuloc,
+								case when "TLMETH"='Other' then "TLOTH" else "TLMETH" end:: Text as tumethod,
+								'N'::text as tulobxfl,
+								'N':: text as tublfl,
+								'Independent Assessor':: text as tueval,
+								'Investigator':: text as tuevalid,
+								null:: numeric as visitnum,
+								"FolderName"::text as visit,
+								dm."arm":: text as epoch,
+								--min("TLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
+								"TLDAT"::text AS tudtc,
+								null::text as  tudy
+					From 		tas3681_101."TL" tl
+					left join 	dm
+					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tl."Subject"=dm.usubjid
+					
+		)a),
+
     tu_data AS (
         SELECT  distinct tu.Study::text AS studyid,
                 tu.SiteNumber::text AS siteid,
@@ -54,152 +203,16 @@ WITH included_subjects AS (
                 tu.epoch::text AS epoch,
                 tu.tudtc::text AS tudtc,
                 (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
-		FROM	(
-					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
-								"Subject" :: text as Subject,
-								null::numeric as tuseq,
-								null:: text as tugrpid,
-								'NL' || "RecordPosition":: text as tulnkid,
-								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NLIMGDAT")::numeric + 1):: text as tulnkgrp,
-								'Lesion ID'::text AS tutestcd,
-								'Lesion Identification':: text as tutest,
-								'NEW':: text as tuorres,
-								'NEW':: text as tustresc,
-								"NLSITE":: text as tuloc,
-								case when "NLMETH"='Other' then "NLOTH" else "NLMETH" end:: Text as tumethod,
-								'N'::text as tulobxfl,
-								'N':: text as tublfl,
-								'Independent Assessor':: text as tueval,
-								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
-								"FolderName"::text as visit,
-								dm."arm":: text as epoch,
-								min("NLIMGDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
-								null::text as  tudy
-					From 		tas3681_101."NL" nl
-					left join 	dm
-					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and nl."Subject"=dm.usubjid
-										
-					union all
-					
-					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
-								"Subject" :: text as Subject,
-								null::numeric as tuseq,
-								null:: text as tugrpid,
-								'NTL' || "RecordPosition":: text as tulnkid,
-								'1':: text as tulnkgrp,
-								'Lesion ID'::text AS tutestcd,
-								'Lesion Identification':: text as tutest,
-								'NON-TARGET':: text as tuorres,
-								'NON-TARGET':: text as tustresc,
-								"NTLBSITE":: text as tuloc,
-								case when "NTLBMETH"='Other' then "NTLBOTH" else "NTLBMETH" end:: Text as tumethod,
-								'Y'::text as tulobxfl,
-								'Y':: text as tublfl,
-								'Independent Assessor':: text as tueval,
-								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
-								"FolderName"::text as visit,
-								dm."arm":: text as epoch,
-								min("NTLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
-								null::text as  tudy
-					From 		tas3681_101."NTLB" ntlb
-					left join 	dm
-					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntlb."Subject"=dm.usubjid
-										
-					union all
-					
-					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
-								"Subject" :: text as Subject,
-								null::numeric as tuseq,
-								null:: text as tugrpid,
-								'NTL' || "RecordPosition":: text as tulnkid,
-								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NTLDAT")::numeric + 1):: text as tulnkgrp,
-								'Lesion ID'::text AS tutestcd,
-								'Lesion Identification':: text as tutest,
-								'NON-TARGET':: text as tuorres,
-								'NON-TARGET':: text as tustresc,
-								"NTLSITE":: text as tuloc,
-								case when "NTLMETH"='Other' then "NTLOTH" else "NTLMETH" end:: Text as tumethod,
-								'N'::text as tulobxfl,
-								'N':: text as tublfl,
-								'Independent Assessor':: text as tueval,
-								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
-								"FolderName"::text as visit,
-								dm."arm":: text as epoch,
-								min("NTLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
-								null::text as  tudy
-					From 		tas3681_101."NTL" ntl
-					left join 	dm
-					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntl."Subject"=dm.usubjid
-									
-					union all
-					
-					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
-								"Subject" :: text as Subject,
-								null::numeric as tuseq,
-								null:: text as tugrpid,
-								'TL' || "RecordPosition":: text as tulnkid,
-								'1':: text as tulnkgrp,
-								'Lesion ID'::text AS tutestcd,
-								'Lesion Identification':: text as tutest,
-								'TARGET':: text as tuorres,
-								'TARGET':: text as tustresc,
-								"TLBSITE":: text as tuloc,
-								case when "TLBMETH"='Other' then "TLBOTH" else "TLBMETH" end:: Text as tumethod,
-								'Y'::text as tulobxfl,
-								'Y':: text as tublfl,
-								'Independent Assessor':: text as tueval,
-								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
-								"FolderName"::text as visit,
-								dm."arm":: text as epoch,
-								min("TLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
-								null::text as  tudy
-					From 		tas3681_101."TLB" tlb
-					left join 	dm
-					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tlb."Subject"=dm.usubjid
-									
-					union all
-					
-					Select 	distinct	'TAS3681_101_DOSE_ESC':: text as Study, 
-								"SiteNumber" :: text as SiteNumber,
-								"Subject" :: text as Subject,
-								null::numeric as tuseq,
-								null:: text as tugrpid,
-								'TL' || "RecordPosition":: text as tulnkid,
-								(rank () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "TLDAT")::numeric + 1):: text as tulnkgrp,
-								'Lesion ID'::text AS tutestcd,
-								'Lesion Identification':: text as tutest,
-								'TARGET':: text as tuorres,
-								'TARGET':: text as tustresc,
-								"TLSITE":: text as tuloc,
-								case when "TLMETH"='Other' then "TLOTH" else "TLMETH" end:: Text as tumethod,
-								'N'::text as tulobxfl,
-								'N':: text as tublfl,
-								'Independent Assessor':: text as tueval,
-								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
-								"FolderName"::text as visit,
-								dm."arm":: text as epoch,
-								min("TLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")::text AS tudtc,
-								null::text as  tudy
-					From 		tas3681_101."TL" tl
-					left join 	dm
-					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tl."Subject"=dm.usubjid
-					
-		)tu	
+						from tu_raw tu
+		inner join (select distinct study, SiteNumber, Subject, tudtc_min
+			from tu_raw) tu1
+on tu.study = tu1.study and tu.SiteNumber=tu1.SiteNumber and tu.Subject =tu1.Subject and tu.tudtc:: date = tu1.tudtc_min:: date  
 		left join 	ex_data e1
-		on			'TAS3681_101_DOSE_ESC'=e1.studyid and SiteNumber=e1.siteid and tu.Subject= e1.usubjid
+		on			'TAS3681_101_DOSE_ESC'=e1.studyid and tu.SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		left join sv_visit svv
-on 'TAS3681_101_DOSE_ESC'=svv.studyid and SiteNumber=svv.siteid and tu.Subject=svv.usubjid
+on 'TAS3681_101_DOSE_ESC'=svv.studyid and tu.SiteNumber=svv.siteid and tu.Subject=svv.usubjid
 				left join sv
-on tu.visit = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid
+on tu.visit = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid and tu.SiteNumber = sv.siteid and tu.Subject=sv.usubjid
 where tu.tudtc is not null
 		)
 

@@ -26,6 +26,196 @@ WITH included_subjects AS (
 				 or visit like '%Day 01 Cycle 01'
 				 or visit like 'Cycle 01'
 				 ),		
+
+                 tu_raw as (
+                    select *, min(tudtc) OVER (PARTITION BY studyid, siteid,usubjid, tulnkid)::text AS tudtc_min
+                    FROM (	
+
+SELECT  	distinct	null::text AS comprehendid,
+                project::text AS studyid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
+                "Subject"::text AS usubjid,
+                null::text AS tuseq,
+                null::text AS tugrpid,
+                null::text AS turefid,
+                null::text AS tuspid,
+                "NLNUM"::text AS tulnkid,
+                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject", "NLNUM" order by "NLDAT"))::text AS tulnkgrp,
+                'Lesion ID'::text AS tutestcd,
+                'Lesion Identification'::text AS tutest,
+                'NEW'::text AS tuorres,
+                'NEW'::text AS tustresc,
+                null::text AS tunam,
+                "NLSITE"::text AS tuloc,
+                null::text AS tulat,
+                null::text AS tudir,
+                null::text AS tuportot,
+                case when lower("NLMETH")='other' then "NLOTH" else "NLMETH" end::text AS tumethod,
+               'N'::text AS tulobxfl,
+                'N'::text AS tublfl,
+                'Independent Assessor'::text AS tueval,
+                'Investigator'::text AS tuevalid,
+                null::text AS tuacptfl,
+                null::numeric AS visitnum,
+                nl."FolderName"::text AS visit,
+                null::numeric AS visitdy,
+                null::numeric AS taetord,
+               -- dm.arm::text AS epoch,
+                --min(nl."NLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NLNUM")
+                "NLDAT"::text AS tudtc
+                --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+from tas0612_101."NL" nl
+
+union all
+
+SELECT  distinct		null::text AS comprehendid,
+                project::text AS studyid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
+                "Subject"::text AS usubjid,
+                null ::text AS tuseq,
+                null::text AS tugrpid,
+                null::text AS turefid,
+                null::text AS tuspid,
+                "NTLSNUM"::text AS tulnkid,
+                '1'::text AS tulnkgrp,
+                'Lesion ID'::text AS tutestcd,
+                'Lesion Identification'::text AS tutest,
+                'NON-TARGET'::text AS tuorres,
+                'NON-TARGET'::text AS tustresc,
+                null::text AS tunam,
+                "NTLSITE"::text AS tuloc,
+                null::text AS tulat,
+                null::text AS tudir,
+                null::text AS tuportot,
+                case when lower("NTLBMETH")='other' then "NTLBOTH" else "NTLBMETH" end::text AS tumethod,
+               -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS 
+               'Y'::text AS tulobxfl,
+                'Y'::text AS tublfl,
+                'Independent Assessor'::text AS tueval,
+                'Investigator'::text AS tuevalid,
+                null::text AS tuacptfl,
+                null::numeric AS visitnum,
+                ntlb."FolderName"::text AS visit,
+                null::numeric AS visitdy,
+                null::numeric AS taetord,
+                --dm.arm::text AS epoch,
+                --min(ntlb."NTLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLSNUM")
+                "NTLBDAT"::text AS tudtc
+                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+from tas0612_101."NTLB" ntlb
+
+union all 
+
+SELECT  distinct		null::text AS comprehendid,
+                project::text AS studyid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
+                "Subject"::text AS usubjid,
+                null::text AS tuseq,
+                null::text AS tugrpid,
+                null::text AS turefid,
+                null::text AS tuspid,
+                "NTLSNUM"::text AS tulnkid,
+                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject", "NTLSNUM" order by "NTLDAT"))::text AS tulnkgrp,
+                'Lesion ID'::text AS tutestcd,
+                'Lesion Identification'::text AS tutest,
+                'NON-TARGET'::text AS tuorres,
+                'NON-TARGET'::text AS tustresc,
+                null::text AS tunam,
+                "NTLSITE"::text AS tuloc,
+                null::text AS tulat,
+                null::text AS tudir,
+                null::text AS tuportot,
+                case when lower("NTLMETH")='other' then "NTLOTH" else "NTLMETH" end::text AS tumethod,
+               -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS 
+               'N'::text AS tulobxfl,
+                'N'::text AS tublfl,
+                'Independent Assessor'::text AS tueval,
+                'Investigator'::text AS tuevalid,
+                null::text AS tuacptfl,
+                null::numeric AS visitnum,
+                ntl."FolderName"::text AS visit,
+                null::numeric AS visitdy,
+                null::numeric AS taetord,
+                --dm.arm::text AS epoch,
+                --min(ntl."NTLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLSNUM")
+                "NTLDAT"::text AS tudtc
+                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+from tas0612_101."NTL" ntl
+
+union all 
+
+SELECT  distinct		null::text AS comprehendid,
+                project::text AS studyid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
+                "Subject"::text AS usubjid,
+                null::text AS tuseq,
+                null::text AS tugrpid,
+                null::text AS turefid,
+                null::text AS tuspid,
+                "LSNUM"::text AS tulnkid,
+                '1'::text AS tulnkgrp,
+                'Lesion ID'::text AS tutestcd,
+                'Lesion Identification'::text AS tutest,
+                'TARGET'::text AS tuorres,
+                'TARGET'::text AS tustresc,
+                null::text AS tunam,
+                "TLSITE"::text AS tuloc,
+                null::text AS tulat,
+                null::text AS tudir,
+                null::text AS tuportot,
+                case when lower("TLBMETH")='other' then "TLBOTH" else "TLBMETH" end::text AS tumethod,
+               'Y'::text AS tulobxfl,
+                'Y'::text AS tublfl,
+                'Independent Assessor'::text AS tueval,
+                'Investigator'::text AS tuevalid,
+                null::text AS tuacptfl,
+                null::numeric AS visitnum,
+                TLB."FolderName"::text AS visit,
+                null::numeric AS visitdy,
+                null::numeric AS taetord,
+                --dm.arm::text AS epoch,
+                --min(tlb."TLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "LSNUM")
+                "TLBDAT"::text AS tudtc
+                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+from tas0612_101."TLB" TLB
+
+union all 
+
+select   distinct		null::text AS comprehendid,
+                project::text AS studyid,
+                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
+                "Subject"::text AS usubjid,
+                null::text AS tuseq,
+                null::text AS tugrpid,
+                null::text AS turefid,
+                null::text AS tuspid,
+                "LSNUM"::text AS tulnkid,
+                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject", "LSNUM" order by "TLDAT"))::text AS tulnkgrp,
+                'Lesion ID'::text AS tutestcd,
+                'Lesion Identification'::text AS tutest,
+                'TARGET'::text AS tuorres,
+                'TARGET'::text AS tustresc,
+                null::text AS tunam,
+                "TLSITE"::text AS tuloc,
+                null::text AS tulat,
+                null::text AS tudir,
+                null::text AS tuportot,
+                case when lower("TLMETH")='other' then "TLOTH" else "TLMETH" end::text AS tumethod,
+               'N'::text AS tulobxfl,
+                'N'::text AS tublfl,
+                'Independent Assessor'::text AS tueval,
+                'Investigator'::text AS tuevalid,
+                null::text AS tuacptfl,
+                null::numeric AS visitnum,
+                TL."FolderName"::text AS visit,
+                null::numeric AS visitdy,
+                null::numeric AS taetord,
+                --dm.arm::text AS epoch,
+                --min(tl."TLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "LSNUM")
+                "TLDAT"::text AS tudtc
+                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
+from tas0612_101."TL" TL
+)a),
 				 
     tu_data AS (
         SELECT distinct
@@ -64,188 +254,10 @@ WITH included_subjects AS (
         dm.arm epoch,
         tu.tudtc,
         (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
-FROM (	
-
-SELECT  	distinct	null::text AS comprehendid,
-                project::text AS studyid,
-                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
-                "Subject"::text AS usubjid,
-                null::text AS tuseq,
-                null::text AS tugrpid,
-                null::text AS turefid,
-                null::text AS tuspid,
-                "NLNUM"::text AS tulnkid,
-                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "NLDAT")::numeric+1)::text AS tulnkgrp,
-                'Lesion ID'::text AS tutestcd,
-                'Lesion Identification'::text AS tutest,
-                'NEW'::text AS tuorres,
-                'NEW'::text AS tustresc,
-                null::text AS tunam,
-                "NLSITE"::text AS tuloc,
-                null::text AS tulat,
-                null::text AS tudir,
-                null::text AS tuportot,
-                case when lower("NLMETH")='other' then "NLOTH" else "NLMETH" end::text AS tumethod,
-               'N'::text AS tulobxfl,
-                'N'::text AS tublfl,
-                'Independent Assessor'::text AS tueval,
-                'Investigator'::text AS tuevalid,
-                null::text AS tuacptfl,
-                null::numeric AS visitnum,
-                nl."FolderName"::text AS visit,
-                null::numeric AS visitdy,
-                null::numeric AS taetord,
-               -- dm.arm::text AS epoch,
-                min(nl."NLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NLNUM")::text AS tudtc
-                --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas0612_101."NL" nl
-
-union all
-
-SELECT  distinct		null::text AS comprehendid,
-                project::text AS studyid,
-                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
-                "Subject"::text AS usubjid,
-                null ::text AS tuseq,
-                null::text AS tugrpid,
-                null::text AS turefid,
-                null::text AS tuspid,
-                "NTLSNUM"::text AS tulnkid,
-                '1'::text AS tulnkgrp,
-                'Lesion ID'::text AS tutestcd,
-                'Lesion Identification'::text AS tutest,
-                'NON-TARGET'::text AS tuorres,
-                'NON-TARGET'::text AS tustresc,
-                null::text AS tunam,
-                "NTLSITE"::text AS tuloc,
-                null::text AS tulat,
-                null::text AS tudir,
-                null::text AS tuportot,
-                case when lower("NTLBMETH")='other' then "NTLBOTH" else "NTLBMETH" end::text AS tumethod,
-               -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS 
-               'Y'::text AS tulobxfl,
-                'Y'::text AS tublfl,
-                'Independent Assessor'::text AS tueval,
-                'Investigator'::text AS tuevalid,
-                null::text AS tuacptfl,
-                null::numeric AS visitnum,
-                ntlb."FolderName"::text AS visit,
-                null::numeric AS visitdy,
-                null::numeric AS taetord,
-                --dm.arm::text AS epoch,
-                min(ntlb."NTLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLSNUM")::text AS tudtc
-                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas0612_101."NTLB" ntlb
-
-union all 
-
-SELECT  distinct		null::text AS comprehendid,
-                project::text AS studyid,
-                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
-                "Subject"::text AS usubjid,
-                null::text AS tuseq,
-                null::text AS tugrpid,
-                null::text AS turefid,
-                null::text AS tuspid,
-                "NTLSNUM"::text AS tulnkid,
-                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "NTLDAT")::numeric+1)::text AS tulnkgrp,
-                'Lesion ID'::text AS tutestcd,
-                'Lesion Identification'::text AS tutest,
-                'NON-TARGET'::text AS tuorres,
-                'NON-TARGET'::text AS tustresc,
-                null::text AS tunam,
-                "NTLSITE"::text AS tuloc,
-                null::text AS tulat,
-                null::text AS tudir,
-                null::text AS tuportot,
-                case when lower("NTLMETH")='other' then "NTLOTH" else "NTLMETH" end::text AS tumethod,
-               -- case when "NTLBDAT"<= ex.ex_mindt then 'Y' else 'N' end::text AS 
-               'N'::text AS tulobxfl,
-                'N'::text AS tublfl,
-                'Independent Assessor'::text AS tueval,
-                'Investigator'::text AS tuevalid,
-                null::text AS tuacptfl,
-                null::numeric AS visitnum,
-                ntl."FolderName"::text AS visit,
-                null::numeric AS visitdy,
-                null::numeric AS taetord,
-                --dm.arm::text AS epoch,
-                min(ntl."NTLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NTLSNUM")::text AS tudtc
-                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas0612_101."NTL" ntl
-
-union all 
-
-SELECT  distinct		null::text AS comprehendid,
-                project::text AS studyid,
-                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
-                "Subject"::text AS usubjid,
-                null::text AS tuseq,
-                null::text AS tugrpid,
-                null::text AS turefid,
-                null::text AS tuspid,
-                "LSNUM"::text AS tulnkid,
-                '1'::text AS tulnkgrp,
-                'Lesion ID'::text AS tutestcd,
-                'Lesion Identification'::text AS tutest,
-                'TARGET'::text AS tuorres,
-                'TARGET'::text AS tustresc,
-                null::text AS tunam,
-                "TLSITE"::text AS tuloc,
-                null::text AS tulat,
-                null::text AS tudir,
-                null::text AS tuportot,
-                case when lower("TLBMETH")='other' then "TLBOTH" else "TLBMETH" end::text AS tumethod,
-               'Y'::text AS tulobxfl,
-                'Y'::text AS tublfl,
-                'Independent Assessor'::text AS tueval,
-                'Investigator'::text AS tuevalid,
-                null::text AS tuacptfl,
-                null::numeric AS visitnum,
-                TLB."FolderName"::text AS visit,
-                null::numeric AS visitdy,
-                null::numeric AS taetord,
-                --dm.arm::text AS epoch,
-                min(tlb."TLBDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "LSNUM")::text AS tudtc
-                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas0612_101."TLB" TLB
-
-union all 
-
-select   distinct		null::text AS comprehendid,
-                project::text AS studyid,
-                concat("SiteNumber",'_',split_part("Site",'_',1))::text AS siteid,
-                "Subject"::text AS usubjid,
-                null::text AS tuseq,
-                null::text AS tugrpid,
-                null::text AS turefid,
-                null::text AS tuspid,
-                "LSNUM"::text AS tulnkid,
-                (rank() over (partition by project, concat("SiteNumber",'_',split_part("Site",'_',1)), "Subject" order by "TLDAT")::numeric+1)::text AS tulnkgrp,
-                'Lesion ID'::text AS tutestcd,
-                'Lesion Identification'::text AS tutest,
-                'TARGET'::text AS tuorres,
-                'TARGET'::text AS tustresc,
-                null::text AS tunam,
-                "TLSITE"::text AS tuloc,
-                null::text AS tulat,
-                null::text AS tudir,
-                null::text AS tuportot,
-                case when lower("TLMETH")='other' then "TLOTH" else "TLMETH" end::text AS tumethod,
-               'N'::text AS tulobxfl,
-                'N'::text AS tublfl,
-                'Independent Assessor'::text AS tueval,
-                'Investigator'::text AS tuevalid,
-                null::text AS tuacptfl,
-                null::numeric AS visitnum,
-                TL."FolderName"::text AS visit,
-                null::numeric AS visitdy,
-                null::numeric AS taetord,
-                --dm.arm::text AS epoch,
-                min(tl."TLDAT") over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "LSNUM")::text AS tudtc
-                ---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
-from tas0612_101."TL" TL
-)tu
+        from tu_raw tu
+        inner join (select distinct studyid, siteid, usubjid, tudtc_min
+			from tu_raw) tu1
+on tu.studyid = tu1.studyid and tu.siteid=tu1.siteid and tu.usubjid =tu1.usubjid and tu.tudtc:: date = tu1.tudtc_min:: date  
 left join ex_data ex
 on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
 left join dm
@@ -255,7 +267,7 @@ on tu.studyid=exv.studyid and tu.siteid=exv.siteid and tu.usubjid=exv.usubjid
 left join sv_visit svv
 on tu.studyid=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
 left join sv
-on tu.visit = sv.visit and 'TAS0612-101' = sv.studyid
+on tu.visit = sv.visit and 'TAS0612-101' = sv.studyid and tu.siteid = sv.siteid and tu.usubjid = sv.usubjid
 where tu.tudtc is not null
                 )
 
