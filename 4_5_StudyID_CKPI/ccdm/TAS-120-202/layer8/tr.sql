@@ -36,7 +36,8 @@ WITH included_subjects AS (
 						trgrpid,
 						trrefid,
 						trspid,
-						coalesce (concat(trgrpid ,' - ', trlnkgrp), (row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text) as trlnkid,
+						--coalesce (concat(trgrpid ,' - ', trlnkgrp), (row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text) as 
+						trlnkid,
 						trlnkgrp,
 						trtestcd,
 						trtest,
@@ -53,7 +54,8 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as trevalid,
+						--concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as 
+						trevalid,
 						tracptfl,
 						--row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc) as visitnum,
 						coalesce (sv.visitnum, 0) as visitnum,
@@ -75,7 +77,7 @@ WITH included_subjects AS (
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'NL'||nl."RecordPosition"::text AS trlnkid,
-                	(row_number() over (partition by project,"SiteNumber", "Subject" order by "NLDAT")::numeric + 1) ::text AS trlnkgrp,
+                	(row_number() over (partition by project,"SiteNumber", "Subject")::numeric + 1) ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
                 	'Present'::text AS trorres,
@@ -145,7 +147,7 @@ WITH included_subjects AS (
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'NTL'||"RecordPosition"::text AS trlnkid,
-                	(row_number() over (partition by project,"SiteNumber" , "Subject" order by "NTLDAT")::numeric + 1) ::text AS trlnkgrp,
+                	(row_number() over (partition by project,"SiteNumber" , "Subject")::numeric + 1) ::text AS trlnkgrp,
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
                 	"NTLBSTAT"::text AS trorres,
@@ -183,7 +185,7 @@ WITH included_subjects AS (
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'TL'||"RecordPosition"::text AS trlnkid,
-                	(row_number() over (partition by project,"SiteNumber", "Subject" order by "TLDAT")::numeric + 1) ::text AS trlnkgrp,
+                	(row_number() over (partition by project,"SiteNumber", "Subject")::numeric + 1) ::text AS trlnkgrp,
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
                 	tl."TLDIM"  ::text AS trorres,
@@ -256,7 +258,7 @@ WITH included_subjects AS (
 		on tr.studyid=ex.studyid and tr.siteid=ex.siteid and tr.usubjid=ex.usubjid
 		left join sv_visit svv
 			on tr.studyid=svv.studyid and tr.siteid=svv.siteid and tr.usubjid=svv.usubjid
-		left join sv on tr.visit = sv.visit
+		left join sv on tr.visit = sv.visit and 'TAS-120-202' = sv.studyid and tr.siteid = sv.siteid and tr.usubjid = sv.usubjid -- done
 		where tr.trdtc is not null
                 )
 

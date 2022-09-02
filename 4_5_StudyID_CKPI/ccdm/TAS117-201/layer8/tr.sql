@@ -56,7 +56,8 @@ WITH included_subjects AS (
 						tr.trlobxfl,
 						tr.trblfl,
 						tr.treval,
-						concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as trevalid,--done
+						--concat(tr.trevalid,row_number() over(partition by tr.studyid, tr.siteid,tr.usubjid order by trdtc))::text as 
+						trevalid,--done
 						tr.tracptfl,
 						--row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as visitnum,
 						coalesce (tr.visitnum,0) as visitnum,
@@ -79,7 +80,7 @@ WITH included_subjects AS (
 							null::text AS trrefid,
 							null::text AS trspid,
 							'NL'||nl."TUNUM2":: text :: text AS trlnkid,--done
-							(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "NLDAT")::numeric+1) ::text AS trlnkgrp,--done
+							(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric+1) ::text AS trlnkgrp,--done
 							'TUMSTATE'::text AS trtestcd,
 							'Tumor State'::text AS trtest,
 							'Present'::text AS trorres,
@@ -96,13 +97,13 @@ WITH included_subjects AS (
 							'Independent Assessor'::text AS treval,
 							'Investigator'::text AS trevalid,
 							null::text AS tracptfl,
-							sv.visitnum ::numeric AS visitnum,
+							coalesce(sv.visitnum,0) ::numeric AS visitnum,
 							nl."FolderName"::text AS visit,
 							null::numeric AS visitdy,
 							null::numeric AS taetord,
 							nl."NLDAT"::text AS trdtc
 					from 	tas117_201."NL" nl 
-					left join sv on nl."FolderName" = sv.visit
+					left join sv on nl."FolderName" = sv.visit and 'TAS117-201' = sv.studyid and concat(project,'_',split_part("SiteNumber",'_',2)) = sv.siteid and "Subject" = sv.usubjid
                 	
                 	union all
                 	
@@ -132,13 +133,13 @@ WITH included_subjects AS (
 	                'Independent Assessor'::text AS treval,
                 	'Investigator'::text AS trevalid,
                 	null::text AS tracptfl,
-                	sv.visitnum ::numeric AS visitnum,
+                	coalesce(sv.visitnum,0) ::numeric AS visitnum,
 	                ntlb."FolderName"::text AS visit,
 	                null::numeric AS visitdy,
 	                null::numeric AS taetord,
                 	ntlb."TUSTDT" ::text AS trdtc
                 	from tas117_201."NTLBASE" ntlb
-                	left join sv on ntlb."FolderName" = sv.visit
+                	left join sv on ntlb."FolderName" = sv.visit and 'TAS117-201' = sv.studyid and concat(project,'_',split_part("SiteNumber",'_',2)) = sv.siteid and "Subject" = sv.usubjid
                 	
                 	union all
                 	
@@ -151,7 +152,7 @@ WITH included_subjects AS (
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'NTL'||ntl."TUNUM1"::text AS trlnkid,--done
-                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "TUSTDT")::numeric+1) ::text AS trlnkgrp,--done
+                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric+1) ::text AS trlnkgrp,--done
                 	'TUMSTATE'::text AS trtestcd,
                 	'Tumor State'::text AS trtest,
                 	ntl."STATUS"::text AS trorres,--done
@@ -172,13 +173,13 @@ WITH included_subjects AS (
 	                'Independent Assessor'::text AS treval,
                 	'Investigator'::text AS trevalid,
                 	null::text AS tracptfl,
-                	sv.visitnum ::numeric AS visitnum,
+                	coalesce(sv.visitnum,0) ::numeric AS visitnum,
 	                ntl."FolderName"::text AS visit,
 	                null::numeric AS visitdy,
 	                null::numeric AS taetord,
                 	ntl."TUSTDT" ::text AS trdtc
                 	from tas117_201."NTLPB" ntl
-                	left join sv on ntl."FolderName" = sv.visit
+                	left join sv on ntl."FolderName" = sv.visit and 'TAS117-201' = sv.studyid and concat(project,'_',split_part("SiteNumber",'_',2)) = sv.siteid and "Subject" = sv.usubjid
                 	
                 	union all
                 	
@@ -211,13 +212,13 @@ WITH included_subjects AS (
 	                'Independent Assessor'::text AS treval,
                 	'Investigator'::text AS trevalid,
                 	null::text AS tracptfl,
-                	sv.visitnum ::numeric AS visitnum,
+                	coalesce(sv.visitnum,0) ::numeric AS visitnum,
 	                tl."FolderName"::text AS visit,
 	                null::numeric AS visitdy,
 	                null::numeric AS taetord,
                 	tl."TUSTDT" ::text AS trdtc
                 	from tas117_201."TLRN2" tl
-                	left join sv on TL."FolderName" = sv.visit
+                	left join sv on TL."FolderName" = sv.visit and 'TAS117-201' = sv.studyid and concat(project,'_',split_part("SiteNumber",'_',2)) = sv.siteid and "Subject" = sv.usubjid
                 	
                 	union all
                 	
@@ -230,7 +231,7 @@ WITH included_subjects AS (
                 	null::text AS trrefid,
                 	null::text AS trspid,
                 	'TL'||tlb."TUNUM"::text AS trlnkid,--done
-                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject" order by "TUSTDT")::numeric+1) ::text AS trlnkgrp,--done
+                	(row_number() over (partition by project, concat(project,'_',split_part("SiteNumber",'_',2)), "Subject")::numeric+1) ::text AS trlnkgrp,--done
                 	'LDIAM'::text AS trtestcd,
                 	'Longest Diameter'::text AS trtest,
                 	tlb."MEASURMT" ::text AS trorres,
@@ -251,13 +252,13 @@ WITH included_subjects AS (
 	                'Independent Assessor'::text AS treval,
                 	'Investigator'::text AS trevalid,
                 	null::text AS tracptfl,
-                	sv.visitnum ::numeric AS visitnum,
+                	coalesce(sv.visitnum,0) ::numeric AS visitnum,
 	                tlb."FolderName"::text AS visit,
 	                null::numeric AS visitdy,
 	                null::numeric AS taetord,
                 	tlb."TUSTDT" ::text AS trdtc
                 	from tas117_201."TLPB" tlb
-                	left join sv on TLB."FolderName" = sv.visit
+                	left join sv on TLB."FolderName" = sv.visit and 'TAS117-201' = sv.studyid and concat(project,'_',split_part("SiteNumber",'_',2)) = sv.siteid and "Subject" = sv.usubjid
 				
 				) tr 
 		

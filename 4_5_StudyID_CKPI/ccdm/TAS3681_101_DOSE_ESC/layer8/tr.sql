@@ -43,7 +43,8 @@ WITH included_subjects AS (
 						trlobxfl,
 						trblfl,
 						treval,
-						concat(u.trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc))::text as trevalid,
+						--concat(u.trevalid,row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc))::text as 
+						trevalid,
 						tracptfl,
 						--row_number() over(partition by u.studyid, u.siteid,u.usubjid order by trdtc) as 
 						coalesce (sv.visitnum,0) as visitnum,
@@ -66,7 +67,7 @@ WITH included_subjects AS (
 									null::text AS trrefid,
 									null::text AS trspid,
 									'NL' || "RecordPosition"::text AS trlnkid,
-									(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NLIMGDAT")::numeric + 1)::text AS trlnkgrp,
+									(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject")::numeric + 1)::text AS trlnkgrp,
 									'TUMSTATE'::text AS trtestcd,---------------1
 									'Tumor State'::text AS trtest,
 									'Present'::text AS trorres,
@@ -156,7 +157,7 @@ WITH included_subjects AS (
 									null::text AS trrefid,
 									null::text AS trspid,
 									'NTL' || "RecordPosition"::text AS trlnkid,
-									(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "NTLDAT")::numeric + 1)::text AS trlnkgrp,
+									(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject")::numeric + 1)::text AS trlnkgrp,
 									'TUMSTATE'::text AS trtestcd,---------------1
 									'Tumor State'::text AS trtest,
 									"NTLSTA"::text AS trorres,
@@ -250,7 +251,7 @@ WITH included_subjects AS (
 									null::text AS trrefid,
 									null::text AS trspid,
 									'TL' || "RecordPosition"::text AS trlnkid,
-									(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject" order by "TLDAT")::numeric + 1)::text AS trlnkgrp,
+									(row_number () over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject")::numeric + 1)::text AS trlnkgrp,
 									'LIDAM'::text AS trtestcd,---------------1
 									'Longest Diameter'::text AS trtest,
 									"TLDIM"::text AS trorres,
@@ -293,7 +294,7 @@ WITH included_subjects AS (
 		
 		left join sv_visit svv
 			on u.studyid=svv.studyid and u.siteid=svv.siteid and u.usubjid=svv.usubjid
-		left join sv on sv.visit = u.visit
+		left join sv on u.visit = sv.visit and u.studyid = sv.studyid and u.siteid = sv.siteid and u.usubjid = sv.usubjid -- done
 		where u.trdtc is not null
                 )
 
