@@ -188,7 +188,7 @@ WITH included_subjects AS (
                 null::text AS turefid,
                 null::text AS tuspid,
                 --coalesce (concat(tugrpid ,' - ', tulnkgrp), (row_number() over(partition by tu.Study, tu.SiteNumber,tu.Subject order by tudtc))::text) as 
-                tulnkid,
+                tu.tulnkid,
                 tulnkgrp::text AS tulnkgrp,
                 'Lesion ID'::text AS tutestcd,
                 'Lesion Identification'::text AS tutest,
@@ -201,11 +201,11 @@ WITH included_subjects AS (
                 null::text AS tuportot,
                 tumethod::text AS tumethod,
                 --case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS 
-                tulobxfl,
+                tu.tulobxfl,
                 tublfl::text AS tublfl,
                 tueval::text AS tueval,
                 --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber,tu.Subject ORDER BY tudtc))::text as 
-				tuevalid,
+				tu.tuevalid,
                 null::text AS tuacptfl,
                 --ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc)::numeric as  
                 coalesce (sv.visitnum,0) as visitnum,
@@ -216,9 +216,11 @@ WITH included_subjects AS (
                 tudtc::text AS tudtc,
                 (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 		from tu_raw tu	
-		inner join (select distinct Study, SiteNumber, Subject, tudtc_min
-			from tu_raw) tu1
-on tu.Study = tu1.Study and tu.SiteNumber=tu1.SiteNumber and tu.Subject =tu1.Subject and tu.tudtc:: date = tu1.tudtc_min:: date  
+		inner join (select distinct study, SiteNumber, Subject,tulnkid,tuevalid,visit, tudtc_min,min(tudtc)
+from tu_raw
+group by 1,2,3,4,5,6,7) tu1
+on tu.study = tu1.study and tu.SiteNumber=tu1.SiteNumber and tu.Subject =tu1.Subject and tu.tudtc:: date = tu1.tudtc_min:: date
+and tu.visit=tu1.visit and  tu.tulnkid=tu1.tulnkid and tu.tuevalid=tu1.tuevalid 
 		left join 	ex_data e1
 		on 'TAS120_202'=e1.studyid and tu.SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		

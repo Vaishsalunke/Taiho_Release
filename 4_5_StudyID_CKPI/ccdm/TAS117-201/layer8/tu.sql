@@ -274,9 +274,11 @@ tu_data as (
         tu.tudtc as tudtc,
         (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 FROM tu_raw tu
-inner join (select distinct studyid, siteid, usubjid, tudtc_min
-			from tu_raw) tu1
-on tu.studyid = tu1.studyid and tu.siteid=tu1.siteid and tu.usubjid =tu1.usubjid and tu.tudtc:: date = tu1.tudtc_min:: date  
+inner join (select distinct studyid, siteid, usubjid,tulnkid,tuevalid,visit, tudtc_min,min(tudtc)
+from tu_raw
+group by 1,2,3,4,5,6,7) tu1
+on tu.studyid = tu1.studyid and tu.siteid=tu1.siteid and tu.usubjid =tu1.usubjid and tu.tudtc:: date = tu1.tudtc_min:: date
+and tu.visit=tu1.visit and  tu.tulnkid=tu1.tulnkid and tu.tuevalid=tu1.tuevalid 
 left join ex_data ex
 on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
 left join dm

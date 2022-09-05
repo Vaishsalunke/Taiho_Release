@@ -177,7 +177,7 @@ WITH included_subjects AS (
                 tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
-                tulnkid::text AS tulnkid,
+                tu.tulnkid::text AS tulnkid,
                 tulnkgrp::text AS tulnkgrp,
                 tutestcd::text AS tutestcd,
                 tutest::text AS tutest,
@@ -190,7 +190,7 @@ WITH included_subjects AS (
                 null::text AS tuportot,
                 tumethod::text AS tumethod,
                 --case when tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS 
-				tulobxfl,
+				tu.tulobxfl,
                 tublfl::text AS tublfl,
                 'Independent Assessor'::text AS tueval,
                 --concat('Investigator',ROW_NUMBER() OVER (PARTITION BY Study, SiteNumber, Subject ORDER BY tudtc))::text as 
@@ -205,9 +205,11 @@ WITH included_subjects AS (
                 tudtc::text AS tudtc
                ,(tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 		from tu_raw tu
-		inner join (select distinct study, SiteNumber, Subject, tudtc_min
-			from tu_raw) tu1
-on tu.study = tu1.study and tu.SiteNumber=tu1.SiteNumber and tu.Subject =tu1.Subject and tu.tudtc:: date = tu1.tudtc_min:: date  
+		inner join (select distinct Study, SiteNumber, Subject,tulnkid,tuevalid,visit, tudtc_min,min(tudtc)
+from tu_raw
+group by 1,2,3,4,5,6,7) tu1
+on tu.Study = tu1.Study and tu.SiteNumber=tu1.SiteNumber and tu.Subject =tu1.Subject and tu.tudtc:: date = tu1.tudtc_min:: date
+and tu.visit=tu1.visit and  tu.tulnkid=tu1.tulnkid and tu.tuevalid=tu1.tuevalid
 		left join 	ex_data e1
 		on			'TAS2940_101'=e1.studyid and tu.SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		left join sv_visit svv

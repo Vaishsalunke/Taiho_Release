@@ -1,8 +1,3 @@
-/*
-CCDM TU Table mapping
-Notes: Standard mapping to CCDM TU table
-*/
-
 WITH included_subjects AS (
                 SELECT DISTINCT studyid, siteid, usubjid FROM subject),
 				
@@ -227,7 +222,7 @@ from tas120_201."TL" TL
         tu.turefid,
         tu.tuspid,
         --coalesce (concat(tugrpid ,' - ', tulnkgrp), (row_number() over(partition by tu.studyid, tu.siteid,tu.usubjid order by tudtc))::text) as 
-        tulnkid,
+        tu.tulnkid,
         tu.tulnkgrp,
         tu.tutestcd,
         tu.tutest,
@@ -244,7 +239,7 @@ from tas120_201."TL" TL
         tu.tublfl,
         tu.tueval,
         --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as 
-        tuevalid,-- done
+        tu.tuevalid,-- done
         tu.tuacptfl,
         --ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as visitnum,
         coalesce (sv.visitnum,0) as visitnum,
@@ -255,9 +250,11 @@ from tas120_201."TL" TL
         tu.tudtc,
         (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 from tu_raw tu
-inner join (select distinct studyid, siteid, usubjid, tudtc_min
-			from tu_raw) tu1
-on tu.studyid = tu1.studyid and tu.siteid=tu1.siteid and tu.usubjid =tu1.usubjid and tu.tudtc:: date = tu1.tudtc_min:: date  
+inner join (select distinct studyid, siteid, usubjid,tulnkid,tuevalid,visit, tudtc_min,min(tudtc)
+from tu_raw
+group by 1,2,3,4,5,6,7) tu1
+on tu.studyid = tu1.studyid and tu.siteid=tu1.siteid and tu.usubjid =tu1.usubjid and tu.tudtc:: date = tu1.tudtc_min:: date
+and tu.visit=tu1.visit and  tu.tulnkid=tu1.tulnkid and tu.tuevalid=tu1.tuevalid
 left join ex_data ex
 on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
 left join dm
@@ -301,8 +298,6 @@ SELECT
     tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc,
     tu.tudy::numeric AS tudy
-    /*KEY , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/
+     , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey 
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
-FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
-;
-
+FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid);
