@@ -253,7 +253,7 @@ WITH included_subjects AS (
 		left join ex_data ex 
 		on tr.studyid=ex.studyid and tr.siteid=ex.siteid and tr.usubjid=ex.usubjid
 		left join sv_visit svv
-			on tr.studyid=svv.studyid and tr.siteid=svv.siteid and tr.usubjid=svv.usubjid
+			on 'TAS-120-201'=svv.studyid and tr.siteid=svv.siteid and tr.usubjid=svv.usubjid
 		left join sv on tr.visit = sv.visit and 'TAS-120-201' = sv.studyid and tr.siteid = sv.siteid and tr.usubjid = sv.usubjid -- done
 		where tr.trdtc is not null -- done
                 )

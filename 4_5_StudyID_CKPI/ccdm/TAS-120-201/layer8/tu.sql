@@ -46,7 +46,7 @@ SELECT  	distinct	null::text AS comprehendid,
                 'Independent Assessor'::text AS tueval,
                 'Investigator'::text AS tuevalid,
                 null::text AS tuacptfl,
-                null::numeric AS visitnum,
+                coalesce (sv.visitnum,0)::numeric AS visitnum,
                 nl."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
@@ -56,6 +56,8 @@ SELECT  	distinct	null::text AS comprehendid,
                 --,("NLDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."NL" nl
+left join sv on "FolderName" = sv.visit and 'TAS-120-201' = sv.studyid and "SiteNumber" = sv.siteid and "Subject" = sv.usubjid --done
+where "NLDAT" is not null
 
 union all
 
@@ -85,7 +87,7 @@ SELECT  distinct		null::text AS comprehendid,
                 'Independent Assessor'::text AS tueval,
                 'Investigator'::text AS tuevalid,
                 null::text AS tuacptfl,
-                null::numeric AS visitnum,
+                coalesce (sv.visitnum,0)::numeric AS visitnum,
                 ntlb."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
@@ -94,6 +96,8 @@ SELECT  distinct		null::text AS comprehendid,
                 ntlb."NTLBDAT"::text AS tudtc---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."NTLB" ntlb
+left join sv on "FolderName" = sv.visit and 'TAS-120-201' = sv.studyid and "SiteNumber" = sv.siteid and "Subject" = sv.usubjid --done
+where "NTLBDAT" is not null
 
 union all 
 
@@ -123,7 +127,7 @@ SELECT  distinct		null::text AS comprehendid,
                 'Independent Assessor'::text AS tueval,
                 'Investigator'::text AS tuevalid,
                 null::text AS tuacptfl,
-                null::numeric AS visitnum,
+                coalesce (sv.visitnum,0)::numeric AS visitnum,
                 ntl."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
@@ -132,6 +136,8 @@ SELECT  distinct		null::text AS comprehendid,
                 ntl."NTLDAT"::text AS tudtc---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."NTL" ntl
+left join sv on "FolderName" = sv.visit and 'TAS-120-201' = sv.studyid and "SiteNumber" = sv.siteid and "Subject" = sv.usubjid --done
+where "NTLDAT" is not null
 
 union all 
 
@@ -161,7 +167,7 @@ SELECT  distinct		null::text AS comprehendid,
                 'Independent Assessor'::text AS tueval,
                 'Investigator'::text AS tuevalid,
                 null::text AS tuacptfl,
-                null::numeric AS visitnum,
+                coalesce (sv.visitnum,0)::numeric AS visitnum,
                 TLB."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
@@ -170,6 +176,8 @@ SELECT  distinct		null::text AS comprehendid,
                 TLB."TLBDAT"::text AS tudtc---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 --,"RecordId"
 from tas120_201."TLB" TLB
+left join sv on "FolderName" = sv.visit and 'TAS-120-201' = sv.studyid and "SiteNumber" = sv.siteid and "Subject" = sv.usubjid --done
+where "TLBDAT" is not null
 
 union all 
 
@@ -199,7 +207,7 @@ select   distinct		null::text AS comprehendid,
                 'Independent Assessor'::text AS tueval,
                 'Investigator'::text AS tuevalid,
                 null::text AS tuacptfl,
-                null::numeric AS visitnum,
+                coalesce (sv.visitnum,0)::numeric AS visitnum,
                 TL."FolderName"::text AS visit,
                 null::numeric AS visitdy,
                 null::numeric AS taetord,
@@ -208,6 +216,8 @@ select   distinct		null::text AS comprehendid,
                 TL."TLDAT"::text AS tudtc---,("NTLBDAT"::date-exv.ex_mindt_visit::date)+1::numeric AS tudy
                 
 from tas120_201."TL" TL
+left join sv on "FolderName" = sv.visit and 'TAS-120-201' = sv.studyid and "SiteNumber" = sv.siteid and "Subject" = sv.usubjid --done
+where "TLDAT" is not null
 )a),
 
 
@@ -235,14 +245,14 @@ from tas120_201."TL" TL
         tu.tuportot,
         tu.tumethod,
         --case when tu.tudtc::date <= ex.ex_mindt then 'Y' else 'N' end::text AS 
-        tulobxfl,
+        tu.tulobxfl,
         tu.tublfl,
         tu.tueval,
         --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc))::text as 
         tu.tuevalid,-- done
         tu.tuacptfl,
         --ROW_NUMBER() OVER (PARTITION BY tu.studyid, tu.siteid, tu.usubjid ORDER BY tudtc) as visitnum,
-        coalesce (sv.visitnum,0) as visitnum,
+        tu.visitnum,
         tu.visit,
         tu.visitdy,
         tu.taetord,
@@ -250,9 +260,9 @@ from tas120_201."TL" TL
         tu.tudtc,
         (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 from tu_raw tu
-inner join (select distinct studyid, siteid, usubjid,tulnkid,tuevalid,visit, tudtc_min,min(tudtc)
-from tu_raw
-group by 1,2,3,4,5,6,7) tu1
+inner join (select u.* from tu_raw u inner join (select distinct studyid, siteid, usubjid,tulnkid,tuevalid, tudtc_min,min(visitnum) as visitnum
+from tu_raw 
+group by 1,2,3,4,5,6) tu_rw on tu_rw.usubjid = u.usubjid and tu_rw.visitnum = u.visitnum) tu1
 on tu.studyid = tu1.studyid and tu.siteid=tu1.siteid and tu.usubjid =tu1.usubjid and tu.tudtc:: date = tu1.tudtc_min:: date
 and tu.visit=tu1.visit and  tu.tulnkid=tu1.tulnkid and tu.tuevalid=tu1.tuevalid
 left join ex_data ex
@@ -260,9 +270,8 @@ on tu.studyid=ex.studyid and tu.siteid=ex.siteid and tu.usubjid=ex.usubjid
 left join dm
 on tu.studyid=dm.studyid and tu.siteid=dm.siteid and tu.usubjid=dm.usubjid
 left join sv_visit svv
-on tu.studyid=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
-left join sv on tu.visit = sv.visit and 'TAS-120-201' = sv.studyid and tu.siteid = sv.siteid and tu.usubjid = sv.usubjid --done
-where tu.tudtc is not null --done
+on 'TAS-120-201'=svv.studyid and tu.siteid=svv.siteid and tu.usubjid=svv.usubjid
+ --done
                 )
 
 SELECT

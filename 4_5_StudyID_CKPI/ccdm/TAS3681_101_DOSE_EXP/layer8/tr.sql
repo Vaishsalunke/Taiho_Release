@@ -11,9 +11,9 @@ WITH included_subjects AS (
 	sv_visit as (
 				 select studyid,siteid,usubjid,visit,svstdtc
 				 from sv
-				 where visit like '%Day 1 Cycle 01' 
-				 or visit like '%Day 01 Cycle 01'
-				 or visit like 'Cycle 01'
+				 where visit = 'Week 1 Day 1 Cycle 01' 
+				 --or visit like '%Day 01 Cycle 01'
+				 --or visit like 'Cycle 01'
 				 ),	
 				
     tr_data AS (

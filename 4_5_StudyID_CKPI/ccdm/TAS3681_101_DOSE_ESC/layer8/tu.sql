@@ -39,7 +39,7 @@ tu_raw as (
 								'N':: text as tublfl,
 								'Independent Assessor':: text as tueval,
 								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
+								coalesce (sv.visitnum,0):: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								--min("NLIMGDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
@@ -48,6 +48,9 @@ tu_raw as (
 					From 		tas3681_101."NL" nl
 					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and nl."Subject"=dm.usubjid
+					left join sv
+on "FolderName" = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid and "SiteNumber" = sv.siteid and "Subject"=sv.usubjid
+where "NLIMGDAT" is not null
 										
 					union all
 					
@@ -68,7 +71,7 @@ tu_raw as (
 								'Y':: text as tublfl,
 								'Independent Assessor':: text as tueval,
 								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
+								sv.visitnum:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								--min("NTLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
@@ -77,6 +80,9 @@ tu_raw as (
 					From 		tas3681_101."NTLB" ntlb
 					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntlb."Subject"=dm.usubjid
+					left join sv
+on "FolderName" = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid and "SiteNumber" = sv.siteid and "Subject"=sv.usubjid
+where "NTLBDAT" is not null
 										
 					union all
 					
@@ -97,7 +103,7 @@ tu_raw as (
 								'N':: text as tublfl,
 								'Independent Assessor':: text as tueval,
 								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
+								sv.visitnum:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								--min("NTLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
@@ -106,6 +112,9 @@ tu_raw as (
 					From 		tas3681_101."NTL" ntl
 					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and ntl."Subject"=dm.usubjid
+					left join sv
+on "FolderName" = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid and "SiteNumber" = sv.siteid and "Subject"=sv.usubjid
+where "NTLDAT" is not null
 									
 					union all
 					
@@ -126,7 +135,7 @@ tu_raw as (
 								'Y':: text as tublfl,
 								'Independent Assessor':: text as tueval,
 								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
+								sv.visitnum:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								--min("TLBDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
@@ -135,6 +144,9 @@ tu_raw as (
 					From 		tas3681_101."TLB" tlb
 					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tlb."Subject"=dm.usubjid
+					left join sv
+on "FolderName" = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid and "SiteNumber" = sv.siteid and "Subject"=sv.usubjid
+where "TLBDAT" is not null
 									
 					union all
 					
@@ -155,7 +167,7 @@ tu_raw as (
 								'N':: text as tublfl,
 								'Independent Assessor':: text as tueval,
 								'Investigator':: text as tuevalid,
-								null:: numeric as visitnum,
+								sv.visitnum:: numeric as visitnum,
 								"FolderName"::text as visit,
 								dm."arm":: text as epoch,
 								--min("TLDAT") over (partition by 'TAS3681_101_DOSE_ESC', "SiteNumber", "Subject", "RecordPosition")
@@ -164,24 +176,29 @@ tu_raw as (
 					From 		tas3681_101."TL" tl
 					left join 	dm
 					on 			'TAS3681_101_DOSE_ESC'=dm.studyid and "SiteNumber"=dm.siteid and tl."Subject"=dm.usubjid
+						left join sv
+on "FolderName" = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid and "SiteNumber" = sv.siteid and "Subject"=sv.usubjid
+where "TLDAT" is not null
 					
-		)a),
+		)a
+						
+		),
 
     tu_data AS (
         SELECT  distinct tu.Study::text AS studyid,
                 tu.SiteNumber::text AS siteid,
                 tu.Subject::text AS usubjid,
                 rank() over (partition by tu.Study, tu.SiteNumber, tu.Subject)::numeric AS tuseq,
-                tugrpid::text AS tugrpid,
+                tu.tugrpid::text AS tugrpid,
                 null::text AS turefid,
                 null::text AS tuspid,
                 --coalesce (concat(tugrpid ,' - ', tulnkgrp), (row_number() over(partition by tu.Study, tu.SiteNumber,tu.Subject order by tudtc))::text) as 
 				tu.tulnkid,
-                tulnkgrp,
+                tu.tulnkgrp,
                 tu.tutestcd::text AS tutestcd,
                 tu.tutest::text AS tutest,
                 tu.tuorres::text AS tuorres,
-                tustresc::text AS tustresc,
+                tu.tustresc::text AS tustresc,
                 null::text AS tunam,
                 tu.tuloc::text AS tuloc,
                 null::text AS tulat,
@@ -189,14 +206,15 @@ tu_raw as (
                 null::text AS tuportot,
                 tu.tumethod::text AS tumethod,
                 --case when tu.tudtc <= e1.ex_mindt then 'Y' else 'N' end::text AS 
-                tulobxfl,
+                tu.tulobxfl,
                 tu.tublfl::text AS tublfl,
-                tueval::text AS tueval,
+                tu.tueval::text AS tueval,
                 --concat(tu.tuevalid,ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber,tu.Subject ORDER BY tudtc))::text as 
 				tu.tuevalid,
                 null::text AS tuacptfl,
                 --ROW_NUMBER() OVER (PARTITION BY tu.Study, tu.SiteNumber, tu.Subject ORDER BY tu.tudtc)::numeric AS 
-                coalesce (sv.visitnum,0) as visitnum,
+                --coalesce (sv.visitnum,0) as 
+                tu.visitnum,
                 REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(tu.visit,'<WK[0-9]DA[0-9]/>\sExpansion',''),'<WK[0-9]DA[0-9][0-9]/>\sExpansion',''),'<W[0-9]DA[0-9]/>\sExpansion',''),'<W[0-9]DA[0-9][0-9]/>\sExpansion',''),'<WK[0-9]D[0-9]/>\sEscalation',''),'<WK[0-9]D[0-9][0-9]/>\sEscalation',''),' Escalation ',' '),'\s\([0-9]\)',''),' [0-9][0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),' [0-9]\s[A-Z][a-z][a-z]\s[0-9][0-9][0-9][0-9]',''),'<WK[0-9]D[0-9][0-9]/>',''),'<WK[0-9]DA[0-9][0-9]/>','')::text AS visit,
                 Null::numeric AS visitdy,
                 null::numeric AS taetord,
@@ -204,19 +222,21 @@ tu_raw as (
                 tu.tudtc::text AS tudtc,
                 (tu.tudtc::date-svv.svstdtc::date)::numeric AS tudy
 						from tu_raw tu
-		inner join (select distinct Study, SiteNumber, Subject,tulnkid,tuevalid,visit, tudtc_min,min(tudtc)
-from tu_raw
-group by 1,2,3,4,5,6,7) tu1
+		inner join (select u.* from tu_raw u inner join (select distinct Study, SiteNumber, Subject,tulnkid,tuevalid, tudtc_min,min(visitnum) as visitnum
+from tu_raw 
+group by 1,2,3,4,5,6) tu_rw on tu_rw.Subject = u.Subject and tu_rw.visitnum = u.visitnum) tu1
 on tu.Study = tu1.Study and tu.SiteNumber=tu1.SiteNumber and tu.Subject =tu1.Subject and tu.tudtc:: date = tu1.tudtc_min:: date
 and tu.visit=tu1.visit and  tu.tulnkid=tu1.tulnkid and tu.tuevalid=tu1.tuevalid
 		left join 	ex_data e1
 		on			'TAS3681_101_DOSE_ESC'=e1.studyid and tu.SiteNumber=e1.siteid and tu.Subject= e1.usubjid
 		left join sv_visit svv
 on 'TAS3681_101_DOSE_ESC'=svv.studyid and tu.SiteNumber=svv.siteid and tu.Subject=svv.usubjid
-				left join sv
-on tu.visit = sv.visit and 'TAS3681_101_DOSE_ESC' = sv.studyid and tu.SiteNumber = sv.siteid and tu.Subject=sv.usubjid
-where tu.tudtc is not null
+
 		)
+		
+		
+		
+		
 
 SELECT
     /*KEY (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid)::text AS comprehendid, KEY*/  
@@ -251,9 +271,7 @@ SELECT
     tu.epoch::text AS epoch,
     tu.tudtc::text AS tudtc,
     tu.tudy::numeric AS tudy
-    /*KEY  , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey KEY*/  
+      , (tu.studyid || '~' || tu.siteid || '~' || tu.usubjid || '~' || tu.tulnkid || '~' || tu.tuevalid)::text  AS objectuniquekey 
     /*KEY , now()::timestamp with time zone AS comprehend_update_time KEY*/
 FROM tu_data tu JOIN included_subjects s ON (tu.studyid = s.studyid AND tu.siteid = s.siteid AND tu.usubjid = s.usubjid)
-;
-
 
