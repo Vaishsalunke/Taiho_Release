@@ -1,0 +1,33 @@
+domain_list: [AE,CM,EC,MH,LB,MAP_VISIT,MAP_SUBJECT,MAP_FORM,MAP_ITEM,MAP_SITE]
+
+bucket: sdq-taiho-prd
+
+rename_cols:
+  MAP_FORM:
+    form_id: OID
+    form_nm: Name
+    form_rev: UNK
+  MAP_ITEM:
+    item_id: OID
+    item_nm: Name
+    question_text: SASLabel
+  MAP_SITE:
+    site_id: oid
+    site_nm: name
+    siteno: studysitenumber
+  MAP_SUBJECT:
+    site_id: site_key
+    subject_guid: __hash
+    subject_rev: UNK
+    subjid: subject_key
+  MAP_VISIT:
+    visit_id: OID
+    visit_nm: Name
+
+source_folder: export_data/custom
+destination_folder: ingestion
+site_folder: study_site_metadata
+
+access_key_path: com/comprehend/panacea/taiho/export_data/cfg/sftp/awsAccessKey
+secret_key_path: com/comprehend/panacea/taiho/export_data/cfg/sftp/awsSecretKey
+ts_watermark_path: com/comprehend/panacea/taiho/export_data/sdq/ingestionWatermarkDT
